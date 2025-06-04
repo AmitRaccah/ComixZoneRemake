@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
@@ -24,7 +24,7 @@ namespace StarterAssets
 
         public bool crouch;
         public bool lookUp;
-
+        public bool pickUp;
 
 #if ENABLE_INPUT_SYSTEM
         public void OnMove(InputValue value)
@@ -54,6 +54,19 @@ namespace StarterAssets
         {
             punch = value.isPressed;
         }
+
+        public void OnPickUp(InputValue value)
+        {
+            bool pressed = value.isPressed;
+            pickUp = pressed;
+
+            if (pressed)
+            {
+                Debug.Log("[INPUT] PickUp pressed");   // ← רואה בלוג?
+                EventBus.Publish(new PlayerPickUpEvent());
+            }
+        }
+
 
 #if ENABLE_INPUT_SYSTEM
 #endif
