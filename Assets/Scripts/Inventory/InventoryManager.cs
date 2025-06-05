@@ -8,12 +8,12 @@ public class InventoryManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus.Subscribe<ItemPickedUpEvent>(OnItemPickedUp);
+        CoreBus.Subscribe<ItemPickedUpEvent>(OnItemPickedUp);
     }
 
     private void OnDisable()
     {
-        EventBus.Unsubscribe<ItemPickedUpEvent>(OnItemPickedUp);
+        CoreBus.Unsubscribe<ItemPickedUpEvent>(OnItemPickedUp);
     }
 
     private void OnItemPickedUp(ItemPickedUpEvent e)
