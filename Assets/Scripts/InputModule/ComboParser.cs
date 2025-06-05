@@ -65,8 +65,10 @@ public class ComboParser : MonoBehaviour
 
         if (MatchSinglePunch(buffer))
         {
+          //  attackActivator.ActivateAttack("LightPunch");
+
             animationDriver.Trigger("Punch");
-            
+
             ClearLastInput();
         }
         if (MatchCrouchHit(buffer))
