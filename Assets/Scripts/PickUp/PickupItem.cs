@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-using UnityEngine;
-
 public class PickupItem : MonoBehaviour
 {
     [SerializeField] private PickupType pickupType;
