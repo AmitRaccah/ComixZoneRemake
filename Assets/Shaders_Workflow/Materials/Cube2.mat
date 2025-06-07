@@ -7,13 +7,13 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Shader Graphs_ToonShader_2
-  m_Shader: {fileID: -6465566751694194690, guid: e299cc2f320a52045b273ab0c4efb087, type: 3}
+  m_Name: Cube2
+  m_Shader: {fileID: -6465566751694194690, guid: 70271cd1c9301ac41a21380f8c1ca986, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 2
+  m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -24,6 +24,10 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _BaseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -38,14 +42,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Outline_Strength: 0.595
+    - _Outline_Width: 0.292
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _ShadowSpread: 0
-    - _step: 0.41
-    m_Colors: []
+    - _SahdowStrength: 0.429
+    - _Srep: 1.48
+    m_Colors:
+    - _BaseColor: {r: 0.91682667, g: 0.6367924, b: 1, a: 0}
+    - _Outline_Color: {r: 1, g: 1, b: 1, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &6949768651061534072
+--- !u!114 &541950324059254184
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
