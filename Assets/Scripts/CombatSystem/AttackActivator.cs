@@ -11,6 +11,9 @@ public class AttackActivator : MonoBehaviour
 
     private Dictionary<string, AttackData> map; //Hit name by string
 
+    public static readonly Dictionary<int, Transform> TransformsById = new Dictionary<int, Transform>();
+
+
     private void Awake()
     {
         map = new Dictionary<string, AttackData>();
@@ -42,6 +45,20 @@ public class AttackActivator : MonoBehaviour
 
     }
 
+
+    void OnEnable()
+    {
+        int id = gameObject.GetInstanceID();
+        AttackActivator.TransformsById[id] = transform;
+
+        var handId = handSocket.GetInstanceID();
+        AttackActivator.TransformsById[handId] = transform;
+    }
+
+    void OnDisable()
+    {
+        TransformsById.Remove(gameObject.GetInstanceID());
+    }
 
 
 

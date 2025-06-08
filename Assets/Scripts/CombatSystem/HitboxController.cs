@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HitboxController : MonoBehaviour
 {
@@ -7,6 +7,8 @@ public class HitboxController : MonoBehaviour
     private Transform owner;
     private float timer;
 
+    private bool armed = false;
+
     public void Init(AttackData d, Transform hand)
     {
         data = d;
@@ -14,6 +16,8 @@ public class HitboxController : MonoBehaviour
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
+
+        GetComponent<Collider>().enabled = false;
     }
 
     void Start()
@@ -29,15 +33,35 @@ public class HitboxController : MonoBehaviour
         else transform.position = owner.TransformPoint(data.hitboxOffset);
     }
 
+    void LateUpdate()               
+    {
+        transform.position = owner.TransformPoint(data.hitboxOffset);
+
+        if (!armed)   
+        {
+            GetComponent<Collider>().enabled = true;
+            armed = true;
+        }
+
+        timer -= Time.deltaTime;
+        if (timer <= 0f) Destroy(gameObject);
+    }
+
+
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform == owner) return;
+        if (!armed || other.transform == owner) return;
 
-        CombatBus.Publish(new DamageEvent 
+        Transform root = other.attachedRigidbody ?        
+                         other.attachedRigidbody.transform :
+                         other.transform.root;             
+
+        CombatBus.Publish(new DamageEvent
         {
             attackerId = owner.GetInstanceID(),
-            targetId = other.GetInstanceID(),
+            targetId = root.gameObject.GetInstanceID(),  
             amount = data.damage,
+            knockback = data.knockback,
             type = data.damageType
         });
     }
