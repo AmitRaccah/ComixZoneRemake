@@ -221,10 +221,13 @@ namespace StarterAssets
 
             if (_input.move.x != 0)
             {
-                float direction = _input.move.x > 0 ? 1f : -1f;
-                _desiredRotationY = direction == 1f ? 90f : -90f;
+                bool faceRight = _input.move.x > 0;
+                _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
+
+                _animator.SetBool("Mirror", !faceRight);  
             }
+
 
             if (_shouldRotate)
             {

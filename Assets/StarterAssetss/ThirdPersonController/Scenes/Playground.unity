@@ -346,6 +346,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f0271df749728104eac22c3d897fd8ce, type: 3}
+--- !u!4 &790346192 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5944892902790622099, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+  m_PrefabInstance: {fileID: 404223979}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &874605735
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,10 +707,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2494e6c4fc4aede46900355633047b00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handSocket: {fileID: 679740599}
+  leftHandSocket: {fileID: 679740599}
+  rightHandSocket: {fileID: 790346192}
   attacks:
   - {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
   hitboxPrefab: {fileID: 7213787313247441692, guid: 18db901701e80ef4e8ecd1f0e03b0a3f, type: 3}
+  animator: {fileID: 968564966}
 --- !u!1 &1028513131
 GameObject:
   m_ObjectHideFlags: 0
@@ -1410,10 +1417,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2494e6c4fc4aede46900355633047b00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handSocket: {fileID: 1767340426}
+  leftHandSocket: {fileID: 0}
+  rightHandSocket: {fileID: 0}
   attacks:
   - {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
   hitboxPrefab: {fileID: 7213787313247441692, guid: 18db901701e80ef4e8ecd1f0e03b0a3f, type: 3}
+  animator: {fileID: 0}
 --- !u!114 &1480421761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1781,7 +1790,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55f6f664cb54eaf40ab9fd7645daef19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 50
+  maxHp: 500
 --- !u!1 &1623885428
 GameObject:
   m_ObjectHideFlags: 0
@@ -2200,11 +2209,6 @@ ReflectionProbe:
   m_UseOcclusionCulling: 1
   m_Importance: 1
   m_CustomBakedTexture: {fileID: 0}
---- !u!4 &1767340426 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3187852125002371600, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
-  m_PrefabInstance: {fileID: 1285262422}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1832619438
 GameObject:
   m_ObjectHideFlags: 0
