@@ -19,7 +19,6 @@ public class HitboxController : MonoBehaviour
 
     void LateUpdate()
     {
-        // מצמידים להיד כל פריים
         transform.position = socket.TransformPoint(data.hitboxOffset);
 
         if (!armed) { GetComponent<Collider>().enabled = true; armed = true; }
@@ -38,7 +37,7 @@ public class HitboxController : MonoBehaviour
 
         CombatBus.Publish(new DamageEvent
         {
-            attackerId = socket.root.gameObject.GetInstanceID(),   //  ← שורש!
+            attackerId = socket.root.gameObject.GetInstanceID(),   
             targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,

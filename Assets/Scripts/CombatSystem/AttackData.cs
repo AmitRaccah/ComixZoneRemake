@@ -10,7 +10,9 @@ public class AttackData : ScriptableObject
 
     public float hitboxRadius = 0.25f; 
     public Vector3 hitboxOffset;       
-    public float activeTime = 0.15f;   
+    public float activeTime = 0.15f;
+    public AttackSide side = AttackSide.Left;
 }
 
 public enum DamageType { Punch, HeavyPunch }
+public enum AttackSide { Left, Right }
