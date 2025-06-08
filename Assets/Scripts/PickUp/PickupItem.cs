@@ -32,6 +32,7 @@ public class PickupItem : MonoBehaviour
         if (!playerFound) return;
 
         CoreBus.Publish(new ItemPickedUpEvent(pickupType));
+        Debug.Log("Picked up! " + pickupType);
         Destroy(gameObject);
     }
 
