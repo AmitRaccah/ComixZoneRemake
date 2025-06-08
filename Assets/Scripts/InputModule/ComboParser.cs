@@ -32,6 +32,28 @@ public class ComboParser : MonoBehaviour
         return false;
     }
 
+    private bool MatchHeavyPunch(List<FrameInput> buffer)
+    {
+        if (buffer.Count == 0) return false;
+
+        FrameInput last = buffer[buffer.Count - 1];
+
+        if (last.inputType == InputType.HeavyPunch)
+        {
+            for (int i = buffer.Count - 2; i >= 0; i--)
+            {
+                if (last.frame - buffer[i].frame > maxFramesBack)
+                    break;
+
+                if (buffer[i].inputType != InputType.HeavyPunch)
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
     private bool MatchCrouchHit(List<FrameInput> buffer)
     {
         if (buffer.Count < 2) return false; //MUST have 2 frames
@@ -70,6 +92,16 @@ public class ComboParser : MonoBehaviour
 
             animationDriver.Trigger("Punch");
          //   attackActivator.ActivateAttack("LightPunch");
+
+            ClearLastInput();
+        }
+
+        if (MatchHeavyPunch(buffer))
+        {
+
+
+            animationDriver.Trigger("HeavyPunch");
+            //  attackActivator.ActivateAttack("HeavyPunch");
 
             ClearLastInput();
         }

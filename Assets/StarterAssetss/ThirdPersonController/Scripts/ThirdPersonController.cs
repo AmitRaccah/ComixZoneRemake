@@ -127,9 +127,16 @@ namespace StarterAssets
             ///
             if (_input.punch)
             {
-                Debug.Log("PUNCH PRESSED");
+                Debug.Log("HEAVYPUNCH PRESSED");
                 InputBuffer.Instance.Add(InputType.Punch);
                 _input.punch = false;
+            }
+
+            if (_input.heavyPunch)
+            {
+                Debug.Log("PUNCH PRESSED");
+                InputBuffer.Instance.Add(InputType.HeavyPunch);
+                _input.heavyPunch = false;
             }
 
             //if (_input.crouch && !wasCrouching)

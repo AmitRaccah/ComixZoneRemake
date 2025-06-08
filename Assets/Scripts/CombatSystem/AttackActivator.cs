@@ -3,11 +3,9 @@ using UnityEngine;
 
 public class AttackActivator : MonoBehaviour
 {
-    [Header("Sockets (גרור ב-Inspector)")]
     [SerializeField] private Transform leftHandSocket;
     [SerializeField] private Transform rightHandSocket; 
 
-    [Header("Combat")]
     [SerializeField] private AttackData[] attacks;
     [SerializeField] private GameObject hitboxPrefab;
     [SerializeField] private Animator animator;      
@@ -34,8 +32,13 @@ public class AttackActivator : MonoBehaviour
             return;
         }
 
+        Transform baseSocket = data.side == AttackSide.Left ? leftHandSocket
+                                                    : rightHandSocket;
+
+
         bool mirror = animator.GetBool("Mirror");        //looking left
-        Transform socket = mirror ? rightHandSocket : leftHandSocket;
+        Transform socket = mirror ? (baseSocket == leftHandSocket ? rightHandSocket : leftHandSocket)
+                              : baseSocket;
 
         GameObject go = Instantiate(hitboxPrefab);
         go.GetComponent<HitboxController>().Init(data, socket);
