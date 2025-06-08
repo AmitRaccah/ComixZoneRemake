@@ -1,77 +1,45 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackActivator : MonoBehaviour
 {
-    [SerializeField] private Transform handSocket;   //Hand/Leg transform
+    [Header("Sockets (גרור ב-Inspector)")]
+    [SerializeField] private Transform leftHandSocket;
+    [SerializeField] private Transform rightHandSocket; 
 
-    [SerializeField] private AttackData[] attacks;   //array for attack types
+    [Header("Combat")]
+    [SerializeField] private AttackData[] attacks;
+    [SerializeField] private GameObject hitboxPrefab;
+    [SerializeField] private Animator animator;      
 
-    [SerializeField] private GameObject hitboxPrefab;   //prefab of sphereCollider + HitboxController
+    Dictionary<string, AttackData> map = new();
 
-    private Dictionary<string, AttackData> map; //Hit name by string
+    public static readonly Dictionary<int, Transform> TransformsById = new();
 
-    public static readonly Dictionary<int, Transform> TransformsById = new Dictionary<int, Transform>();
-
-
-    private void Awake()
+    void Awake()
     {
-        map = new Dictionary<string, AttackData>();
-
-        foreach(AttackData data in attacks) 
-        {
-            if (!map.ContainsKey(data.attackName))
-                map.Add(data.attackName, data);
-        }
+        foreach (var a in attacks)
+            if (!map.ContainsKey(a.attackName))
+                map.Add(a.attackName, a);
     }
 
+    void OnEnable() => TransformsById[gameObject.GetInstanceID()] = transform;
+    void OnDisable() => TransformsById.Remove(gameObject.GetInstanceID());
 
+    /* ---------- ComboParser ---------- */
     public void ActivateAttack(string name)
     {
-        if (!map.TryGetValue(name, out AttackData data))
+        if (!map.TryGetValue(name, out var data))
         {
-            Debug.LogWarning($"AttackActivator: {name} - does not exsist");
             return;
         }
 
-        GameObject go = Instantiate(hitboxPrefab);
+        bool mirror = animator.GetBool("Mirror");        //looking left
+        Transform socket = mirror ? rightHandSocket : leftHandSocket;
 
-        HitboxController ctrl = go.GetComponent<HitboxController>();
-        ctrl.Init(data, handSocket);
+        GameObject go = Instantiate(hitboxPrefab);
+        go.GetComponent<HitboxController>().Init(data, socket);
 
         CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
-
-
-
-    }
-
-
-    void OnEnable()
-    {
-        int id = gameObject.GetInstanceID();
-        AttackActivator.TransformsById[id] = transform;
-
-        var handId = handSocket.GetInstanceID();
-        AttackActivator.TransformsById[handId] = transform;
-    }
-
-    void OnDisable()
-    {
-        TransformsById.Remove(gameObject.GetInstanceID());
-    }
-
-
-
-
-
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

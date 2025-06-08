@@ -2,69 +2,47 @@
 
 public class HitboxController : MonoBehaviour
 {
-
-    private AttackData data;
-    private Transform owner;
-    private float timer;
-
-    private bool armed = false;
+    AttackData data;
+    Transform socket;
+    float timer;
+    bool armed;
 
     public void Init(AttackData d, Transform hand)
     {
         data = d;
-        owner = hand;
+        socket = hand;
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
-
         GetComponent<Collider>().enabled = false;
     }
 
-    void Start()
+    void LateUpdate()
     {
-        
-    }
+        // מצמידים להיד כל פריים
+        transform.position = socket.TransformPoint(data.hitboxOffset);
 
-    // Update is called once per frame
-    void Update()
-    {
-        timer -= Time.deltaTime;
-        if (timer < 0f) Destroy(gameObject);
-        else transform.position = owner.TransformPoint(data.hitboxOffset);
-    }
-
-    void LateUpdate()               
-    {
-        transform.position = owner.TransformPoint(data.hitboxOffset);
-
-        if (!armed)   
-        {
-            GetComponent<Collider>().enabled = true;
-            armed = true;
-        }
+        if (!armed) { GetComponent<Collider>().enabled = true; armed = true; }
 
         timer -= Time.deltaTime;
         if (timer <= 0f) Destroy(gameObject);
     }
 
-
-    private void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (!armed || other.transform == owner) return;
+        if (!armed || other.transform == socket) return;
 
-        Transform root = other.attachedRigidbody ?        
+        Transform root = other.attachedRigidbody ?
                          other.attachedRigidbody.transform :
-                         other.transform.root;             
+                         other.transform.root;
 
         CombatBus.Publish(new DamageEvent
         {
-            attackerId = owner.GetInstanceID(),
-            targetId = root.gameObject.GetInstanceID(),  
+            attackerId = socket.root.gameObject.GetInstanceID(),   //  ← שורש!
+            targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
             type = data.damageType
         });
     }
-
-
 }
