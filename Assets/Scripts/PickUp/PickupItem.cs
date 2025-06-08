@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
-using UnityEngine;
-
 public class PickupItem : MonoBehaviour
 {
     [SerializeField] private PickupType pickupType;
@@ -13,22 +11,27 @@ public class PickupItem : MonoBehaviour
     private Transform player;             
 
     private void OnEnable() =>
-        EventBus.Subscribe<PlayerPickUpEvent>(TryPickup);
+        CoreBus.Subscribe<PlayerPickUpEvent>(TryPickup);
 
     private void OnDisable() =>
-        EventBus.Unsubscribe<PlayerPickUpEvent>(TryPickup);
+        CoreBus.Unsubscribe<PlayerPickUpEvent>(TryPickup);
 
     private void TryPickup(PlayerPickUpEvent _)
     {
-        // ② השתמש במסיכה
-        Collider[] hits = Physics.OverlapSphere(transform.position,
-                                                pickupRange //,
-                                                //playerLayerMask
-                                                );
+        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange);
 
-        if (hits.Length == 0) return;
+        bool playerFound = false;
+        foreach (var h in hits)
+        {
+            if (h.CompareTag("Player"))
+            {
+                playerFound = true;
+                break;
+            }
+        }
+        if (!playerFound) return;
 
-        EventBus.Publish(new ItemPickedUpEvent(pickupType));
+        CoreBus.Publish(new ItemPickedUpEvent(pickupType));
         Destroy(gameObject);
     }
 

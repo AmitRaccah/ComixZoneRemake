@@ -6,14 +6,14 @@ public class LookUpAnimationListener : MonoBehaviour
 
     private void OnEnable()
     {
-        EventBus.Subscribe<PlayerLookUpEvent>(OnLookUpEvent);
-        EventBus.Subscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
+        CoreBus.Subscribe<PlayerLookUpEvent>(OnLookUpEvent);
+        CoreBus.Subscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
     }
 
 private void OnDisable()
 {
-    EventBus.Unsubscribe<PlayerLookUpEvent>(OnLookUpEvent);
-    EventBus.Unsubscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
+    CoreBus.Unsubscribe<PlayerLookUpEvent>(OnLookUpEvent);
+    CoreBus.Unsubscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
 }
 
 private void OnLookUpEvent(PlayerLookUpEvent evt)

@@ -63,7 +63,7 @@ namespace StarterAssets
             if (pressed)
             {
                 Debug.Log("[INPUT] PickUp pressed");   // ← רואה בלוג?
-                EventBus.Publish(new PlayerPickUpEvent());
+                CoreBus.Publish(new PlayerPickUpEvent());
             }
         }
 
@@ -76,9 +76,9 @@ namespace StarterAssets
             bool pressed = value.Get<float>() > 0.5f;
 
             if (pressed && !crouch)
-                EventBus.Publish(new PlayerCrouchEvent());
+                CoreBus.Publish(new PlayerCrouchEvent());
             else if (!pressed && crouch)
-                EventBus.Publish(new PlayerUncrouchEvent());
+                CoreBus.Publish(new PlayerUncrouchEvent());
 
             crouch = pressed;
         }
@@ -88,11 +88,11 @@ namespace StarterAssets
             bool pressed = value.Get<float>() > 0.5f;
 
             if (pressed && !lookUp)
-                EventBus.Publish(new PlayerLookUpEvent());
-            else if (!pressed && crouch)
-                EventBus.Publish(new PlayerUnLookUpEvent());
+                CoreBus.Publish(new PlayerLookUpEvent());
+            else if (!pressed && lookUp)
+                CoreBus.Publish(new PlayerUnLookUpEvent());
 
-            crouch = pressed;
+            lookUp = pressed;
         }
 
 

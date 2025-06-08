@@ -8,6 +8,7 @@ public class ComboParser : MonoBehaviour
 
     [SerializeField] private int maxFramesBack = 12;
 
+    [SerializeField] private AttackActivator attackActivator;
 
 
     private bool MatchSinglePunch(List<FrameInput> buffer)
@@ -65,8 +66,11 @@ public class ComboParser : MonoBehaviour
 
         if (MatchSinglePunch(buffer))
         {
+          //  attackActivator.ActivateAttack("LightPunch");
+
             animationDriver.Trigger("Punch");
-            
+            attackActivator.ActivateAttack("LightPunch");
+
             ClearLastInput();
         }
         if (MatchCrouchHit(buffer))
