@@ -66,10 +66,10 @@ public class ComboParser : MonoBehaviour
 
         if (MatchSinglePunch(buffer))
         {
-          //  attackActivator.ActivateAttack("LightPunch");
+          
 
             animationDriver.Trigger("Punch");
-            attackActivator.ActivateAttack("LightPunch");
+         //   attackActivator.ActivateAttack("LightPunch");
 
             ClearLastInput();
         }
