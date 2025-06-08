@@ -14,5 +14,5 @@ public class AttackData : ScriptableObject
     public AttackSide side = AttackSide.Left;
 }
 
-public enum DamageType { Punch, HeavyPunch }
+public enum DamageType { Punch }
 public enum AttackSide { Left, Right }
