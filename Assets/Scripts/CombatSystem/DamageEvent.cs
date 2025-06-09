@@ -7,4 +7,5 @@ public struct DamageEvent
     public DamageType type;
 
     public float shakeAmplitude;
+    public float freezeFrameDuration;
 }
