@@ -41,7 +41,8 @@ public class HitboxController : MonoBehaviour
             targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
-            type = data.damageType
+            type = data.damageType,
+            shakeAmplitude = data.shakeAmplitude
         });
     }
 }

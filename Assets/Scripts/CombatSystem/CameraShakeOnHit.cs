@@ -1,36 +1,41 @@
-﻿using System;
-using Unity.Cinemachine;
+﻿using Unity.Cinemachine;
 using UnityEngine;
 
 public class CameraShakeOnHit : MonoBehaviour
 {
-    [SerializeField] CinemachineImpulseSource impulse;
+    [SerializeField] private CinemachineImpulseSource impulse;
+    private int myId;
+
+    private void Awake()
+    {
+        myId = gameObject.GetInstanceID();
+    }
 
     private void OnEnable()
     {
         CombatBus.Subscribe<DamageEvent>(OnDamage);
     }
-    void OnDisable()
+
+    private void OnDisable()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-
-    void OnDamage(DamageEvent e)
+    private void OnDamage(DamageEvent e)
     {
-        int myId = gameObject.GetInstanceID();
-        if (e.attackerId == myId)
-            impulse.GenerateImpulse();
+        if (e.attackerId != myId)
+        {
+            return;
+        }
+
+        impulse.GenerateImpulse(Vector3.up * e.shakeAmplitude);
     }
 
-
-
-
-
-    void Update()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
-            impulse.GenerateImpulse();
+        {
+            impulse.GenerateImpulse(Vector3.up * 1f);
+        }
     }
-
 }

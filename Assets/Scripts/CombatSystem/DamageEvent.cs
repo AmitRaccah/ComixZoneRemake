@@ -6,5 +6,5 @@ public struct DamageEvent
     public float knockback;
     public DamageType type;
 
-
+    public float shakeAmplitude;
 }
