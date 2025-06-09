@@ -14,6 +14,8 @@ public class AttackData : ScriptableObject
     public AttackSide side = AttackSide.Left;
 
     public float shakeAmplitude = 1f;
+
+    public float freezeFrameDuration = 0.1f;
 }
 
 public enum DamageType { Punch }

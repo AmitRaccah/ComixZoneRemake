@@ -42,7 +42,8 @@ public class HitboxController : MonoBehaviour
             amount = data.damage,
             knockback = data.knockback,
             type = data.damageType,
-            shakeAmplitude = data.shakeAmplitude
+            shakeAmplitude = data.shakeAmplitude,
+            freezeFrameDuration = data.freezeFrameDuration
         });
     }
 }
