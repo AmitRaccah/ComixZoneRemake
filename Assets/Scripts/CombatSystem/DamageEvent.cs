@@ -5,4 +5,6 @@ public struct DamageEvent
     public int amount;
     public float knockback;
     public DamageType type;
+
+
 }
