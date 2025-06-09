@@ -12,6 +12,8 @@ public class AttackData : ScriptableObject
     public Vector3 hitboxOffset;       
     public float activeTime = 0.15f;
     public AttackSide side = AttackSide.Left;
+
+    public float shakeAmplitude = 1f;
 }
 
 public enum DamageType { Punch }
