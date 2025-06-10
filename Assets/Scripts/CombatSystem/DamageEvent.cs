@@ -8,4 +8,8 @@ public struct DamageEvent
 
     public float shakeAmplitude;
     public float freezeFrameDuration;
+
+    //VFX
+    public AttackData attackData;
+
 }
