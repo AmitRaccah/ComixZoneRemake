@@ -5,13 +5,25 @@ using UnityEngine.UI;
 public class ItemSlot : MonoBehaviour
 {
    //ITEM reference
-   public InvItem m_item;
+   public Item m_item = null;
    [SerializeField] private Image itemImage;
-   [SerializeField] private TextMeshProUGUI itemAmount_txt;
+   //[SerializeField] private TextMeshProUGUI itemAmount_txt;
 
-   public void Initialize(InvItem item)
+   public void Initialize(Item item)
    {
       m_item = item;
-      //itemImage.sprite = pickupItem.itmeSPrite;
+      itemImage.sprite = item.icon;
    }
+
+    public void OnUseItem() // call when active item!
+    {
+        // Remove this specific item from inventory list
+        InventoryManager.Instance.inventory.Remove(m_item);
+        
+        // Clear the slot
+        m_item = null;
+        itemImage.sprite = null;
+        Debug.Log("Item used and slot cleared!");
+        
+    }
 }

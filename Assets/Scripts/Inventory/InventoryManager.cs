@@ -2,13 +2,19 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-
 public class InventoryManager : MonoBehaviour
 {
-    private List<PickupType> inventory = new();
-    private List<InvItem> inventoryItems = new List<InvItem>();
+    public static InventoryManager Instance;
 
+    public List <Item> allItems = new List<Item>();
+    public List<Item> inventory = new List<Item>();
     public List <ItemSlot> itemSlots;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     private void OnEnable()
     {
         CoreBus.Subscribe<ItemPickedUpEvent>(OnItemPickedUp);
@@ -19,18 +25,37 @@ public class InventoryManager : MonoBehaviour
         CoreBus.Unsubscribe<ItemPickedUpEvent>(OnItemPickedUp);
     }
 
-    private void OnItemPickedUp(ItemPickedUpEvent e)
+    public bool IsFreeSlot()
     {
-        inventory.Add(e.pickupType);
-        inventoryItems.Add(new InvItem(e.pickupType, null ));
-        Debug.Log($"[Inventory] Added: {e.pickupType} | Total items: {inventory.Count}");
-
-        ManageItemSlots();
+        int freeSlots = 0;
+        for (int i = 0; i < itemSlots.Count; i++)
+        {
+            if (itemSlots[i].m_item == null)
+                freeSlots++;
+        }
+        if (freeSlots > 0)
+        {
+            return true;
+        }
+     
+        Debug.Log("Inventory Full!");
+        return false;
     }
 
-    private void ManageItemSlots()
+    private void OnItemPickedUp(ItemPickedUpEvent e)
     {
-        itemSlots[0].Initialize(inventoryItems[0]);
+        Item newItem = null;
+        newItem = allItems.Find(x => x.pickupType == e.pickupType);
+        inventory.Add(newItem);
+        Debug.Log($"[Inventory] Added: {e.pickupType} | Total items: {inventory.Count}");
+
+        ManageItemSlots(newItem);
+    }
+
+    private void ManageItemSlots(Item _newItem)
+    {
+        ItemSlot slot = itemSlots.Find(x => x.m_item == null);
+        slot.Initialize(_newItem);
     }
 }
 

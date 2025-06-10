@@ -30,6 +30,8 @@ public class PickupItem : MonoBehaviour
             }
         }
         if (!playerFound) return;
+        if (!InventoryManager.Instance.IsFreeSlot())
+            return;
 
         CoreBus.Publish(new ItemPickedUpEvent(pickupType));
         Debug.Log("Picked up! " + pickupType);
