@@ -13,9 +13,14 @@ public class AttackData : ScriptableObject
     public float activeTime = 0.15f;
     public AttackSide side = AttackSide.Left;
 
+    //CAM
     public float shakeAmplitude = 1f;
 
     public float freezeFrameDuration = 0.1f;
+
+    //VFX
+    public GameObject hitEffectPrefab;
+    public Vector3 hitEffectOffset;
 }
 
 public enum DamageType { Punch }

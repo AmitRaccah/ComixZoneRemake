@@ -43,7 +43,17 @@ public class HitboxController : MonoBehaviour
             knockback = data.knockback,
             type = data.damageType,
             shakeAmplitude = data.shakeAmplitude,
-            freezeFrameDuration = data.freezeFrameDuration
+            freezeFrameDuration = data.freezeFrameDuration,
+            //VFX
+            attackData = data
         });
+
+        //VFX
+        if (data.hitEffectPrefab != null)
+        {
+            Vector3 spawnPos = socket.TransformPoint(data.hitEffectOffset);
+            Quaternion spawnRot = socket.rotation;
+            Instantiate(data.hitEffectPrefab, spawnPos, spawnRot);
+        }
     }
 }
