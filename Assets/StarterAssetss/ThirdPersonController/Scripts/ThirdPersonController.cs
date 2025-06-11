@@ -118,6 +118,13 @@ namespace StarterAssets
         private void Update()
         {
             _hasAnimator = TryGetComponent(out _animator);
+            var locker = GetComponent<MovementLock>();
+            if (locker != null && locker.IsLocked)
+            {
+                _input.move = Vector2.zero;
+                _input.jump = false;
+                _input.sprint = false;
+            }
 
             JumpAndGravity();
             GroundedCheck();
@@ -200,6 +207,9 @@ namespace StarterAssets
 
         private void Move()
         {
+
+            if (GetComponent<MovementLock>().IsLocked) return;
+
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;

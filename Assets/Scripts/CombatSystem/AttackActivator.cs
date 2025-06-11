@@ -44,5 +44,8 @@ public class AttackActivator : MonoBehaviour
         go.GetComponent<HitboxController>().Init(data, socket);
 
         CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
+
+        CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+
     }
 }
