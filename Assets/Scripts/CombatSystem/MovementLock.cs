@@ -10,7 +10,7 @@ public class MovementLock : MonoBehaviour
 
     private void Awake()
     {
-        ctrl = GetComponent<ThirdPersonController>();
+     //   ctrl = GetComponent<ThirdPersonController>();
         myId = gameObject.GetInstanceID();
     }
 
