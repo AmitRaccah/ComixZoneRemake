@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -137,8 +137,14 @@ namespace StarterAssets
 
         private void Update()
         {
-            _attackLockTimer = Mathf.Max(0f, _attackLockTimer - Time.deltaTime);
-            bool isAttackLocked = _attackLockTimer > 0f;
+            _hasAnimator = TryGetComponent(out _animator);
+            var locker = GetComponent<MovementLock>();
+            if (locker != null && locker.IsLocked)
+            {
+                _input.move = Vector2.zero;
+                _input.jump = false;
+                _input.sprint = false;
+            }
 
             bool wantJump = _input.jump;
             _input.jump = false;
@@ -204,17 +210,8 @@ namespace StarterAssets
 
         private void Move(bool isAttackLocked)
         {
-            if (isAttackLocked)
-            {
-                _controller.Move(Vector3.up * _verticalVelocity * Time.deltaTime);
-                if (_hasAnimator)
-                {
-                    _animator.SetFloat(_animIDSpeed, 0f);
-                    _animator.SetFloat(_animIDMotionSpeed, 0f);
-                }
-                return;
-            }
 
+            if (GetComponent<MovementLock>().IsLocked) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;

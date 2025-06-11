@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AttackActivator : MonoBehaviour
@@ -43,6 +43,9 @@ public class AttackActivator : MonoBehaviour
         GameObject go = Instantiate(hitboxPrefab);
         go.GetComponent<HitboxController>().Init(data, socket);
 
-        CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID(),data.activeTime));
+        CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
+
+        CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+
     }
 }
