@@ -12,10 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6f4d41e03cc89241985a7697a9b6fe2, type: 3}
   m_Name: HeavyPunch
   m_EditorClassIdentifier: 
-  attackName: 
+  attackName: HeavyPunch
   damageType: 0
-  damage: 5
-  knockback: 2
+  damage: 10
+  knockback: 10
   hitboxRadius: 0.25
   hitboxOffset: {x: 0, y: 0, z: 0}
   activeTime: 0.15
+  side: 1
+  shakeAmplitude: 1
+  freezeFrameDuration: 0.1
+  hitEffectPrefab: {fileID: 15519141184830794, guid: a966ff7ca9ba43649bbf73addb10565d, type: 3}
+  hitEffectOffset: {x: 0, y: 0, z: 0}

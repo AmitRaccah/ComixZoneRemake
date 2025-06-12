@@ -14,6 +14,7 @@ namespace StarterAssets
         public bool jump;
         public bool sprint;
         public bool punch;
+        public bool heavyPunch;
 
         [Header("Movement Settings")]
         public bool analogMovement;
@@ -55,6 +56,11 @@ namespace StarterAssets
             punch = value.isPressed;
         }
 
+        public void OnHeavyPunch(InputValue value)
+        {
+            heavyPunch = value.isPressed;
+        }
+
         public void OnPickUp(InputValue value)
         {
             bool pressed = value.isPressed;
@@ -62,7 +68,7 @@ namespace StarterAssets
 
             if (pressed)
             {
-                Debug.Log("[INPUT] PickUp pressed");   // ← רואה בלוג?
+                Debug.Log("[INPUT] PickUp pressed");   
                 CoreBus.Publish(new PlayerPickUpEvent());
             }
         }
