@@ -1,103 +1,103 @@
-using UnityEngine;
-using System.Collections.Generic;
+//using UnityEngine;
+//using System.Collections.Generic;
 
-public class ComboParser : MonoBehaviour
-{
+//public class ComboParser : MonoBehaviour
+//{
 
-    [SerializeField] private AnimationDriver animationDriver;
+//    [SerializeField] private AnimationDriver animationDriver;
 
-    [SerializeField] private int maxFramesBack = 12;
+//    [SerializeField] private int maxFramesBack = 12;
 
-    [SerializeField] private AttackActivator attackActivator;
-
-
-    private bool MatchSinglePunch(List<FrameInput> buffer)
-    {
-        if (buffer.Count == 0) return false;
-
-        FrameInput last = buffer[buffer.Count - 1];
-
-        if (last.inputType == InputType.Punch)
-        {
-            for (int i = buffer.Count - 2; i >= 0; i--)
-            {
-                if (last.frame - buffer[i].frame > maxFramesBack)
-                    break;
-
-                if (buffer[i].inputType != InputType.Punch)
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-    private bool MatchHeavyPunch(List<FrameInput> buffer)
-    {
-        if (buffer.Count == 0) return false;
-
-        FrameInput last = buffer[buffer.Count - 1];
-
-        if (last.inputType == InputType.HeavyPunch)
-        {
-            for (int i = buffer.Count - 2; i >= 0; i--)
-            {
-                if (last.frame - buffer[i].frame > maxFramesBack)
-                    break;
-
-                if (buffer[i].inputType != InputType.HeavyPunch)
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
+//    [SerializeField] private AttackActivator attackActivator;
 
 
-    private bool MatchCrouchHit(List<FrameInput> buffer)
-    {
-        if (buffer.Count < 2) return false; //MUST have 2 frames
+//    private bool MatchSinglePunch(List<FrameInput> buffer)
+//    {
+//        if (buffer.Count == 0) return false;
 
-        FrameInput last = buffer[buffer.Count - 1];
-        if (last.inputType != InputType.Punch)
-        {
-            return false;
-        }
+//        FrameInput last = buffer[buffer.Count - 1];
 
-        for (int i = buffer.Count - 2; i >= 0; i--)
-        {
-            if (last.frame - buffer[i].frame > maxFramesBack)
-                break;
+//        if (last.inputType == InputType.Punch)
+//        {
+//            for (int i = buffer.Count - 2; i >= 0; i--)
+//            {
+//                if (last.frame - buffer[i].frame > maxFramesBack)
+//                    break;
 
-            if (buffer[i].inputType == InputType.Crouch)
-                return true;
-        }
-        return false;
-    }
+//                if (buffer[i].inputType != InputType.Punch)
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
-    private void ClearLastInput()
-    {
-        List<FrameInput> buffer = InputBuffer.Instance.GetBuffer();
-        buffer.RemoveAt(buffer.Count - 1);
-    }
+//    private bool MatchHeavyPunch(List<FrameInput> buffer)
+//    {
+//        if (buffer.Count == 0) return false;
 
-    // Update is called once per frame
-    void Update()
-    {
-        List<FrameInput> buffer = InputBuffer.Instance.GetBuffer();
+//        FrameInput last = buffer[buffer.Count - 1];
 
-        if (MatchHeavyPunch(buffer))
-        {
-            animationDriver.Trigger("HeavyPunch");
-            buffer.RemoveAt(buffer.Count - 1);
-        }
+//        if (last.inputType == InputType.HeavyPunch)
+//        {
+//            for (int i = buffer.Count - 2; i >= 0; i--)
+//            {
+//                if (last.frame - buffer[i].frame > maxFramesBack)
+//                    break;
 
-        if (MatchCrouchHit(buffer))
-        {
-            animationDriver.Trigger("CrouchPunch");
-            buffer.RemoveAt(buffer.Count - 1);
-        }
-    }
+//                if (buffer[i].inputType != InputType.HeavyPunch)
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
 
-}
+//    private bool MatchCrouchHit(List<FrameInput> buffer)
+//    {
+//        if (buffer.Count < 2) return false; //MUST have 2 frames
+
+//        FrameInput last = buffer[buffer.Count - 1];
+//        if (last.inputType != InputType.Punch)
+//        {
+//            return false;
+//        }
+
+//        for (int i = buffer.Count - 2; i >= 0; i--)
+//        {
+//            if (last.frame - buffer[i].frame > maxFramesBack)
+//                break;
+
+//            if (buffer[i].inputType == InputType.Crouch)
+//                return true;
+//        }
+//        return false;
+//    }
+
+//    private void ClearLastInput()
+//    {
+//        List<FrameInput> buffer = InputBuffer.Instance.GetBuffer();
+//        buffer.RemoveAt(buffer.Count - 1);
+//    }
+
+//    // Update is called once per frame
+//    void Update()
+//    {
+//        List<FrameInput> buffer = InputBuffer.Instance.GetBuffer();
+
+//        if (MatchHeavyPunch(buffer))
+//        {
+//            animationDriver.Trigger("HeavyPunch");
+//            buffer.RemoveAt(buffer.Count - 1);
+//        }
+
+//        if (MatchCrouchHit(buffer))
+//        {
+//            animationDriver.Trigger("CrouchPunch");
+//            buffer.RemoveAt(buffer.Count - 1);
+//        }
+//    }
+
+
+//}
