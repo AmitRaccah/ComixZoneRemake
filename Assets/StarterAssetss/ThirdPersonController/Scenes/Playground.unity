@@ -215,9 +215,6 @@ PrefabInstance:
       addedObject: {fileID: 968564972}
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 968564971}
-    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 968564970}
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
@@ -243,6 +240,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
       insertIndex: -1
       addedObject: {fileID: 968564995}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 968565001}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!1 &501191873 stripped
 GameObject:
@@ -713,21 +713,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bufferSize: 12
---- !u!114 &968564971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 968564960}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91487e33560ab7d4fab1d61ead1baa85, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animationDriver: {fileID: 968564972}
-  maxFramesBack: 12
-  attackActivator: {fileID: 968564979}
 --- !u!114 &968564972
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -867,6 +852,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 948cc17035c00934f81ebfe766bd19b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &968565001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 968564960}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 605d9c3dfe9ff754797aaf7a8ffea9ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  combo: {fileID: 11400000, guid: b0c5eb6537034e84790ecfc4d723682d, type: 2}
+  activator: {fileID: 968564979}
+  animator: {fileID: 1762682265}
+  step: -1
+  canChain: 0
 --- !u!1 &1028513131
 GameObject:
   m_ObjectHideFlags: 0
