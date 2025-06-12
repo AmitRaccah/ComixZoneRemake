@@ -86,30 +86,18 @@ public class ComboParser : MonoBehaviour
     {
         List<FrameInput> buffer = InputBuffer.Instance.GetBuffer();
 
-        if (MatchSinglePunch(buffer))
-        {
-          
-
-            animationDriver.Trigger("Punch");
-         //   attackActivator.ActivateAttack("LightPunch");
-
-            ClearLastInput();
-        }
-
         if (MatchHeavyPunch(buffer))
         {
-
-
             animationDriver.Trigger("HeavyPunch");
-            //  attackActivator.ActivateAttack("HeavyPunch");
-
-            ClearLastInput();
+            buffer.RemoveAt(buffer.Count - 1);
         }
+
         if (MatchCrouchHit(buffer))
         {
             animationDriver.Trigger("CrouchPunch");
-            ClearLastInput();
+            buffer.RemoveAt(buffer.Count - 1);
         }
-
     }
+
+
 }

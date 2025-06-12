@@ -139,16 +139,16 @@ namespace StarterAssets
             Move();            // Move כבר עושה if (locker.IsLocked) return;
 
             /* Buffering לדוגמה */
-            if (_input.punch)
-            {
-                InputBuffer.Instance.Add(InputType.Punch);
-                _input.punch = false;
-            }
-            if (_input.heavyPunch)
-            {
-                InputBuffer.Instance.Add(InputType.HeavyPunch);
-                _input.heavyPunch = false;
-            }
+            //if (_input.punch)
+            //{
+            //    InputBuffer.Instance.Add(InputType.Punch);
+            //    _input.punch = false;
+            //}
+            //if (_input.heavyPunch)
+            //{
+            //    InputBuffer.Instance.Add(InputType.HeavyPunch);
+            //    _input.heavyPunch = false;
+            //}
         }
 
 
