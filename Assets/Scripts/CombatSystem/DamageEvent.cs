@@ -5,4 +5,11 @@ public struct DamageEvent
     public int amount;
     public float knockback;
     public DamageType type;
+
+    public float shakeAmplitude;
+    public float freezeFrameDuration;
+
+    //VFX
+    public AttackData attackData;
+
 }

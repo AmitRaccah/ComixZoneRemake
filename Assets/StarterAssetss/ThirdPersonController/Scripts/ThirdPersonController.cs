@@ -118,6 +118,13 @@ namespace StarterAssets
         private void Update()
         {
             _hasAnimator = TryGetComponent(out _animator);
+            var locker = GetComponent<MovementLock>();
+            if (locker != null && locker.IsLocked)
+            {
+                _input.move = Vector2.zero;
+                _input.jump = false;
+                _input.sprint = false;
+            }
 
             JumpAndGravity();
             GroundedCheck();
@@ -127,9 +134,16 @@ namespace StarterAssets
             ///
             if (_input.punch)
             {
-                Debug.Log("PUNCH PRESSED");
+                Debug.Log("HEAVYPUNCH PRESSED");
                 InputBuffer.Instance.Add(InputType.Punch);
                 _input.punch = false;
+            }
+
+            if (_input.heavyPunch)
+            {
+                Debug.Log("PUNCH PRESSED");
+                InputBuffer.Instance.Add(InputType.HeavyPunch);
+                _input.heavyPunch = false;
             }
 
             //if (_input.crouch && !wasCrouching)
@@ -193,6 +207,9 @@ namespace StarterAssets
 
         private void Move()
         {
+
+            if (GetComponent<MovementLock>().IsLocked) return;
+
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
 
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
@@ -221,10 +238,13 @@ namespace StarterAssets
 
             if (_input.move.x != 0)
             {
-                float direction = _input.move.x > 0 ? 1f : -1f;
-                _desiredRotationY = direction == 1f ? 90f : -90f;
+                bool faceRight = _input.move.x > 0;
+                _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
+
+                _animator.SetBool("Mirror", !faceRight);  
             }
+
 
             if (_shouldRotate)
             {

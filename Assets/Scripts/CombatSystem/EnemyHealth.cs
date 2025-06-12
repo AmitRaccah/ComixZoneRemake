@@ -4,8 +4,9 @@
 public class EnemyHealth : MonoBehaviour
 {
     [SerializeField] private int maxHp = 20;
-    private int hp;
-    private Rigidbody rb;
+
+    int hp;
+    Rigidbody rb;
 
     void Awake() => rb = GetComponent<Rigidbody>();
 
@@ -14,10 +15,9 @@ public class EnemyHealth : MonoBehaviour
         hp = maxHp;
         CombatBus.Subscribe<DamageEvent>(OnDamage);
     }
-
     void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
 
-    private void OnDamage(DamageEvent e)
+    void OnDamage(DamageEvent e)
     {
         if (e.targetId != gameObject.GetInstanceID()) return;
 
@@ -27,21 +27,23 @@ public class EnemyHealth : MonoBehaviour
         if (e.knockback > 0f)
             ApplyKnockback(e.attackerId, e.knockback);
 
-        if (hp <= 0)
-            Die(e.attackerId);
+        if (hp <= 0) Die(e.attackerId);
     }
 
-    private void ApplyKnockback(int attackerId, float force)
+    void ApplyKnockback(int attackerId, float force)
     {
         if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var attacker))
+        {
+            Debug.LogWarning("Knockback: attacker not found");
             return;
+        }
 
         Vector3 dir = (transform.position - attacker.position).normalized;
         dir.y = 0f;
         rb.AddForce(dir * force, ForceMode.Impulse);
     }
 
-    private void Die(int killerId)
+    void Die(int killerId)
     {
         CombatBus.Publish(new EnemyDownEvent(gameObject.GetInstanceID(), killerId));
         Destroy(gameObject);
