@@ -51,14 +51,15 @@ namespace StarterAssets
             SprintInput(value.isPressed);
         }
 
-        public void OnPunch(InputValue value)
+        public void OnPunch(InputValue v)
         {
-            punch = value.isPressed;
+            if (v.isPressed)
+                InputBuffer.Instance.Add(InputType.Punch);
         }
-
-        public void OnHeavyPunch(InputValue value)
+        public void OnHeavyPunch(InputValue v)
         {
-            heavyPunch = value.isPressed;
+            if (v.isPressed)
+                InputBuffer.Instance.Add(InputType.HeavyPunch);
         }
 
         public void OnPickUp(InputValue value)

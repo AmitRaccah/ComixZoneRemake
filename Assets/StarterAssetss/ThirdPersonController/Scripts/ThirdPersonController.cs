@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -77,7 +77,10 @@ namespace StarterAssets
 
         // private bool wasCrouching = false;
 
-        private float _attackLockTimer = 0f;
+        private Vector2 cachedMove;
+        private bool cachedSprint;
+        private bool cachedJump;
+        private bool prevLocked;
 
 
 
@@ -140,24 +143,34 @@ namespace StarterAssets
             _attackLockTimer = Mathf.Max(0f, _attackLockTimer - Time.deltaTime);
             bool isAttackLocked = _attackLockTimer > 0f;
 
-            bool wantJump = _input.jump;
-            _input.jump = false;
+            /* ===== נעילה ===== */
+            var locker = GetComponent<MovementLock>();
+            bool locked = locker != null && locker.IsLocked;
 
-            if (_input.punch)
+            if (locked && !prevLocked)         // נכנס לנעילה
             {
-                InputBuffer.Instance.Add(InputType.Punch);
-                _input.punch = false;
+                _input.jump = false;           // מבטל קפיצה שהוזנה תוך כדי
             }
-            if (_input.heavyPunch)
-            {
-                InputBuffer.Instance.Add(InputType.HeavyPunch);
-                _input.heavyPunch = false;
-            }
+            prevLocked = locked;
+            /* ================= */
 
-            JumpAndGravity(wantJump, isAttackLocked);
+            JumpAndGravity();
             GroundedCheck();
-            Move(isAttackLocked);
+            Move();            // Move כבר עושה if (locker.IsLocked) return;
+
+            /* Buffering לדוגמה */
+            //if (_input.punch)
+            //{
+            //    InputBuffer.Instance.Add(InputType.Punch);
+            //    _input.punch = false;
+            //}
+            //if (_input.heavyPunch)
+            //{
+            //    InputBuffer.Instance.Add(InputType.HeavyPunch);
+            //    _input.heavyPunch = false;
+            //}
         }
+
 
 
         private void LateUpdate()
@@ -204,17 +217,8 @@ namespace StarterAssets
 
         private void Move(bool isAttackLocked)
         {
-            if (isAttackLocked)
-            {
-                _controller.Move(Vector3.up * _verticalVelocity * Time.deltaTime);
-                if (_hasAnimator)
-                {
-                    _animator.SetFloat(_animIDSpeed, 0f);
-                    _animator.SetFloat(_animIDMotionSpeed, 0f);
-                }
-                return;
-            }
 
+            if (GetComponent<MovementLock>().IsLocked) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;

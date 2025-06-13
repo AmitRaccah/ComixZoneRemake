@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76fdb511fb68ce241a7bab2afd6ef16f, type: 3}
+  m_Name: BasicPunchCombo
+  m_EditorClassIdentifier: 
+  steps:
+  - input: 0
+    trigger: Punch
+    attack: {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
+  - input: 0
+    trigger: Punch2
+    attack: {fileID: 11400000, guid: 5a3df0bfb2058724d8fcfe842da848c1, type: 2}
+  - input: 0
+    trigger: Punch3
+    attack: {fileID: 11400000, guid: a3a5e21204cdf714699bf9cd0f336a8c, type: 2}
+  - input: 8
+    trigger: Punch
+    attack: {fileID: 11400000, guid: 2320f12798ef6b743aeb4034d59e5028, type: 2}

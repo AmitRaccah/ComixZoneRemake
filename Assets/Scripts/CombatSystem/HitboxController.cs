@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class HitboxController : MonoBehaviour
 {
@@ -33,13 +33,11 @@ public class HitboxController : MonoBehaviour
 
         if (!other.CompareTag("Enemy")) return;
 
-        Transform root = other.attachedRigidbody != null
-            ? other.attachedRigidbody.transform
-            : other.transform.root;
+        if (root == socket.root) return;        
 
         CombatBus.Publish(new DamageEvent
         {
-            attackerId = socket.root.GetInstanceID(),
+            attackerId = socket.root.gameObject.GetInstanceID(),
             targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
@@ -49,10 +47,11 @@ public class HitboxController : MonoBehaviour
             attackData = data
         });
 
-        if (data.hitEffectPrefab != null)
+        // VFX
+        if (data.hitEffectPrefab)
         {
-            Vector3 pos = socket.TransformPoint(data.hitEffectOffset);
-            Instantiate(data.hitEffectPrefab, pos, socket.rotation);
+            Vector3 spawnPos = socket.TransformPoint(data.hitEffectOffset);
+            Instantiate(data.hitEffectPrefab, spawnPos, socket.rotation);
         }
     }
 
