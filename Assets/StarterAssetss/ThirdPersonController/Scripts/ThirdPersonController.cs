@@ -1,9 +1,7 @@
-using UnityEngine;
+﻿using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
-using System.Collections.Generic;   // Dictionary, List וכו'
-
 
 namespace StarterAssets
 {
@@ -83,13 +81,6 @@ namespace StarterAssets
         private bool prevLocked;
 
 
-
-        private void OnAttackPerformed(AttackPerformedEvent e)
-        {
-            if (e.attackerId != gameObject.GetInstanceID()) return;
-            _attackLockTimer = e.attackDuration;
-        }
-
         private bool IsCurrentDeviceMouse
         {
             get
@@ -104,21 +95,11 @@ namespace StarterAssets
 
         private void Awake()
         {
-
             if (_mainCamera == null)
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
-
-            CombatBus.Subscribe<AttackPerformedEvent>(OnAttackPerformed);
-
         }
-
-        private void OnDestroy()
-        {
-            CombatBus.Unsubscribe<AttackPerformedEvent>(OnAttackPerformed);
-        }
-
 
         private void Start()
         {
@@ -140,8 +121,7 @@ namespace StarterAssets
 
         private void Update()
         {
-            _attackLockTimer = Mathf.Max(0f, _attackLockTimer - Time.deltaTime);
-            bool isAttackLocked = _attackLockTimer > 0f;
+            _hasAnimator = TryGetComponent(out _animator);
 
             /* ===== נעילה ===== */
             var locker = GetComponent<MovementLock>();
@@ -215,17 +195,16 @@ namespace StarterAssets
                 _cinemachineTargetYaw, 0.0f);
         }
 
-        private void Move(bool isAttackLocked)
+        private void Move()
         {
 
             if (GetComponent<MovementLock>().IsLocked) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
+
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
-            float currentHorizontalSpeed = new Vector3(
-                _controller.velocity.x, 0.0f, _controller.velocity.z
-            ).magnitude;
+            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
@@ -233,11 +212,8 @@ namespace StarterAssets
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
-                _speed = Mathf.Lerp(
-                    currentHorizontalSpeed,
-                    targetSpeed * inputMagnitude,
-                    Time.deltaTime * SpeedChangeRate
-                );
+                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
+                    Time.deltaTime * SpeedChangeRate);
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
             }
             else
@@ -245,44 +221,40 @@ namespace StarterAssets
                 _speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(
-                _animationBlend,
-                targetSpeed,
-                Time.deltaTime * SpeedChangeRate
-            );
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
+
+            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, 0.0f).normalized;
 
             if (_input.move.x != 0)
             {
                 bool faceRight = _input.move.x > 0;
                 _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
-                _animator.SetBool("Mirror", !faceRight);
+
+                _animator.SetBool("Mirror", !faceRight);  
             }
+
+
             if (_shouldRotate)
             {
                 float currentY = transform.eulerAngles.y;
                 if (currentY > 180f) currentY -= 360f;
 
-                float newY = Mathf.SmoothDampAngle(
-                    currentY,
-                    _desiredRotationY,
-                    ref _rotationVelocity,
-                    RotationSmoothTime
-                );
-                transform.rotation = Quaternion.Euler(0f, newY, 0f);
+                float newY = Mathf.SmoothDampAngle(currentY, _desiredRotationY, ref _rotationVelocity, RotationSmoothTime);
+                transform.rotation = Quaternion.Euler(0, newY, 0);
 
                 if (Mathf.Abs(newY - _desiredRotationY) < 1f)
                 {
-                    transform.rotation = Quaternion.Euler(0f, _desiredRotationY, 0f);
+                    transform.rotation = Quaternion.Euler(0, _desiredRotationY, 0);
                     _shouldRotate = false;
                 }
             }
 
-            Vector3 horizontal = new Vector3(_input.move.x, 0f, 0f)
-                * (_speed * Time.deltaTime);
-            Vector3 vertical = Vector3.up * _verticalVelocity * Time.deltaTime;
-            _controller.Move(horizontal + vertical);
+            Vector3 targetDirection = inputDirection;
+
+            _controller.Move(targetDirection * (_speed * Time.deltaTime) +
+                             new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             if (_hasAnimator)
             {
@@ -295,38 +267,60 @@ namespace StarterAssets
             transform.position = fixedPos;
         }
 
-        private void JumpAndGravity(bool wantJump, bool isAttackLocked)
+        private void JumpAndGravity()
         {
-            if (_verticalVelocity < _terminalVelocity)
-                _verticalVelocity += Gravity * Time.deltaTime;
-
             if (Grounded)
             {
                 _fallTimeoutDelta = FallTimeout;
+
                 if (_hasAnimator)
                 {
                     _animator.SetBool(_animIDJump, false);
                     _animator.SetBool(_animIDFreeFall, false);
                 }
 
-                if (_verticalVelocity < 0f)
-                    _verticalVelocity = -2f;
-
-                if (wantJump && !isAttackLocked && _jumpTimeoutDelta <= 0f)
+                if (_verticalVelocity < 0.0f)
                 {
-                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-                    if (_hasAnimator) _animator.SetBool(_animIDJump, true);
-                    _jumpTimeoutDelta = JumpTimeout;    
+                    _verticalVelocity = -2f;
                 }
 
-                if (_jumpTimeoutDelta > 0f)
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                {
+                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDJump, true);
+                    }
+                }
+
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
                     _jumpTimeoutDelta -= Time.deltaTime;
+                }
             }
             else
             {
-                _fallTimeoutDelta -= Time.deltaTime;
-                if (_fallTimeoutDelta <= 0f && _hasAnimator)
-                    _animator.SetBool(_animIDFreeFall, true);
+                _jumpTimeoutDelta = JumpTimeout;
+
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDFreeFall, true);
+                    }
+                }
+
+                _input.jump = false;
+            }
+
+            if (_verticalVelocity < _terminalVelocity)
+            {
+                _verticalVelocity += Gravity * Time.deltaTime;
             }
         }
 
