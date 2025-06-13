@@ -864,11 +864,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 605d9c3dfe9ff754797aaf7a8ffea9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combo: {fileID: 11400000, guid: b0c5eb6537034e84790ecfc4d723682d, type: 2}
-  activator: {fileID: 968564979}
-  animator: {fileID: 1762682265}
-  step: -1
-  canChain: 0
+  combos:
+  - sequence: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+  - sequence: {fileID: 11400000, guid: eeb96d6b79e08554aab3712a48da5265, type: 2}
+  - sequence: {fileID: 11400000, guid: 124ea2a26021c8c4c813810afbf03708, type: 2}
 --- !u!1 &1028513131
 GameObject:
   m_ObjectHideFlags: 0
