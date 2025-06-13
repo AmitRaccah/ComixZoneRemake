@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HitboxController : MonoBehaviour
 {
@@ -35,7 +35,7 @@ public class HitboxController : MonoBehaviour
                          other.attachedRigidbody.transform :
                          other.transform.root;
 
-        if (root == socket.root) return;
+        if (root == socket.root) return;        
 
         CombatBus.Publish(new DamageEvent
         {
