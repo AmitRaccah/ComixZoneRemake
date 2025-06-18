@@ -27,6 +27,9 @@ namespace StarterAssets
         public bool lookUp;
         public bool pickUp;
 
+        public bool allowZMovementTemporarily = false;
+
+
 #if ENABLE_INPUT_SYSTEM
         public void OnMove(InputValue value)
         {

@@ -1,3 +1,4 @@
+
 using StarterAssets;
 using UnityEngine;
 
@@ -20,8 +21,20 @@ public class MovementLock : MonoBehaviour
         CombatBus.Unsubscribe<AttackEndedEvent>(OnEnd);
     }
 
-    void OnStart(AttackStartedEvent e) { if (e.attackerId == myId) locked = true; }
-    void OnEnd(AttackEndedEvent e) { if (e.attackerId == myId) locked = false; }
+    void OnStart(AttackStartedEvent e)
+    {
+        if (e.attackerId != myId) return;
+        locked = true;
+
+        // flush residual velocity this frame
+        var ctrl = GetComponent<CharacterController>();
+        if (ctrl) ctrl.Move(Vector3.zero);
+    }
+
+    void OnEnd(AttackEndedEvent e)
+    {
+        if (e.attackerId == myId) locked = false;
+    }
 
     public bool IsLocked => locked;
 }
