@@ -4,48 +4,68 @@ using UnityEngine;
 public class AttackActivator : MonoBehaviour
 {
     [SerializeField] private Transform leftHandSocket;
-    [SerializeField] private Transform rightHandSocket; 
+    [SerializeField] private Transform rightHandSocket;
+    [SerializeField] private Transform leftFootSocket;
+    [SerializeField] private Transform rightFootSocket;
 
     [SerializeField] private AttackData[] attacks;
     [SerializeField] private GameObject hitboxPrefab;
-    [SerializeField] private Animator animator;      
+    [SerializeField] private Animator animator;
 
-    Dictionary<string, AttackData> map = new();
-
+    private readonly Dictionary<string, AttackData> map = new();
     public static readonly Dictionary<int, Transform> TransformsById = new();
 
-    void Awake()
+    private void Awake()
     {
-        foreach (var a in attacks)
+        foreach (AttackData a in attacks)
             if (!map.ContainsKey(a.attackName))
                 map.Add(a.attackName, a);
     }
 
-    void OnEnable() => TransformsById[gameObject.GetInstanceID()] = transform;
-    void OnDisable() => TransformsById.Remove(gameObject.GetInstanceID());
+    private void OnEnable() => TransformsById[gameObject.GetInstanceID()] = transform;
+    private void OnDisable() => TransformsById.Remove(gameObject.GetInstanceID());
 
-    /* ---------- ComboParser ---------- */
     public void ActivateAttack(string name)
     {
-        if (!map.TryGetValue(name, out var data))
-        {
+        if (!map.TryGetValue(name, out AttackData data))
             return;
+
+        Transform socket = GetSocketForSide(data.side);
+        if (socket == null) return;   
+
+        if (animator.GetBool("Mirror"))
+        {
+            AttackSide mirrorSide = GetMirroredSide(data.side);
+            socket = GetSocketForSide(mirrorSide);
         }
-
-        Transform baseSocket = data.side == AttackSide.Left ? leftHandSocket
-                                                    : rightHandSocket;
-
-
-        bool mirror = animator.GetBool("Mirror");        //looking left
-        Transform socket = mirror ? (baseSocket == leftHandSocket ? rightHandSocket : leftHandSocket)
-                              : baseSocket;
 
         GameObject go = Instantiate(hitboxPrefab);
         go.GetComponent<HitboxController>().Init(data, socket);
 
         CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
+    }
 
-        CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+    private Transform GetSocketForSide(AttackSide side)
+    {
+        switch (side)
+        {
+            case AttackSide.LeftHand: return leftHandSocket;
+            case AttackSide.RightHand: return rightHandSocket;
+            case AttackSide.LeftFoot: return leftFootSocket;
+            case AttackSide.RightFoot: return rightFootSocket;
+            default: return null;
+        }
+    }
 
+    private AttackSide GetMirroredSide(AttackSide side)
+    {
+        switch (side)
+        {
+            case AttackSide.LeftHand: return AttackSide.RightHand;
+            case AttackSide.RightHand: return AttackSide.LeftHand;
+            case AttackSide.LeftFoot: return AttackSide.RightFoot;
+            case AttackSide.RightFoot: return AttackSide.LeftFoot;
+            default: return side;
+        }
     }
 }

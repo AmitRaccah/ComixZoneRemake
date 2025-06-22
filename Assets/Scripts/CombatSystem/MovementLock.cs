@@ -1,41 +1,39 @@
+
 using StarterAssets;
 using UnityEngine;
 
 [RequireComponent(typeof(ThirdPersonController))]
 public class MovementLock : MonoBehaviour
 {
-    private bool locked;
-    private ThirdPersonController ctrl;
-    private int myId;
+    bool locked;
+    int myId;
 
-    private void Awake()
+    void Awake() => myId = gameObject.GetInstanceID();
+
+    void OnEnable()
     {
-        ctrl = GetComponent<ThirdPersonController>();
-        myId = gameObject.GetInstanceID();
+        CombatBus.Subscribe<AttackStartedEvent>(OnStart);
+        CombatBus.Subscribe<AttackEndedEvent>(OnEnd);
+    }
+    void OnDisable()
+    {
+        CombatBus.Unsubscribe<AttackStartedEvent>(OnStart);
+        CombatBus.Unsubscribe<AttackEndedEvent>(OnEnd);
     }
 
-    private void OnEnable()
+    void OnStart(AttackStartedEvent e)
     {
-        CombatBus.Subscribe<AttackStartedEvent>(OnAttackStarted);
-        CombatBus.Subscribe<AttackEndedEvent>(OnAttackEnded);
+        if (e.attackerId != myId) return;
+        locked = true;
+
+        // flush residual velocity this frame
+        var ctrl = GetComponent<CharacterController>();
+        if (ctrl) ctrl.Move(Vector3.zero);
     }
 
-    private void OnDisable()
+    void OnEnd(AttackEndedEvent e)
     {
-        CombatBus.Unsubscribe<AttackStartedEvent>(OnAttackStarted);
-        CombatBus.Unsubscribe<AttackEndedEvent>(OnAttackEnded);
-    }
-
-    private void OnAttackStarted(AttackStartedEvent e)
-    {
-        if (e.attackerId == myId)
-            locked = true;
-    }
-
-    private void OnAttackEnded(AttackEndedEvent e)
-    {
-        if (e.attackerId == myId)
-            locked = false;
+        if (e.attackerId == myId) locked = false;
     }
 
     public bool IsLocked => locked;

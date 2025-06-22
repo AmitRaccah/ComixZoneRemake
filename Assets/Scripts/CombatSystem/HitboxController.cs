@@ -35,25 +35,26 @@ public class HitboxController : MonoBehaviour
                          other.attachedRigidbody.transform :
                          other.transform.root;
 
+        if (root == socket.root) return;        
+
         CombatBus.Publish(new DamageEvent
         {
-            attackerId = socket.root.gameObject.GetInstanceID(),   
+            attackerId = socket.root.gameObject.GetInstanceID(),
             targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
             type = data.damageType,
             shakeAmplitude = data.shakeAmplitude,
             freezeFrameDuration = data.freezeFrameDuration,
-            //VFX
             attackData = data
         });
 
-        //VFX
-        if (data.hitEffectPrefab != null)
+        // VFX
+        if (data.hitEffectPrefab)
         {
             Vector3 spawnPos = socket.TransformPoint(data.hitEffectOffset);
-            Quaternion spawnRot = socket.rotation;
-            Instantiate(data.hitEffectPrefab, spawnPos, spawnRot);
+            Instantiate(data.hitEffectPrefab, spawnPos, socket.rotation);
         }
     }
+
 }
