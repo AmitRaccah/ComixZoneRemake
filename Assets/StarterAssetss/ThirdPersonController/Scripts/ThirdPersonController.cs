@@ -80,6 +80,9 @@ namespace StarterAssets
         private bool cachedJump;
         private bool prevLocked;
 
+        public bool allowZMovementTemporarily = false;
+
+
 
         private bool IsCurrentDeviceMouse
         {
@@ -262,9 +265,13 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
 
-            Vector3 fixedPos = transform.position;
-            fixedPos.z = 0f;
-            transform.position = fixedPos;
+            if (!allowZMovementTemporarily)
+            {
+                Vector3 fixedPos = transform.position;
+                fixedPos.z = 0f;
+                transform.position = fixedPos;
+            }
+
         }
 
         private void JumpAndGravity()
