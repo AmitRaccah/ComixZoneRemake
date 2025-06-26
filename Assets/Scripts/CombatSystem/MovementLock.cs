@@ -1,11 +1,10 @@
-
-using StarterAssets;
+﻿using StarterAssets;
 using UnityEngine;
 
 [RequireComponent(typeof(ThirdPersonController))]
 public class MovementLock : MonoBehaviour
 {
-    bool locked;
+    int lockCount = 0;        
     int myId;
 
     void Awake() => myId = gameObject.GetInstanceID();
@@ -24,17 +23,18 @@ public class MovementLock : MonoBehaviour
     void OnStart(AttackStartedEvent e)
     {
         if (e.attackerId != myId) return;
-        locked = true;
+        lockCount++;
 
-        // flush residual velocity this frame
+        // אפס מהירות מידית
         var ctrl = GetComponent<CharacterController>();
         if (ctrl) ctrl.Move(Vector3.zero);
     }
 
     void OnEnd(AttackEndedEvent e)
     {
-        if (e.attackerId == myId) locked = false;
+        if (e.attackerId != myId) return;
+        lockCount = Mathf.Max(0, lockCount - 1);
     }
 
-    public bool IsLocked => locked;
+    public bool IsLocked => lockCount > 0;
 }

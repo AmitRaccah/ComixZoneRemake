@@ -27451,14 +27451,14 @@ AnimationClip:
   m_HasMotionFloatCurves: 1
   m_Events:
   - time: 0
-    functionName: OnAttackStart
+    functionName: DisableChain
     data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.033333335
-    functionName: EnableChain
+  - time: 0
+    functionName: OnAttackStart
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -27471,8 +27471,8 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.36666667
-    functionName: DisableChain
+  - time: 0.2
+    functionName: EnableChain
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -27482,13 +27482,6 @@ AnimationClip:
     functionName: EndStep
     data: 
     objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.46666667
-    functionName: OnAttackEnd
-    data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

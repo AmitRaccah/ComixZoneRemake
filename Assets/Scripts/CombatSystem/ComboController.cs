@@ -53,23 +53,34 @@ public class ComboController : MonoBehaviour
     {
         step = idx;
         canChain = false;
-        resetT = 0.4f;
+        resetT = 0.20f;                     
 
         var s = curSeq.steps[idx];
         anim.Trigger(s.trigger);
 
-        // immediately lock movement
         CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
     }
-
     void Tick()
     {
-        if (step < 0) return;
-
-        resetT -= Time.deltaTime;
-        if (resetT <= 0f && !canChain)
+        // ­­­­­­­­­­­­­­­­­­­­­­­­­ 1) אין קליפ פעיל – מחכים לגרייס
+        if (step < 0)
         {
-            CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
+            resetT -= Time.deltaTime;
+            if (resetT <= 0f)                       // לא לחצו → סיום קומבו
+            {
+                CombatBus.Publish(
+                    new AttackEndedEvent(gameObject.GetInstanceID()));
+                canChain = false;                   // מחכים ללחיצה חדשה
+            }
+            return;
+        }
+
+        // ­­­­­­­­­­­­­­­­­­­­­­­­­ 2) יש קליפ פעיל
+        resetT -= Time.deltaTime;
+        if (resetT <= 0f && !canChain)              // קליפ נגמר, לא שרשרו
+        {
+            CombatBus.Publish(
+                new AttackEndedEvent(gameObject.GetInstanceID()));
             step = -1;
         }
     }
@@ -80,10 +91,15 @@ public class ComboController : MonoBehaviour
     // called by Animation Event at the end of each clip
     public void EndStep()
     {
-        if (step == curSeq.steps.Length - 1)      // last clip
-            CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
+        resetT = 0.05f;      // חלון קצר ללחיצה נוספת
+        canChain = true;     // מותר להתחיל Punch-1 חדש מיד
 
-        resetT = 0.25f;
-        step = -1;
+        // אם זה היה הקליפ האחרון בשרשרת – שחרר תנועה עכשיו
+        if (step == curSeq.steps.Length - 1)
+            CombatBus.Publish(
+                new AttackEndedEvent(gameObject.GetInstanceID()));
+
+        step = -1;           // חזרה למצב Idle בקומבו-מכונה
     }
+
 }
