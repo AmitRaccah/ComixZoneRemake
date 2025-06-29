@@ -6,7 +6,7 @@ public class HitboxController : MonoBehaviour
     Transform socket;
     float timer;
     bool armed;
-
+    public event System.Action OnFirstHit;
     public void Init(AttackData d, Transform hand)
     {
         data = d;
@@ -35,7 +35,7 @@ public class HitboxController : MonoBehaviour
                          other.attachedRigidbody.transform :
                          other.transform.root;
 
-        if (root == socket.root) return;        
+        if (root == socket.root) return;
 
         CombatBus.Publish(new DamageEvent
         {
@@ -47,7 +47,11 @@ public class HitboxController : MonoBehaviour
             shakeAmplitude = data.shakeAmplitude,
             freezeFrameDuration = data.freezeFrameDuration,
             attackData = data
+
         });
+             OnFirstHit?.Invoke();              
+             Destroy(gameObject);
+        ;
 
         // VFX
         if (data.hitEffectPrefab)

@@ -79,7 +79,7 @@ public class ComboController : MonoBehaviour
         anim.Trigger(s.trigger);
 
         // immediately lock movement
-        CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+      //  CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
     }
 
     void Tick()
@@ -100,7 +100,7 @@ public class ComboController : MonoBehaviour
     // called by Animation Event at the end of each clip
     public void EndStep()
     {
-        CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
+  //      CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
 
         resetT = 0.25f; 
         step = -1;     

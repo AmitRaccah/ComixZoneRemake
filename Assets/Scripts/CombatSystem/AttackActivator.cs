@@ -15,8 +15,13 @@ public class AttackActivator : MonoBehaviour
     private readonly Dictionary<string, AttackData> map = new();
     public static readonly Dictionary<int, Transform> TransformsById = new();
 
+    HitboxController activeHitbox;
+    int myId;
+
     private void Awake()
     {
+        myId = GetInstanceID();
+
         foreach (AttackData a in attacks)
             if (!map.ContainsKey(a.attackName))
                 map.Add(a.attackName, a);
@@ -25,24 +30,33 @@ public class AttackActivator : MonoBehaviour
     private void OnEnable() => TransformsById[gameObject.GetInstanceID()] = transform;
     private void OnDisable() => TransformsById.Remove(gameObject.GetInstanceID());
 
-    public void ActivateAttack(string name)
+    public void BeginHitbox(string attackName)
     {
-        if (!map.TryGetValue(name, out AttackData data))
-            return;
+        if (activeHitbox) return;           
+        if (!map.TryGetValue(attackName, out var data)) return;
 
-        Transform socket = GetSocketForSide(data.side);
-        if (socket == null) return;   
+        var side = animator.GetBool("Mirror") ? GetMirroredSide(data.side) : data.side;
+        var socket = GetSocketForSide(side);
+        if (!socket) return;
 
-        if (animator.GetBool("Mirror"))
-        {
-            AttackSide mirrorSide = GetMirroredSide(data.side);
-            socket = GetSocketForSide(mirrorSide);
-        }
+        var go = Instantiate(hitboxPrefab);
+        activeHitbox = go.GetComponent<HitboxController>();
+        activeHitbox.Init(data, socket);
+        activeHitbox.OnFirstHit += KillHitbox;    
 
-        GameObject go = Instantiate(hitboxPrefab);
-        go.GetComponent<HitboxController>().Init(data, socket);
+        CombatBus.Publish(new AttackStartedEvent(myId));
+    }
 
-        CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
+    public void EndHitbox() => KillHitbox();
+
+    void KillHitbox()
+    {
+        if (!activeHitbox) return;
+        activeHitbox.OnFirstHit -= KillHitbox;
+        Destroy(activeHitbox.gameObject);
+        activeHitbox = null;
+
+        CombatBus.Publish(new AttackEndedEvent(myId));
     }
 
     private Transform GetSocketForSide(AttackSide side)
