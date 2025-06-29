@@ -15,21 +15,41 @@ public class ComboController : MonoBehaviour
     bool canChain;
     float resetT;
 
+    const float EarlyWindow = 0.15f;  
+    InputType? queuedInput = null;     
+    float queuedTimer = 0f;            
+
+
     void Awake() => anim = GetComponent<AnimationDriver>();
 
     void Update()
     {
         List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
-        if (buf.Count == 0) { Tick(); return; }
+        if (buf.Count > 0)
+        {
+            queuedInput = buf[^1].inputType;
+            queuedTimer = EarlyWindow;
 
-        InputType inp = buf[^1].inputType;
-        buf.RemoveAt(buf.Count - 1);
+            buf.RemoveAt(buf.Count - 1);
+        }
 
-        if (step == -1 && TryBegin(inp)) { Tick(); return; }
+        if (queuedTimer > 0f) queuedTimer -= Time.deltaTime;
+        if (queuedTimer <= 0f) queuedInput = null;
 
-        if (canChain && step + 1 < curSeq.steps.Length &&
-            curSeq.steps[step + 1].input == inp)
+        if (step == -1 && queuedInput.HasValue && TryBegin(queuedInput.Value))
+        {
+            queuedInput = null;                
+            Tick();
+            return;
+        }
+
+        if (step >= 0 && queuedInput.HasValue && canChain &&
+            step + 1 < curSeq.steps.Length &&
+            curSeq.steps[step + 1].input == queuedInput.Value)
+        {
             StartStep(step + 1);
+            queuedInput = null;               
+        }
 
         Tick();
     }
@@ -80,10 +100,11 @@ public class ComboController : MonoBehaviour
     // called by Animation Event at the end of each clip
     public void EndStep()
     {
-        if (step == curSeq.steps.Length - 1)      // last clip
-            CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
+        CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
 
-        resetT = 0.25f;
-        step = -1;
+        resetT = 0.25f; 
+        step = -1;     
+        canChain = false; 
     }
+
 }
