@@ -45,10 +45,11 @@ public class AttackActivator : MonoBehaviour
         AttackSide side = animator.GetBool("Mirror") ? GetMirroredSide(data.side) : data.side;
         Transform socket = GetSocketForSide(side);
         if (!socket) return;
-
         GameObject go = Instantiate(hitboxPrefab);
         activeHitbox = go.GetComponent<HitboxController>();
-        activeHitbox.Init(data, socket);
+
+
+        activeHitbox.Init(data, socket, myId);
         activeHitbox.OnFirstHit += KillHitbox;
     }
 
