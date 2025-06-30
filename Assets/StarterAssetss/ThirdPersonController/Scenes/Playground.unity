@@ -1724,7 +1724,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 104
+  m_Constraints: 72
   m_CollisionDetection: 0
 --- !u!114 &1480421760
 MonoBehaviour:
@@ -2866,7 +2866,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: attacks.Array.size
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: 'attacks.Array.data[1]'
@@ -2880,6 +2880,10 @@ PrefabInstance:
       propertyPath: 'attacks.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: 2320f12798ef6b743aeb4034d59e5028, type: 2}
+    - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: 'attacks.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 120f4b94094218c42aab78d97d755acd, type: 2}
     - target: {fileID: 1744208064218866521, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: m_Name
       value: PlayerArmature
