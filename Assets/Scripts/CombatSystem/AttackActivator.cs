@@ -15,37 +15,57 @@ public class AttackActivator : MonoBehaviour
     private readonly Dictionary<string, AttackData> map = new();
     public static readonly Dictionary<int, Transform> TransformsById = new();
 
-    private void Awake()
+    HitboxController activeHitbox;
+    int myId;
+
+    void Awake()
     {
+        myId = GetInstanceID();
+
         foreach (AttackData a in attacks)
             if (!map.ContainsKey(a.attackName))
                 map.Add(a.attackName, a);
     }
 
-    private void OnEnable() => TransformsById[gameObject.GetInstanceID()] = transform;
-    private void OnDisable() => TransformsById.Remove(gameObject.GetInstanceID());
-
-    public void ActivateAttack(string name)
+    void OnEnable()
     {
-        if (!map.TryGetValue(name, out AttackData data))
-            return;
-
-        Transform socket = GetSocketForSide(data.side);
-        if (socket == null) return;   
-
-        if (animator.GetBool("Mirror"))
-        {
-            AttackSide mirrorSide = GetMirroredSide(data.side);
-            socket = GetSocketForSide(mirrorSide);
-        }
-
-        GameObject go = Instantiate(hitboxPrefab);
-        go.GetComponent<HitboxController>().Init(data, socket);
-
-        CombatBus.Publish(new AttackPerformedEvent(name, gameObject.GetInstanceID()));
+        TransformsById[myId] = transform;
     }
 
-    private Transform GetSocketForSide(AttackSide side)
+    void OnDisable()
+    {
+        TransformsById.Remove(myId);
+    }
+
+    public void BeginHitbox(string attackName)
+    {
+        if (activeHitbox) return;
+        if (!map.TryGetValue(attackName, out AttackData data)) return;
+
+        AttackSide side = animator.GetBool("Mirror") ? GetMirroredSide(data.side) : data.side;
+        Transform socket = GetSocketForSide(side);
+        if (!socket) return;
+
+        GameObject go = Instantiate(hitboxPrefab);
+        activeHitbox = go.GetComponent<HitboxController>();
+        activeHitbox.Init(data, socket);
+        activeHitbox.OnFirstHit += KillHitbox;
+    }
+
+    public void EndHitbox()
+    {
+        KillHitbox();
+    }
+
+    void KillHitbox()
+    {
+        if (!activeHitbox) return;
+        activeHitbox.OnFirstHit -= KillHitbox;
+        Destroy(activeHitbox.gameObject);
+        activeHitbox = null;
+    }
+
+    Transform GetSocketForSide(AttackSide side)
     {
         switch (side)
         {
@@ -57,7 +77,7 @@ public class AttackActivator : MonoBehaviour
         }
     }
 
-    private AttackSide GetMirroredSide(AttackSide side)
+    AttackSide GetMirroredSide(AttackSide side)
     {
         switch (side)
         {
