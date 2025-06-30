@@ -1698,7 +1698,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55f6f664cb54eaf40ab9fd7645daef19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 50
+  maxHp: 100
 --- !u!54 &1480421759
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2884,6 +2884,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerArmature
       objectReference: {fileID: 0}
+    - target: {fileID: 4451859924052457167, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: bufferSize
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[0].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[1].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: 481a42299ff911c4c9adbec525756264, type: 2}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[2].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[3].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: eeb96d6b79e08554aab3712a48da5265, type: 2}
     - target: {fileID: 7208167457459582222, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: m_LocalPosition.x
       value: -2.43

@@ -1,70 +1,85 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 [RequireComponent(typeof(AnimationDriver))]
 public class ComboController : MonoBehaviour
 {
     [System.Serializable] public struct Entry { public AttackSequence sequence; }
-
     [SerializeField] private Entry[] combos;
 
     AnimationDriver anim;
     AttackSequence curSeq;
+
     int step = -1;
-    bool canChain;
-    float resetT;
+    int windowStep = -2;
+    float resetT = 0.4f;
 
-    const float EarlyWindow = 0.15f;  
-    InputType? queuedInput = null;     
-    float queuedTimer = 0f;            
+    InputType? queuedInput = null;
 
-
-    void Awake() => anim = GetComponent<AnimationDriver>();
+    void Awake()
+    {
+        anim = GetComponent<AnimationDriver>();
+    }
 
     void Update()
     {
-        List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
+        var buf = InputBuffer.Instance.GetBuffer();
         if (buf.Count > 0)
         {
             queuedInput = buf[^1].inputType;
-            queuedTimer = EarlyWindow;
-
             buf.RemoveAt(buf.Count - 1);
         }
 
-        if (queuedTimer > 0f) queuedTimer -= Time.deltaTime;
-        if (queuedTimer <= 0f) queuedInput = null;
-
-        if (step == -1 && queuedInput.HasValue && TryBegin(queuedInput.Value))
-        {
-            queuedInput = null;                
-            Tick();
-            return;
-        }
-
-        if (step >= 0 && queuedInput.HasValue && canChain &&
+        bool chained = false;
+        if (step >= 0 &&
+            queuedInput.HasValue &&
+            windowStep == step &&
             step + 1 < curSeq.steps.Length &&
             curSeq.steps[step + 1].input == queuedInput.Value)
         {
             StartStep(step + 1);
-            queuedInput = null;               
+            queuedInput = null;
+            chained = true;
         }
 
-        Tick();
+        if (!chained && queuedInput.HasValue && TryBegin(queuedInput.Value))
+        {
+            queuedInput = null;
+            return;                     
+        }
+
+        if (step >= 0)
+        {
+            resetT -= Time.deltaTime;
+            if (resetT <= 0f) step = -1;
+        }
     }
 
-    bool TryBegin(InputType inp)
+
+    bool TryBegin(InputType firstInput)
     {
+        AttackSequence best = null;
+
         foreach (var e in combos)
         {
             var seq = e.sequence;
-            if (seq && seq.steps.Length > 0 && seq.steps[0].input == inp)
-            {
-                curSeq = seq;
-                StartStep(0);
-                return true;
-            }
+            if (seq == null || seq.steps.Length == 0) continue;
+
+            if (seq.steps[0].input != firstInput) continue;
+
+            if (seq.steps.Length > 1 && queuedInput.HasValue &&
+                seq.steps[1].input != queuedInput.Value)
+                continue;
+
+            if (best == null || seq.steps.Length > best.steps.Length)
+                best = seq;
+        }
+
+        if (best != null)
+        {
+            curSeq = best;
+            StartStep(0);
+            return true;
         }
         return false;
     }
@@ -72,39 +87,24 @@ public class ComboController : MonoBehaviour
     void StartStep(int idx)
     {
         step = idx;
-        canChain = false;
+        windowStep = -2;
         resetT = 0.4f;
 
-        var s = curSeq.steps[idx];
-        anim.Trigger(s.trigger);
-
-        // immediately lock movement
-      //  CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+        anim.Trigger(curSeq.steps[idx].trigger);
     }
 
-    void Tick()
+    public void EnableChain()
     {
-        if (step < 0) return;
-
-        resetT -= Time.deltaTime;
-        if (resetT <= 0f && !canChain)
-        {
-            CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
-            step = -1;
-        }
+        windowStep = step;
     }
 
-    public void EnableChain() => canChain = true;
-    public void DisableChain() => canChain = false;
+    public void DisableChain()
+    {
+        if (windowStep == step) windowStep = -2;
+    }
 
-    // called by Animation Event at the end of each clip
     public void EndStep()
     {
-  //      CombatBus.Publish(new AttackEndedEvent(gameObject.GetInstanceID()));
-
-        resetT = 0.25f; 
-        step = -1;     
-        canChain = false; 
+        if (step == curSeq.steps.Length - 1) step = -1;
     }
-
 }
