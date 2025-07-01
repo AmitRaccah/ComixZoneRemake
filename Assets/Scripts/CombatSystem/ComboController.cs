@@ -7,6 +7,9 @@ public class ComboController : MonoBehaviour
     [System.Serializable] public struct Entry { public AttackSequence sequence; }
     [SerializeField] private Entry[] combos;
 
+    [SerializeField] private AttackActivator activator;
+
+
     AnimationDriver anim;
     AttackSequence curSeq;
 
@@ -89,6 +92,11 @@ public class ComboController : MonoBehaviour
         step = idx;
         windowStep = -2;
         resetT = 0.4f;
+
+        var stepData = curSeq.steps[idx].attack;
+        Debug.Log($"[Combo] Step {idx}: attack = {stepData.attackName}");
+        activator.SetCurrentAttack(stepData);
+
 
         anim.Trigger(curSeq.steps[idx].trigger);
     }
