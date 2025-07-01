@@ -44,12 +44,16 @@ public class ComboController : MonoBehaviour
             queuedInput = null;
             chained = true;
         }
-
-        if (!chained && queuedInput.HasValue && TryBegin(queuedInput.Value))
+        if (!chained && queuedInput.HasValue)
         {
+            if (step < 0 && TryBegin(queuedInput.Value))
+            {
+                queuedInput = null;
+                return;
+            }
             queuedInput = null;
-            return;                     
         }
+
 
         if (step >= 0)
         {

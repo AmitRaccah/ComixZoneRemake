@@ -12,7 +12,7 @@ public class HitboxController : MonoBehaviour
     {
         data = d;
         socket = hand;
-        this.attackerId = attackerId;    // ← שומר
+        this.attackerId = attackerId; 
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
