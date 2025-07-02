@@ -23,7 +23,7 @@ public class AttackData : ScriptableObject
 
 public enum DamageType
 {
-    Punch
+    Punch, HeavyPunch
 }
 
 public enum AttackSide
