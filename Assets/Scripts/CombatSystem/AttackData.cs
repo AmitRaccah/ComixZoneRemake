@@ -3,25 +3,33 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Combat/Attack Data")]
 public class AttackData : ScriptableObject
 {
-    public string attackName;          
-    public DamageType damageType;          // enum
-    public int damage = 5;             
-    public float knockback = 2f;       
+    public string attackName;                
+    public DamageType damageType;                 
 
-    public float hitboxRadius = 0.25f; 
-    public Vector3 hitboxOffset;       
+    public int damage = 5;
+    public float knockback = 2f;
     public float activeTime = 0.15f;
-    public AttackSide side = AttackSide.Left;
 
-    //CAM
+    public float hitboxRadius = 0.25f;
+    public Vector3 hitboxOffset;
+    public AttackSide side = AttackSide.LeftHand;   
+
     public float shakeAmplitude = 1f;
-
     public float freezeFrameDuration = 0.1f;
 
-    //VFX
     public GameObject hitEffectPrefab;
     public Vector3 hitEffectOffset;
 }
 
-public enum DamageType { Punch }
-public enum AttackSide { Left, Right }
+public enum DamageType
+{
+    Punch, HeavyPunch
+}
+
+public enum AttackSide
+{
+    LeftHand = 0,
+    RightHand = 1,
+    LeftFoot = 2,
+    RightFoot = 3,
+}

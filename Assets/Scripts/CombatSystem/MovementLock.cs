@@ -1,42 +1,23 @@
-using StarterAssets;
 using UnityEngine;
 
-[RequireComponent(typeof(ThirdPersonController))]
+[RequireComponent(typeof(Animator))]
 public class MovementLock : MonoBehaviour
 {
-    private bool locked;
-    private ThirdPersonController ctrl;
-    private int myId;
+    bool locked;
+    Animator anim;
 
-    private void Awake()
+    void Awake()
     {
-        ctrl = GetComponent<ThirdPersonController>();
-        myId = gameObject.GetInstanceID();
+        anim = GetComponent<Animator>();
     }
 
-    private void OnEnable()
+    void Update()
     {
-        CombatBus.Subscribe<AttackStartedEvent>(OnAttackStarted);
-        CombatBus.Subscribe<AttackEndedEvent>(OnAttackEnded);
+        locked = anim.GetBool("IsAttacking");
     }
 
-    private void OnDisable()
+    public bool IsLocked
     {
-        CombatBus.Unsubscribe<AttackStartedEvent>(OnAttackStarted);
-        CombatBus.Unsubscribe<AttackEndedEvent>(OnAttackEnded);
+        get { return locked; }
     }
-
-    private void OnAttackStarted(AttackStartedEvent e)
-    {
-        if (e.attackerId == myId)
-            locked = true;
-    }
-
-    private void OnAttackEnded(AttackEndedEvent e)
-    {
-        if (e.attackerId == myId)
-            locked = false;
-    }
-
-    public bool IsLocked => locked;
 }

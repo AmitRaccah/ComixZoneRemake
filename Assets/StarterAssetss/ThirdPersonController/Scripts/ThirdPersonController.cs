@@ -73,7 +73,14 @@ namespace StarterAssets
         private bool _shouldRotate = false;
         private float _desiredRotationY = 0f;
 
-       // private bool wasCrouching = false;
+        // private bool wasCrouching = false;
+
+        private Vector2 cachedMove;
+        private bool cachedSprint;
+        private bool cachedJump;
+        private bool prevLocked;
+
+        public bool allowZMovementTemporarily = false;
 
 
 
@@ -118,50 +125,33 @@ namespace StarterAssets
         private void Update()
         {
             _hasAnimator = TryGetComponent(out _animator);
+
             var locker = GetComponent<MovementLock>();
-            if (locker != null && locker.IsLocked)
+            bool locked = locker != null && locker.IsLocked;
+
+            if (locked && !prevLocked)         
             {
-                _input.move = Vector2.zero;
-                _input.jump = false;
-                _input.sprint = false;
+                _input.jump = false;           
             }
+            prevLocked = locked;
 
             JumpAndGravity();
             GroundedCheck();
-            Move();
+            Move();            
 
-            /////////TEST///////
-            ///
-            if (_input.punch)
-            {
-                Debug.Log("HEAVYPUNCH PRESSED");
-                InputBuffer.Instance.Add(InputType.Punch);
-                _input.punch = false;
-            }
-
-            if (_input.heavyPunch)
-            {
-                Debug.Log("PUNCH PRESSED");
-                InputBuffer.Instance.Add(InputType.HeavyPunch);
-                _input.heavyPunch = false;
-            }
-
-            //if (_input.crouch && !wasCrouching)
+            //if (_input.punch)
             //{
-            //    InputBuffer.Instance.Add(InputType.Crouch);
-            //    Debug.Log("Crouch pressed"); 
-            //    EventBus.Publish(new PlayerCrouchEvent());
-            //    wasCrouching = true;
+            //    InputBuffer.Instance.Add(InputType.Punch);
+            //    _input.punch = false;
             //}
-
-            //if (!_input.crouch && wasCrouching)
+            //if (_input.heavyPunch)
             //{
-            //    Debug.Log("Crouch released");
-            //    EventBus.Publish(new PlayerUncrouchEvent());
-            //    wasCrouching = false;
+            //    InputBuffer.Instance.Add(InputType.HeavyPunch);
+            //    _input.heavyPunch = false;
             //}
-
         }
+
+
 
         private void LateUpdate()
         {
@@ -242,7 +232,7 @@ namespace StarterAssets
                 _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
 
-                _animator.SetBool("Mirror", !faceRight);  
+                _animator.SetBool("Mirror", !faceRight);
             }
 
 
@@ -272,9 +262,13 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
 
-            Vector3 fixedPos = transform.position;
-            fixedPos.z = 0f;
-            transform.position = fixedPos;
+            if (!allowZMovementTemporarily)
+            {
+                Vector3 fixedPos = transform.position;
+                fixedPos.z = 0f;
+                transform.position = fixedPos;
+            }
+
         }
 
         private void JumpAndGravity()
