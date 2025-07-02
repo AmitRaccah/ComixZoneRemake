@@ -40,8 +40,12 @@ public class EnemyHealth : MonoBehaviour
 
         Vector3 dir = (transform.position - attacker.position).normalized;
         dir.y = 0f;
+        Debug.Log($"Knock dir {dir} force {force}", this); 
+
         rb.AddForce(dir * force, ForceMode.Impulse);
     }
+
+
 
     void Die(int killerId)
     {

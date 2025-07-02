@@ -12,6 +12,9 @@ public class AttackActivator : MonoBehaviour
     [SerializeField] private GameObject hitboxPrefab;
     [SerializeField] private Animator animator;
 
+    private AttackData _currentAttack;
+
+
     private readonly Dictionary<string, AttackData> map = new();
     public static readonly Dictionary<int, Transform> TransformsById = new();
 
@@ -36,19 +39,25 @@ public class AttackActivator : MonoBehaviour
     {
         TransformsById.Remove(myId);
     }
-
-    public void BeginHitbox(string attackName)
+    public void SetCurrentAttack(AttackData data)
     {
-        if (activeHitbox) return;
-        if (!map.TryGetValue(attackName, out AttackData data)) return;
+        _currentAttack = data;
+        Debug.Log($"[Activator] CurrentAttack ← {data.attackName}");
+    }
 
-        AttackSide side = animator.GetBool("Mirror") ? GetMirroredSide(data.side) : data.side;
-        Transform socket = GetSocketForSide(side);
+    public void BeginHitbox()
+    {
+        if (_currentAttack == null || activeHitbox != null) return;
+
+        var data = _currentAttack;
+        bool mirrored = animator.GetBool("Mirror");
+        var side = mirrored ? GetMirroredSide(data.side) : data.side;
+        var socket = GetSocketForSide(side);
         if (!socket) return;
 
-        GameObject go = Instantiate(hitboxPrefab);
+        var go = Instantiate(hitboxPrefab);
         activeHitbox = go.GetComponent<HitboxController>();
-        activeHitbox.Init(data, socket);
+        activeHitbox.Init(data, socket, GetInstanceID());
         activeHitbox.OnFirstHit += KillHitbox;
     }
 
@@ -56,6 +65,7 @@ public class AttackActivator : MonoBehaviour
     {
         KillHitbox();
     }
+
 
     void KillHitbox()
     {
