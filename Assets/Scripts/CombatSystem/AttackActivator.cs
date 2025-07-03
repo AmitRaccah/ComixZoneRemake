@@ -25,7 +25,7 @@ public class AttackActivator : MonoBehaviour
     {
         myId = GetInstanceID();
 
-        foreach (AttackData a in attacks)
+        foreach (var a in attacks)
             if (!map.ContainsKey(a.attackName))
                 map.Add(a.attackName, a);
     }
@@ -45,11 +45,21 @@ public class AttackActivator : MonoBehaviour
         Debug.Log($"[Activator] CurrentAttack ← {data.attackName}");
     }
 
-    public void BeginHitbox()
+    public void BeginHitbox(string attackKey = "")
     {
-        if (_currentAttack == null || activeHitbox != null) return;
+        if (_currentAttack != null &&
+            !string.IsNullOrEmpty(attackKey) &&
+            attackKey != _currentAttack.attackName)
+            return;  
 
-        var data = _currentAttack;
+        AttackData data = null;
+        if (!string.IsNullOrEmpty(attackKey) && map.TryGetValue(attackKey, out var explicitData))
+            data = explicitData;                  
+        else
+            data = _currentAttack;                
+
+        if (data == null) return;                 
+
         bool mirrored = animator.GetBool("Mirror");
         var side = mirrored ? GetMirroredSide(data.side) : data.side;
         var socket = GetSocketForSide(side);
@@ -57,8 +67,8 @@ public class AttackActivator : MonoBehaviour
 
         var go = Instantiate(hitboxPrefab);
         activeHitbox = go.GetComponent<HitboxController>();
-        activeHitbox.Init(data, socket, GetInstanceID());
-        activeHitbox.OnFirstHit += KillHitbox;
+        activeHitbox.Init(data, socket, myId);    
+        activeHitbox.OnFirstHit += KillHitbox;     
     }
 
     public void EndHitbox()
@@ -69,10 +79,13 @@ public class AttackActivator : MonoBehaviour
 
     void KillHitbox()
     {
-        if (!activeHitbox) return;
+        if (activeHitbox == null) return;
+
         activeHitbox.OnFirstHit -= KillHitbox;
         Destroy(activeHitbox.gameObject);
         activeHitbox = null;
+
+        _currentAttack = null;  
     }
 
     Transform GetSocketForSide(AttackSide side)
