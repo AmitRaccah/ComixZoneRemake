@@ -39,7 +39,6 @@ public class HitboxController : MonoBehaviour
 
         if (root == socket.root) return;
 
-        // משתמשים ב-attackerId ששמרנו
         CombatBus.Publish(new DamageEvent
         {
             attackerId = attackerId,
