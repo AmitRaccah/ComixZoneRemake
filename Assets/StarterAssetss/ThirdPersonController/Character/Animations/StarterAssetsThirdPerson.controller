@@ -24,7 +24,7 @@ AnimatorState:
   m_MirrorParameterActive: 1
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 4b3cc39d76461604db9582db153199b8, type: 2}
+  m_Motion: {fileID: 7400000, guid: 3b1eaa5b39e4b3340867f6ed0841d080, type: 2}
   m_Tag: Attack
   m_SpeedParameter: Speed
   m_MirrorParameter: Mirror
@@ -478,7 +478,7 @@ AnimatorState:
   m_MirrorParameterActive: 1
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: 25ceeba086f23c94a8e5515204b4424a, type: 2}
+  m_Motion: {fileID: 7400000, guid: 0136cf61fc42b7c49b896a1244c832b5, type: 2}
   m_Tag: Attack
   m_SpeedParameter: Speed
   m_MirrorParameter: Mirror
@@ -491,7 +491,10 @@ AnimatorStateTransition:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_Conditions: []
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: HeavyPunch3
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7850867281817724598}
   m_Solo: 0
@@ -666,7 +669,7 @@ AnimatorState:
   m_MirrorParameterActive: 1
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: ad973e08e692b024fb0e27aed6c4c7c2, type: 2}
+  m_Motion: {fileID: 7400000, guid: 7f1ae723d46cff341a485779e353099f, type: 2}
   m_Tag: Attack
   m_SpeedParameter: Speed
   m_MirrorParameter: Mirror
@@ -761,6 +764,18 @@ AnimatorController:
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
   - m_Name: HeavyPunch
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: HeavyPunch2
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: HeavyPunch3
     m_Type: 9
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -1156,7 +1171,10 @@ AnimatorStateTransition:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_Conditions: []
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: HeavyPunch2
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 6988808635855908185}
   m_Solo: 0
