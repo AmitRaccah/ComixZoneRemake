@@ -1509,8 +1509,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1289350894}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2422,7 +2421,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8a0dd5bcde43938478d2ed88569c0b62, type: 2}
   inventory: []
   itemSlots:
-  - {fileID: 675168130}
+  - {fileID: 0}
   - {fileID: 1951109772}
   - {fileID: 0}
 --- !u!4 &1623885430
@@ -2842,6 +2841,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1843241793 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1744208064218866521, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+  m_PrefabInstance: {fileID: 5011486215448294559}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1951109772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3136,10 +3140,22 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
   m_PrefabInstance: {fileID: 5011486215448294559}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1843241793}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2494e6c4fc4aede46900355633047b00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3893294198281463688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1843241793}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fadf9593dde6124b8ddfe185449f287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &5011486215448294559
@@ -3152,7 +3168,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: attacks.Array.size
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: 'attacks.Array.data[1]'
@@ -3170,6 +3186,14 @@ PrefabInstance:
       propertyPath: 'attacks.Array.data[4]'
       value: 
       objectReference: {fileID: 11400000, guid: 120f4b94094218c42aab78d97d755acd, type: 2}
+    - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: 'attacks.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1454cd1e7ae1af94185c076b81f972e8, type: 2}
+    - target: {fileID: 1180834899705639352, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: 'attacks.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 38c347c428204a743a1fdbafd0392451, type: 2}
     - target: {fileID: 1744208064218866521, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: m_Name
       value: PlayerArmature
@@ -3184,22 +3208,30 @@ PrefabInstance:
       objectReference: {fileID: 3893294198281463687}
     - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: combos.Array.size
-      value: 4
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: combos.Array.data[0].sequence
       value: 
-      objectReference: {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
+      objectReference: {fileID: 11400000, guid: 009e77855d61fa94dbb50dbb542fda53, type: 2}
     - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: combos.Array.data[1].sequence
       value: 
-      objectReference: {fileID: 11400000, guid: 481a42299ff911c4c9adbec525756264, type: 2}
+      objectReference: {fileID: 11400000, guid: 0450aa820c861fc41880062172ae51a7, type: 2}
     - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: combos.Array.data[2].sequence
       value: 
-      objectReference: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+      objectReference: {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
     - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
       propertyPath: combos.Array.data[3].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: 481a42299ff911c4c9adbec525756264, type: 2}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[4].sequence
+      value: 
+      objectReference: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+    - target: {fileID: 6845351872267539849, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      propertyPath: combos.Array.data[5].sequence
       value: 
       objectReference: {fileID: 11400000, guid: eeb96d6b79e08554aab3712a48da5265, type: 2}
     - target: {fileID: 7208167457459582222, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
@@ -3245,7 +3277,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1744208064218866521, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3893294198281463688}
   m_SourcePrefab: {fileID: 100100000, guid: 3fe4ca9da87a6c146add6a5bf19ca0af, type: 3}
 --- !u!1001 &8345070700268369567
 PrefabInstance:
@@ -3447,3 +3482,5 @@ SceneRoots:
   - {fileID: 1623885430}
   - {fileID: 1832619439}
   - {fileID: 349286964}
+  - {fileID: 1083279464}
+  - {fileID: 1261946965}

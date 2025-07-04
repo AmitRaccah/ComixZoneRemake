@@ -13,6 +13,8 @@ public class ComboController : MonoBehaviour
     AnimationDriver anim;
     AttackSequence curSeq;
 
+    bool stanceNowLogged = false;
+
     int step = -1;
     int windowStep = -2;
     float resetT = 0.4f;
@@ -65,31 +67,38 @@ public class ComboController : MonoBehaviour
 
     bool TryBegin(InputType firstInput)
     {
-        AttackSequence best = null;
+        PlayerStance stanceNow = PlayerStanceTracker.Current;
+        Debug.Log($"FIRST input={firstInput}  stanceNow={stanceNow}");
 
-        foreach (var e in combos)
+        for (int i = 0; i < combos.Length; i++)
         {
-            var seq = e.sequence;
+            var seq = combos[i].sequence;
             if (seq == null || seq.steps.Length == 0) continue;
 
-            if (seq.steps[0].input != firstInput) continue;
+            var first = seq.steps[0];
+            if (first.input != firstInput) continue;
+            if (first.stance != PlayerStance.Any &&
+                first.stance != stanceNow) continue;
 
-            if (seq.steps.Length > 1 && queuedInput.HasValue &&
-                seq.steps[1].input != queuedInput.Value)
-                continue;
+            if (seq.steps.Length > 1 && queuedInput.HasValue)
+            {
+                var second = seq.steps[1];
+                if (second.input != queuedInput.Value) continue;
+                if (second.stance != PlayerStance.Any &&
+                    second.stance != stanceNow) continue;
 
-            if (best == null || seq.steps.Length > best.steps.Length)
-                best = seq;
-        }
+            }
 
-        if (best != null)
-        {
-            curSeq = best;
+            curSeq = seq;
             StartStep(0);
             return true;
+
+
         }
+
         return false;
     }
+
 
     void StartStep(int idx)
     {
