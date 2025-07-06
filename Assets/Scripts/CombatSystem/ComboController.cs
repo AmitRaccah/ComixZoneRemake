@@ -116,6 +116,7 @@ public class ComboController : MonoBehaviour
 
     public void EnableChain()
     {
+        Debug.Log("EnableChain()");
         windowStep = step;
     }
 

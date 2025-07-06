@@ -45,12 +45,15 @@ public class AttackActivator : MonoBehaviour
         Debug.Log($"[Activator] CurrentAttack ← {data.attackName}");
     }
 
-    public void BeginHitbox(string attackKey = "")
-    {
-        if (_currentAttack != null &&
-            !string.IsNullOrEmpty(attackKey) &&
-            attackKey != _currentAttack.attackName)
-            return;  
+    //public void BeginHitbox(string attackKey = "")
+    //{
+    //    if (_currentAttack != null &&
+    //        !string.IsNullOrEmpty(attackKey) &&
+    //        attackKey != _currentAttack.attackName)
+    //        return;  
+
+    public void BeginHitbox(string attackKey = "") 
+    { 
 
         AttackData data = null;
         if (!string.IsNullOrEmpty(attackKey) && map.TryGetValue(attackKey, out var explicitData))
