@@ -22474,7 +22474,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 1
+    m_StopTime: 1.1
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -43704,31 +43704,17 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 1
   m_Events:
-  - time: 0
-    functionName: OnAttackStart
-    data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.33333334
+  - time: 0.033333335
     functionName: EnableChain
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.53333336
-    functionName: ActivateAttack
-    data: HeabyPunch2
+  - time: 0.4
+    functionName: BeginHitbox
+    data: HeavyPunch2
     objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.6666667
-    functionName: OnAttackEnd
-    data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
@@ -43742,6 +43728,13 @@ AnimationClip:
   - time: 1
     functionName: EndStep
     data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 1.1
+    functionName: EndHitbox
+    data: HeavyPunch2
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0

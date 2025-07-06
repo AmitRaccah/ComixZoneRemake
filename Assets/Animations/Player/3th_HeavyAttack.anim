@@ -46351,34 +46351,27 @@ AnimationClip:
   m_HasMotionFloatCurves: 1
   m_Events:
   - time: 0
-    functionName: OnAttackStart
-    data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
-    floatParameter: 0
-    intParameter: 0
-    messageOptions: 0
-  - time: 0.33333334
     functionName: EnableChain
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.56666666
-    functionName: ActivateAttack
-    data: HeabyPunch3
+  - time: 0.46666667
+    functionName: BeginHitbox
+    data: HeavyPunch3
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.7
-    functionName: OnAttackEnd
-    data: 
-    objectReferenceParameter: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+  - time: 1.0666667
+    functionName: EndHitbox
+    data: HeavyPunch3
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 1.0666667
+  - time: 1.2
     functionName: DisableChain
     data: 
     objectReferenceParameter: {fileID: 0}
