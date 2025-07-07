@@ -3,7 +3,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
 public class Item : ScriptableObject
 {
-    public PickupType pickupType; 
+    public PickupType pickupType;
     public Sprite icon = null;
     public bool isStackable = false;
     public int maxStack = 1;
@@ -14,3 +14,4 @@ public class Item : ScriptableObject
     // public float weight;
     // public ItemType itemType;
 }
+

@@ -6,9 +6,9 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private PickupType pickupType;
     [SerializeField] private float pickupRange = 2f;
 
- //   [SerializeField] private LayerMask playerLayerMask;
+    //   [SerializeField] private LayerMask playerLayerMask;
 
-    private Transform player;             
+    private Transform player;
 
     private void OnEnable() =>
         CoreBus.Subscribe<PlayerPickUpEvent>(TryPickup);
@@ -18,25 +18,26 @@ public class PickupItem : MonoBehaviour
 
     private void TryPickup(PlayerPickUpEvent _)
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange);
+        if (!IsPlayerInRange()) return;
 
-        bool playerFound = false;
-        foreach (var h in hits)
+        bool accepted = InventoryManager.Instance.TryAddItem(pickupType);
+
+        if (accepted)
         {
-            if (h.CompareTag("Player"))
-            {
-                playerFound = true;
-                break;
-            }
+            Debug.Log("Picked up! " + pickupType);
+            Destroy(gameObject);
         }
-        if (!playerFound) return;
-        if (!InventoryManager.Instance.IsFreeSlot())
-            return;
-
-        CoreBus.Publish(new ItemPickedUpEvent(pickupType));
-        Debug.Log("Picked up! " + pickupType);
-        Destroy(gameObject);
     }
+
+    bool IsPlayerInRange()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRange);
+        for (int i = 0; i < hits.Length; i++)
+            if (hits[i].CompareTag("Player"))
+                return true;
+        return false;
+    }
+
 
 
     private bool PlayerInRange()
@@ -57,3 +58,4 @@ public class PickupItem : MonoBehaviour
     }
 #endif
 }
+
