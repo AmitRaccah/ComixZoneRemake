@@ -70,6 +70,16 @@ public class ComboController : MonoBehaviour
         PlayerStance stanceNow = PlayerStanceTracker.Current;
         Debug.Log($"FIRST input={firstInput}  stanceNow={stanceNow}");
 
+        if (stanceNow == PlayerStance.Airborne)
+        {
+            AirAttackLimiter limiter = GetComponent<AirAttackLimiter>();
+            if (limiter != null && !limiter.CanStartAirAttack())
+            {
+                return false; 
+            }
+        }
+
+
         for (int i = 0; i < combos.Length; i++)
         {
             var seq = combos[i].sequence;

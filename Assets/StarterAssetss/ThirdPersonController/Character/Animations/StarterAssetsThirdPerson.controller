@@ -646,6 +646,31 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!1101 &-1582929216383927519
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: Grounded
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -1645763842379584696}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.5
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-1346110272669028535
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -872,6 +897,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: -360640319134363630}
   - {fileID: 1014877343953952781}
+  - {fileID: -1582929216383927519}
   m_StateMachineBehaviours:
   - {fileID: 8757293624781526865}
   - {fileID: -2419813568293956954}
@@ -884,7 +910,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 7f1ae723d46cff341a485779e353099f, type: 2}
-  m_Tag: Attack
+  m_Tag: 
   m_SpeedParameter: Speed
   m_MirrorParameter: Mirror
   m_CycleOffsetParameter: Speed
@@ -1184,7 +1210,10 @@ AnimatorStateTransition:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: 
-  m_Conditions: []
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: FreeFall
+    m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -7469282255733588732}
   m_Solo: 0
@@ -1194,7 +1223,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.47048202
   m_TransitionOffset: 0.60876185
   m_ExitTime: 0.66366935
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -1426,10 +1455,10 @@ AnimatorStateTransition:
   m_Name: 
   m_Conditions:
   - m_ConditionMode: 1
-    m_ConditionEvent: Jump
+    m_ConditionEvent: AirAttack
     m_EventTreshold: 0
   - m_ConditionMode: 1
-    m_ConditionEvent: AirAttack
+    m_ConditionEvent: FreeFall
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -30682265158903239}
