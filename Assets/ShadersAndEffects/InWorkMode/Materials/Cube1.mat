@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Cube1
-  m_Shader: {fileID: -6465566751694194690, guid: 70271cd1c9301ac41a21380f8c1ca986, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 6bdd5302492f4cb47a44e39e290ba4a8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -28,6 +28,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -42,15 +46,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AmbientStrength: 0.02
+    - _FalloffAmount: 0.33
+    - _FresnelSize: 1
+    - _LightingCutoff: 0.1
     - _Outline_Strength: 0.595
     - _Outline_Width: 0.292
     - _QueueControl: 0
     - _QueueOffset: 0
     - _SahdowStrength: 0.429
+    - _Smoothness: 1000
     - _Srep: 1.48
+    - _Step: 17.39
     m_Colors:
     - _BaseColor: {r: 0.252759, g: 0.754717, b: 0.61055636, a: 0}
+    - _DiffuseColor: {r: 0.26931292, g: 0.6415094, b: 0.42684728, a: 1}
+    - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
     - _Outline_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &541950324059254184
