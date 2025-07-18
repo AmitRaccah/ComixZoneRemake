@@ -28,10 +28,18 @@ public class ComboController : MonoBehaviour
 
     void Update()
     {
-        var buf = InputBuffer.Instance.GetBuffer();
+
+        if (InputBuffer.Instance == null)
+        {
+            return;
+        }
+
+        List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
+
         if (buf.Count > 0)
         {
-            queuedInput = buf[^1].inputType;
+            FrameInput last = buf[buf.Count - 1];
+            queuedInput = last.inputType;
             buf.RemoveAt(buf.Count - 1);
         }
 
