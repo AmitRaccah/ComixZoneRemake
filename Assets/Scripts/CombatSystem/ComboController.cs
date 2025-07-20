@@ -29,6 +29,26 @@ public class ComboController : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    bool TryBeginLoopable(InputType firstInput)
+    {
+        PlayerStance stanceNow = PlayerStanceTracker.Current;
+
+        foreach (var entry in combos)
+        {
+            var seq = entry.sequence;
+            if (seq == null || !seq.loopableDuringAttack) continue;
+
+            var first = seq.steps[0];
+            if (first.input != firstInput) continue;
+            if (first.stance != PlayerStance.Any && first.stance != stanceNow) continue;
+
+            curSeq = seq;
+            StartStep(0);
+            return true;                    // מצאנו קומבו לופ‑ספאם והתחלנו אותו
+        }
+        return false;
+    }
+
     void Update()
     {
 
@@ -46,11 +66,25 @@ public class ComboController : MonoBehaviour
 
             if (stillInAttack)
             {
+                // נבדוק אם יש אינפוט שאפשר להתחיל איתו קומבו לופ‑ספאם
+                List<FrameInput> loopBuf = InputBuffer.Instance.GetBuffer();
+                if (loopBuf.Count > 0)
+                {
+                    FrameInput last = loopBuf[^1];
+                    if (TryBeginLoopable(last.inputType))
+                    {
+                        loopBuf.RemoveAt(loopBuf.Count - 1);
+                        return;
+                    }
+                }
+
+                // אין קומבו לופ → מנקים כדי לא ליצור אגרוף רפאים
                 InputBuffer.Instance.GetBuffer().Clear();
                 queuedInput = null;
                 return;
             }
         }
+
 
 
         List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
