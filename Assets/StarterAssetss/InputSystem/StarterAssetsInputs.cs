@@ -56,14 +56,18 @@ namespace StarterAssets
 
         public void OnPunch(InputValue v)
         {
-            if (v.isPressed)
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
                 InputBuffer.Instance.Add(InputType.Punch);
+            }
         }
+
         public void OnHeavyPunch(InputValue v)
         {
-            if (v.isPressed)
-                Debug.Log("HEAVY pressed");
-            InputBuffer.Instance.Add(InputType.HeavyPunch);
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
+                InputBuffer.Instance.Add(InputType.HeavyPunch);
+            }
         }
 
         public void OnPickUp(InputValue value)
