@@ -3,25 +3,29 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public class MovementLock : MonoBehaviour
 {
-    private Animator anim;
-    private bool locked;
+    private Animator _anim;
+    private bool _externalLock = false;  //For other scripts
 
     public bool IsLocked
     {
-        get { return locked; }
+        get
+        {
+            bool inAttack = _anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
+            bool nextAttack =
+                _anim.IsInTransition(0) &&
+                _anim.GetNextAnimatorStateInfo(0).IsTag("Attack");
+
+            return _externalLock || inAttack || nextAttack;
+        }
+    }
+
+    public void SetExternalLock(bool state)
+    {
+        _externalLock = state;
     }
 
     private void Awake()
     {
-        anim = GetComponent<Animator>();
-    }
-
-    private void LateUpdate()
-    {
-        bool inAttack = anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
-        bool nextAttack = anim.IsInTransition(0) &&
-                          anim.GetNextAnimatorStateInfo(0).IsTag("Attack");
-
-        locked = inAttack || nextAttack;
+        _anim = GetComponent<Animator>();
     }
 }
