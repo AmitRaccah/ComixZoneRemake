@@ -82,6 +82,8 @@ namespace StarterAssets
 
         public bool allowZMovementTemporarily = false;
 
+        bool _punchHeld = false;
+        bool _heavyHeld = false;
 
 
         private bool IsCurrentDeviceMouse

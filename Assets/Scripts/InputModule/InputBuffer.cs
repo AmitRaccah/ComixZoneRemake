@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 
@@ -14,15 +14,40 @@ public class InputBuffer : MonoBehaviour
 
     private void Awake()
     {
+   //     Instance = this;
+    }
+
+    private void OnEnable()
+    {
         Instance = this;
     }
 
+    private void OnDisable()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
     public void Add(InputType input)
     {
-        if (buffer.Count > 0 && buffer[^1].inputType == input &&
-            buffer[^1].frame == currentFrame) return;   
+        if (bufferSize == 0)                    
+        {
+            return;                            
+        }
+
+        if (buffer.Count > 0)
+        {
+            FrameInput last = buffer[buffer.Count - 1];
+            if (last.inputType == input && last.frame == currentFrame)
+            {
+                return;                         
+            }
+        }
+
         buffer.Add(new FrameInput(input, currentFrame));
     }
+
 
     public List<FrameInput> GetBuffer()
     {
@@ -36,12 +61,25 @@ public class InputBuffer : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         currentFrame++;
+        Debug.Log($"BUF count={buffer.Count}");
 
-        buffer.RemoveAll(i => currentFrame - i.frame > bufferSize);
 
+        if (bufferSize == 0)
+        {
+            buffer.Clear();
+            return;
+        }
 
+        for (int i = buffer.Count - 1; i >= 0; i--)
+        {
+            int age = currentFrame - buffer[i].frame;
+            if (age >= bufferSize)        
+            {
+                buffer.RemoveAt(i);
+            }
+        }
     }
 }

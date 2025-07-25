@@ -12,6 +12,9 @@ public class AttackActivator : MonoBehaviour
     [SerializeField] private GameObject hitboxPrefab;
     [SerializeField] private Animator animator;
 
+    private AttackData _currentAttack;
+
+
     private readonly Dictionary<string, AttackData> map = new();
     public static readonly Dictionary<int, Transform> TransformsById = new();
 
@@ -22,7 +25,7 @@ public class AttackActivator : MonoBehaviour
     {
         myId = GetInstanceID();
 
-        foreach (AttackData a in attacks)
+        foreach (var a in attacks)
             if (!map.ContainsKey(a.attackName))
                 map.Add(a.attackName, a);
     }
@@ -36,20 +39,39 @@ public class AttackActivator : MonoBehaviour
     {
         TransformsById.Remove(myId);
     }
-
-    public void BeginHitbox(string attackName)
+    public void SetCurrentAttack(AttackData data)
     {
-        if (activeHitbox) return;
-        if (!map.TryGetValue(attackName, out AttackData data)) return;
+        _currentAttack = data;
+        Debug.Log($"[Activator] CurrentAttack ← {data.attackName}");
+    }
 
-        AttackSide side = animator.GetBool("Mirror") ? GetMirroredSide(data.side) : data.side;
-        Transform socket = GetSocketForSide(side);
+    //public void BeginHitbox(string attackKey = "")
+    //{
+    //    if (_currentAttack != null &&
+    //        !string.IsNullOrEmpty(attackKey) &&
+    //        attackKey != _currentAttack.attackName)
+    //        return;  
+
+    public void BeginHitbox(string attackKey = "") 
+    { 
+
+        AttackData data = null;
+        if (!string.IsNullOrEmpty(attackKey) && map.TryGetValue(attackKey, out var explicitData))
+            data = explicitData;                  
+        else
+            data = _currentAttack;                
+
+        if (data == null) return;                 
+
+        bool mirrored = animator.GetBool("Mirror");
+        var side = mirrored ? GetMirroredSide(data.side) : data.side;
+        var socket = GetSocketForSide(side);
         if (!socket) return;
 
-        GameObject go = Instantiate(hitboxPrefab);
+        var go = Instantiate(hitboxPrefab);
         activeHitbox = go.GetComponent<HitboxController>();
-        activeHitbox.Init(data, socket);
-        activeHitbox.OnFirstHit += KillHitbox;
+        activeHitbox.Init(data, socket, myId);    
+        activeHitbox.OnFirstHit += KillHitbox;     
     }
 
     public void EndHitbox()
@@ -57,12 +79,16 @@ public class AttackActivator : MonoBehaviour
         KillHitbox();
     }
 
+
     void KillHitbox()
     {
-        if (!activeHitbox) return;
+        if (activeHitbox == null) return;
+
         activeHitbox.OnFirstHit -= KillHitbox;
         Destroy(activeHitbox.gameObject);
         activeHitbox = null;
+
+        _currentAttack = null;  
     }
 
     Transform GetSocketForSide(AttackSide side)

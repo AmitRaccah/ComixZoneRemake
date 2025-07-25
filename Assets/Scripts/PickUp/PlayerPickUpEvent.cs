@@ -1,1 +1,1 @@
-public struct PlayerPickUpEvent { }
+//public struct PlayerPickUpEvent { }

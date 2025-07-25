@@ -7,10 +7,12 @@ public class HitboxController : MonoBehaviour
     float timer;
     bool armed;
     public event System.Action OnFirstHit;
-    public void Init(AttackData d, Transform hand)
+    int attackerId;
+    public void Init(AttackData d, Transform hand, int attackerId)
     {
         data = d;
         socket = hand;
+        this.attackerId = attackerId; 
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
@@ -39,7 +41,7 @@ public class HitboxController : MonoBehaviour
 
         CombatBus.Publish(new DamageEvent
         {
-            attackerId = socket.root.gameObject.GetInstanceID(),
+            attackerId = attackerId,
             targetId = root.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
@@ -47,17 +49,15 @@ public class HitboxController : MonoBehaviour
             shakeAmplitude = data.shakeAmplitude,
             freezeFrameDuration = data.freezeFrameDuration,
             attackData = data
-
         });
-             OnFirstHit?.Invoke();              
-             Destroy(gameObject);
-        ;
 
-        // VFX
+        OnFirstHit?.Invoke();
+        Destroy(gameObject);
+
         if (data.hitEffectPrefab)
         {
-            Vector3 spawnPos = socket.TransformPoint(data.hitEffectOffset);
-            Instantiate(data.hitEffectPrefab, spawnPos, socket.rotation);
+            Vector3 pos = socket.TransformPoint(data.hitEffectOffset);
+            Instantiate(data.hitEffectPrefab, pos, socket.rotation);
         }
     }
 

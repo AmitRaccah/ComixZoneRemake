@@ -1,103 +1,114 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Cinemachine;      // Cinemachine 3.x namespace
+using DG.Tweening;
+using Unity.Cinemachine;     // Cinemachine 3.x
 
 public class CrossAnime : MonoBehaviour
 {
-    /* ---------- Animation ---------- */
-    [Header("Animation Settings")]
+    [Header("Animation")]
     [SerializeField] private string animationTriggerName = "Pass";
     [SerializeField] private string animationStateName = "Stage_Pass";
 
-    /* ---------- Path ---------- */
-    [Header("Path Settings")]
-    [Tooltip("Way-points the player walks through (in order)")]
-    [SerializeField] private List<Transform> pathPoints = new();
-
-    /* ---------- Movement ---------- */
-    [Header("Movement Settings")]
-    [SerializeField] private float moveDelay = 0.1f;
+    [Header("Movement")]
+    [SerializeField] private Transform pathPoint;
     [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float stoppingDistance = 0.05f;
+    [SerializeField] private float endDelay = 0.1f;
 
-    /* ---------- Camera ---------- */
-    [Header("Camera Switch")]
-    [Tooltip("Camera that is currently active before the transition")]
+    [Header("Camera")]
     [SerializeField] private CinemachineVirtualCamera currentCam;
-    [Tooltip("Camera we want to cut / blend to during the transition")]
     [SerializeField] private CinemachineVirtualCamera targetCam;
     [SerializeField] private int camPriorityActive = 20;
     [SerializeField] private int camPriorityInactive = 5;
 
-    /* ======================================================== */
+    [Header("Wall Collider")]
+    [SerializeField] private Collider wallCollider;
+
+    private bool _triggered = false;
+
+    private Transform _player;
 
     private void OnTriggerEnter(Collider other)
     {
+        if (_triggered) return;
         if (!other.CompareTag("Player")) return;
-        StartCoroutine(MoveThroughPathWhenAnimationBegins(other.transform));
+
+        _triggered = true;
+        StartCoroutine(DoStagePass(other.transform));
     }
 
-    private IEnumerator MoveThroughPathWhenAnimationBegins(Transform player)
+    private IEnumerator DoStagePass(Transform player)
     {
-        /* ----- 1. Unlock Z movement temporarily ----- */
         var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
-        if (controller) controller.allowZMovementTemporarily = true;
+        var input = player.GetComponent<StarterAssets.StarterAssetsInputs>();
+        var mLock = player.GetComponent<MovementLock>();
 
-        /* ----- 2. Kick animation ----- */
-        Animator anim = player.GetComponentInChildren<Animator>();
-        if (anim) anim.SetTrigger(animationTriggerName);
-
-        /* ----- 3. Wait until state starts ----- */
-        yield return new WaitUntil(() =>
-            anim && !anim.IsInTransition(0) &&
-            anim.GetCurrentAnimatorStateInfo(0).IsName(animationStateName));
-
-        /* ----- 4. Switch camera once, right before movement ----- */
-        SwitchToTargetCamera();
-
-        /* ----- 5. Move along path ----- */
-        foreach (Transform point in pathPoints)
+        if (controller != null)
         {
-            float sqStop = stoppingDistance * stoppingDistance;
-            float elapsed = 0f;
-            const float maxTime = 5f;
+            controller.allowZMovementTemporarily = true;
+            controller.enabled = false;
+        }
+        if (input != null) input.enabled = false;
+        if (mLock != null) mLock.SetExternalLock(true);
+        if (wallCollider != null) wallCollider.enabled = false;
 
-            while ((player.position - point.position).sqrMagnitude > sqStop)
+        var anim = player.GetComponentInChildren<Animator>();
+        if (anim != null) anim.SetTrigger(animationTriggerName);
+
+        yield return new WaitUntil(
+            delegate
             {
-                elapsed += Time.deltaTime;
-                if (elapsed > maxTime) break;
+                if (anim == null) return true;   
+                bool playingDesired =
+                    !anim.IsInTransition(0) &&
+                    anim.GetCurrentAnimatorStateInfo(0).IsName(animationStateName);
+                return playingDesired;
+            });
 
-                Vector3 dir = (point.position - player.position).normalized;
-                float step = moveSpeed * Time.deltaTime;
-                player.position = Vector3.MoveTowards(player.position, point.position, step);
+        if (targetCam != null)
+        {
+            if (currentCam != null) currentCam.Priority = camPriorityInactive;
+            targetCam.Priority = camPriorityActive;
 
-                if (dir.x != 0 || dir.z != 0)
-                    player.forward = new Vector3(dir.x, 0f, dir.z);
-
-                yield return null;
-            }
-
-            player.position = point.position; // snap
+            currentCam = targetCam;
+            targetCam = null;
         }
 
-        /* ----- 6. Lock Z again & done ----- */
-        yield return new WaitForSeconds(0.1f);
-        if (controller) controller.allowZMovementTemporarily = false;
+        if (pathPoint != null)
+        {
+            _player = player;                   
+
+            float distance = Vector3.Distance(_player.position, pathPoint.position);
+            float duration = distance / moveSpeed;
+
+            Tween tween = _player
+                .DOMove(pathPoint.position, duration)
+                .SetEase(Ease.Linear)           
+                .OnUpdate(OrientPlayer);        
+
+            yield return tween.WaitForCompletion();
+
+            _player = null;                   
+        }
+
+        yield return new WaitForSeconds(endDelay);
+
+        if (controller != null)
+        {
+            controller.enabled = true;
+            controller.allowZMovementTemporarily = false;
+        }
+        if (input != null) input.enabled = true;
+        if (mLock != null) mLock.SetExternalLock(false);
+        if (wallCollider != null) wallCollider.enabled = true;
+
+        Destroy(this); 
     }
 
-    /* ======================================================== */
-    /* CAMERA HELPER                                            */
-    /* ======================================================== */
-
-    private void SwitchToTargetCamera()
+    private void OrientPlayer()
     {
-        if (targetCam == null) return;         
+        if (_player == null || pathPoint == null) return;
 
-        if (currentCam) currentCam.Priority = camPriorityInactive;
-        targetCam.Priority = camPriorityActive;
-
-        currentCam = targetCam;
-        targetCam = null;                     
+        Vector3 direction = (pathPoint.position - _player.position).normalized;
+       // _player.forward = new Vector3(direction.x, 0f, direction.z);
     }
 }

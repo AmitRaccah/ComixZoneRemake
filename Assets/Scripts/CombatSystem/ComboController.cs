@@ -7,8 +7,13 @@ public class ComboController : MonoBehaviour
     [System.Serializable] public struct Entry { public AttackSequence sequence; }
     [SerializeField] private Entry[] combos;
 
+    [SerializeField] private AttackActivator activator;
+
+
     AnimationDriver anim;
     AttackSequence curSeq;
+
+    bool stanceNowLogged = false;
 
     int step = -1;
     int windowStep = -2;
@@ -16,17 +21,78 @@ public class ComboController : MonoBehaviour
 
     InputType? queuedInput = null;
 
+    Animator animator;
+
     void Awake()
     {
         anim = GetComponent<AnimationDriver>();
+        animator = GetComponent<Animator>();
+    }
+
+    bool TryBeginLoopable(InputType firstInput)
+    {
+        PlayerStance stanceNow = PlayerStanceTracker.Current;
+
+        foreach (var entry in combos)
+        {
+            var seq = entry.sequence;
+            if (seq == null || !seq.loopableDuringAttack) continue;
+
+            var first = seq.steps[0];
+            if (first.input != firstInput) continue;
+            if (first.stance != PlayerStance.Any && first.stance != stanceNow) continue;
+
+            curSeq = seq;
+            StartStep(0);
+            return true;                    // מצאנו קומבו לופ‑ספאם והתחלנו אותו
+        }
+        return false;
     }
 
     void Update()
     {
-        var buf = InputBuffer.Instance.GetBuffer();
+
+        if (InputBuffer.Instance == null)
+        {
+            return;
+        }
+
+        if (step == -1)
+        {
+            bool stillInAttack =
+                animator.GetCurrentAnimatorStateInfo(0).IsTag("Attack") ||
+                (animator.IsInTransition(0) &&
+                 animator.GetNextAnimatorStateInfo(0).IsTag("Attack"));
+
+            if (stillInAttack)
+            {
+                // נבדוק אם יש אינפוט שאפשר להתחיל איתו קומבו לופ‑ספאם
+                List<FrameInput> loopBuf = InputBuffer.Instance.GetBuffer();
+                if (loopBuf.Count > 0)
+                {
+                    FrameInput last = loopBuf[^1];
+                    if (TryBeginLoopable(last.inputType))
+                    {
+                        loopBuf.RemoveAt(loopBuf.Count - 1);
+                        return;
+                    }
+                }
+
+                // אין קומבו לופ → מנקים כדי לא ליצור אגרוף רפאים
+                InputBuffer.Instance.GetBuffer().Clear();
+                queuedInput = null;
+                return;
+            }
+        }
+
+
+
+        List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
+
         if (buf.Count > 0)
         {
-            queuedInput = buf[^1].inputType;
+            FrameInput last = buf[buf.Count - 1];
+            queuedInput = last.inputType;
             buf.RemoveAt(buf.Count - 1);
         }
 
@@ -41,12 +107,16 @@ public class ComboController : MonoBehaviour
             queuedInput = null;
             chained = true;
         }
-
-        if (!chained && queuedInput.HasValue && TryBegin(queuedInput.Value))
+        if (!chained && queuedInput.HasValue)
         {
+            if (step < 0 && TryBegin(queuedInput.Value))
+            {
+                queuedInput = null;
+                return;
+            }
             queuedInput = null;
-            return;                     
         }
+
 
         if (step >= 0)
         {
@@ -58,31 +128,40 @@ public class ComboController : MonoBehaviour
 
     bool TryBegin(InputType firstInput)
     {
-        AttackSequence best = null;
+        PlayerStance stanceNow = PlayerStanceTracker.Current;
+        AttackSequence bestSeq = null;
+        int bestScore = -1;
 
-        foreach (var e in combos)
+        foreach (var entry in combos)
         {
-            var seq = e.sequence;
+            var seq = entry.sequence;
             if (seq == null || seq.steps.Length == 0) continue;
 
-            if (seq.steps[0].input != firstInput) continue;
+            var first = seq.steps[0];
+            if (first.input != firstInput) continue;
+            if (first.stance != PlayerStance.Any && first.stance != stanceNow) continue;
 
+            int score = seq.steps.Length;
             if (seq.steps.Length > 1 && queuedInput.HasValue &&
-                seq.steps[1].input != queuedInput.Value)
-                continue;
+                seq.steps[1].input == queuedInput.Value)
+                score += 100;         
 
-            if (best == null || seq.steps.Length > best.steps.Length)
-                best = seq;
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestSeq = seq;
+            }
         }
 
-        if (best != null)
+        if (bestSeq != null)
         {
-            curSeq = best;
+            curSeq = bestSeq;
             StartStep(0);
             return true;
         }
         return false;
     }
+
 
     void StartStep(int idx)
     {
@@ -90,11 +169,17 @@ public class ComboController : MonoBehaviour
         windowStep = -2;
         resetT = 0.4f;
 
+        var stepData = curSeq.steps[idx].attack;
+        Debug.Log($"[Combo] Step {idx}: attack = {stepData.attackName}");
+        activator.SetCurrentAttack(stepData);
+
+
         anim.Trigger(curSeq.steps[idx].trigger);
     }
 
     public void EnableChain()
     {
+        Debug.Log("EnableChain()");
         windowStep = step;
     }
 
@@ -108,3 +193,5 @@ public class ComboController : MonoBehaviour
         if (step == curSeq.steps.Length - 1) step = -1;
     }
 }
+
+
