@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Cube2
-  m_Shader: {fileID: -6465566751694194690, guid: 70271cd1c9301ac41a21380f8c1ca986, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 32c4a335b79ffa347b7271ca880af055, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -42,15 +42,23 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AmbientStrength: 0.3
+    - _FalloffAmount: 0.72
+    - _FresnelSize: 0.57
+    - _LightingCutoff: 0.13
     - _Outline_Strength: 0.595
     - _Outline_Width: 0.292
     - _QueueControl: 0
     - _QueueOffset: 0
     - _SahdowStrength: 0.429
+    - _Smoothness: 5365.5
     - _Srep: 1.48
     m_Colors:
     - _BaseColor: {r: 0.91682667, g: 0.6367924, b: 1, a: 0}
+    - _DiffuseColor: {r: 0.9240583, g: 0.5538448, b: 0.9245283, a: 1}
+    - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
     - _Outline_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &541950324059254184
