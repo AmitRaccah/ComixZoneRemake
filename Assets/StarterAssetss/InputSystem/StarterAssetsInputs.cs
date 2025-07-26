@@ -30,6 +30,23 @@ namespace StarterAssets
         public bool allowZMovementTemporarily = false;
 
 
+        public void OnUseSlot1(InputValue v) { if (v.isPressed) UseSlot(0); }
+        public void OnUseSlot2(InputValue v) { if (v.isPressed) UseSlot(1); }
+        public void OnUseSlot3(InputValue v) { if (v.isPressed) UseSlot(2); }
+
+
+        private void UseSlot(int idx)
+        {
+            var slots = InventoryManager.Instance.itemSlots;
+            if (idx < 0 || idx >= slots.Count) return;
+
+            var s = slots[idx];
+            if (s?.m_item != null)
+                s.OnUseItem();
+        }
+
+
+
 #if ENABLE_INPUT_SYSTEM
         public void OnMove(InputValue value)
         {
@@ -56,13 +73,18 @@ namespace StarterAssets
 
         public void OnPunch(InputValue v)
         {
-            if (v.isPressed)
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
                 InputBuffer.Instance.Add(InputType.Punch);
+            }
         }
+
         public void OnHeavyPunch(InputValue v)
         {
-            if (v.isPressed)
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
                 InputBuffer.Instance.Add(InputType.HeavyPunch);
+            }
         }
 
         public void OnPickUp(InputValue value)
