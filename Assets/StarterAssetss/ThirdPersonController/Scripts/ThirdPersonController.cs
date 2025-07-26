@@ -126,19 +126,22 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
 
+            /* ===== נעילה ===== */
             var locker = GetComponent<MovementLock>();
             bool locked = locker != null && locker.IsLocked;
 
-            if (locked && !prevLocked)         
+            if (locked && !prevLocked)         // נכנס לנעילה
             {
-                _input.jump = false;           
+                _input.jump = false;           // מבטל קפיצה שהוזנה תוך כדי
             }
             prevLocked = locked;
+            /* ================= */
 
             JumpAndGravity();
             GroundedCheck();
-            Move();            
+            Move();            // Move כבר עושה if (locker.IsLocked) return;
 
+            /* Buffering לדוגמה */
             //if (_input.punch)
             //{
             //    InputBuffer.Instance.Add(InputType.Punch);
@@ -232,7 +235,7 @@ namespace StarterAssets
                 _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
 
-                _animator.SetBool("Mirror", !faceRight);
+                _animator.SetBool("Mirror", !faceRight);  
             }
 
 

@@ -1,30 +1,18 @@
-﻿//using UnityEngine;
+﻿using UnityEngine;
 
-//public class AttackAnimationRelay : MonoBehaviour
-//{
-//    int myId;
-//    bool started;          
+public class AttackAnimationRelay : MonoBehaviour
+{
+    int myId;
+    void Awake() => myId = gameObject.GetInstanceID();
 
-//    void Awake()
-//    {
-//        myId = GetInstanceID();
-//    }
+    public void OnAttackEnd()
+    {
+        CombatBus.Publish(new AttackEndedEvent(myId));
+    }
 
-//    public void OnAttackStart()
-//    {
-//        if (started) return;        
-//        started = true;
+    public void OnAttackStart()
+    {
+        CombatBus.Publish(new AttackStartedEvent(gameObject.GetInstanceID()));
+    }
 
-//        Debug.Log("[Relay] AttackStarted " + myId);
-//        CombatBus.Publish(new AttackStartedEvent(myId));
-//    }
-
-//    public void OnAttackEnd()
-//    {
-//        if (!started) return;       
-//        started = false;
-
-//        Debug.Log("[Relay] AttackEnded " + myId);
-//        CombatBus.Publish(new AttackEndedEvent(myId));
-//    }
-//}
+}

@@ -1,15 +1,14 @@
 ﻿using Unity.Cinemachine;
 using UnityEngine;
 
-[RequireComponent(typeof(CinemachineImpulseSource))]
 public class CameraShakeOnHit : MonoBehaviour
 {
-    private CinemachineImpulseSource _impulseSource;
+    [SerializeField] private CinemachineImpulseSource impulse;
+    private int myId;
 
     private void Awake()
     {
-        _impulseSource = GetComponent<CinemachineImpulseSource>();
-        if (_impulseSource == null) ;
+        myId = gameObject.GetInstanceID();
     }
 
     private void OnEnable()
@@ -24,18 +23,19 @@ public class CameraShakeOnHit : MonoBehaviour
 
     private void OnDamage(DamageEvent e)
     {
+        if (e.attackerId != myId)
+        {
+            return;
+        }
 
-        float amplitude = e.attackData.shakeAmplitude;
-
-        if (amplitude > 0f)
-            _impulseSource.GenerateImpulse(Vector3.up * amplitude);
+        impulse.GenerateImpulse(Vector3.up * e.shakeAmplitude);
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            _impulseSource.GenerateImpulse(Vector3.up * 1f);
+            impulse.GenerateImpulse(Vector3.up * 1f);
         }
     }
 }

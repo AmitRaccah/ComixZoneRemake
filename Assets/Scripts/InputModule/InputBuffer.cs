@@ -19,8 +19,6 @@ public class InputBuffer : MonoBehaviour
 
     public void Add(InputType input)
     {
-        if (buffer.Count > 0 && buffer[^1].inputType == input &&
-            buffer[^1].frame == currentFrame) return;   
         buffer.Add(new FrameInput(input, currentFrame));
     }
 
