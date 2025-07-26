@@ -1,40 +1,31 @@
-
-using StarterAssets;
 using UnityEngine;
 
-[RequireComponent(typeof(ThirdPersonController))]
+[RequireComponent(typeof(Animator))]
 public class MovementLock : MonoBehaviour
 {
-    bool locked;
-    int myId;
+    private Animator _anim;
+    private bool _externalLock = false;  //For other scripts
 
-    void Awake() => myId = gameObject.GetInstanceID();
-
-    void OnEnable()
+    public bool IsLocked
     {
-        CombatBus.Subscribe<AttackStartedEvent>(OnStart);
-        CombatBus.Subscribe<AttackEndedEvent>(OnEnd);
-    }
-    void OnDisable()
-    {
-        CombatBus.Unsubscribe<AttackStartedEvent>(OnStart);
-        CombatBus.Unsubscribe<AttackEndedEvent>(OnEnd);
-    }
+        get
+        {
+            bool inAttack = _anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack");
+            bool nextAttack =
+                _anim.IsInTransition(0) &&
+                _anim.GetNextAnimatorStateInfo(0).IsTag("Attack");
 
-    void OnStart(AttackStartedEvent e)
-    {
-        if (e.attackerId != myId) return;
-        locked = true;
-
-        // flush residual velocity this frame
-        var ctrl = GetComponent<CharacterController>();
-        if (ctrl) ctrl.Move(Vector3.zero);
+            return _externalLock || inAttack || nextAttack;
+        }
     }
 
-    void OnEnd(AttackEndedEvent e)
+    public void SetExternalLock(bool state)
     {
-        if (e.attackerId == myId) locked = false;
+        _externalLock = state;
     }
 
-    public bool IsLocked => locked;
+    private void Awake()
+    {
+        _anim = GetComponent<Animator>();
+    }
 }

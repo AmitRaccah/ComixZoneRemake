@@ -1,103 +1,161 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Cinemachine;      // Cinemachine 3.x namespace
+using DG.Tweening;
+using Unity.Cinemachine;    // Cinemachine 3.x
 
 public class CrossAnime : MonoBehaviour
 {
-    /* ---------- Animation ---------- */
-    [Header("Animation Settings")]
-    [SerializeField] private string animationTriggerName = "Pass";
+    /* ───── Animation ───── */
+    [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
+    [SerializeField] private float crossFadeTime = 0.05f;   // blend time
 
-    /* ---------- Path ---------- */
-    [Header("Path Settings")]
-    [Tooltip("Way-points the player walks through (in order)")]
-    [SerializeField] private List<Transform> pathPoints = new();
-
-    /* ---------- Movement ---------- */
-    [Header("Movement Settings")]
-    [SerializeField] private float moveDelay = 0.1f;
+    /* ───── Movement ───── */
+    [Header("Movement")]
+    [SerializeField] private Transform pathPoint;
     [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float stoppingDistance = 0.05f;
+    [SerializeField] private float endDelay = 0.1f;
 
-    /* ---------- Camera ---------- */
-    [Header("Camera Switch")]
-    [Tooltip("Camera that is currently active before the transition")]
+    /* ───── Camera ───── */
+    [Header("Camera")]
     [SerializeField] private CinemachineVirtualCamera currentCam;
-    [Tooltip("Camera we want to cut / blend to during the transition")]
     [SerializeField] private CinemachineVirtualCamera targetCam;
     [SerializeField] private int camPriorityActive = 20;
     [SerializeField] private int camPriorityInactive = 5;
 
-    /* ======================================================== */
+    /* ───── Colliders to disable during pass ───── */
+    [Header("Colliders")]
+    [SerializeField] private Collider[] collidersToDisable;
 
-    private void OnTriggerEnter(Collider other)
+    /* ───── Down‑Pass Settings ───── */
+    [Header("Down Pass")]
+    [SerializeField] private bool requireCrouch = false;
+
+    /* ───────── State ───────── */
+    bool _triggered;
+    bool _playerInside;
+    Coroutine _waitRoutine;
+
+    /* ───────── Trigger Entry ───────── */
+    void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
-        StartCoroutine(MoveThroughPathWhenAnimationBegins(other.transform));
-    }
+        if (_triggered || !other.CompareTag("Player")) return;
+        _playerInside = true;
 
-    private IEnumerator MoveThroughPathWhenAnimationBegins(Transform player)
-    {
-        /* ----- 1. Unlock Z movement temporarily ----- */
-        var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
-        if (controller) controller.allowZMovementTemporarily = true;
+        var input = other.GetComponent<StarterAssets.StarterAssetsInputs>();
+        if (input == null) return;
 
-        /* ----- 2. Kick animation ----- */
-        Animator anim = player.GetComponentInChildren<Animator>();
-        if (anim) anim.SetTrigger(animationTriggerName);
-
-        /* ----- 3. Wait until state starts ----- */
-        yield return new WaitUntil(() =>
-            anim && !anim.IsInTransition(0) &&
-            anim.GetCurrentAnimatorStateInfo(0).IsName(animationStateName));
-
-        /* ----- 4. Switch camera once, right before movement ----- */
-        SwitchToTargetCamera();
-
-        /* ----- 5. Move along path ----- */
-        foreach (Transform point in pathPoints)
+        if (!requireCrouch)
         {
-            float sqStop = stoppingDistance * stoppingDistance;
-            float elapsed = 0f;
-            const float maxTime = 5f;
-
-            while ((player.position - point.position).sqrMagnitude > sqStop)
-            {
-                elapsed += Time.deltaTime;
-                if (elapsed > maxTime) break;
-
-                Vector3 dir = (point.position - player.position).normalized;
-                float step = moveSpeed * Time.deltaTime;
-                player.position = Vector3.MoveTowards(player.position, point.position, step);
-
-                if (dir.x != 0 || dir.z != 0)
-                    player.forward = new Vector3(dir.x, 0f, dir.z);
-
-                yield return null;
-            }
-
-            player.position = point.position; // snap
+            BeginPass(other.transform, input);
+            return;
         }
 
-        /* ----- 6. Lock Z again & done ----- */
-        yield return new WaitForSeconds(0.1f);
-        if (controller) controller.allowZMovementTemporarily = false;
+        if (input.crouch)
+            BeginPass(other.transform, input);
+        else
+            _waitRoutine = StartCoroutine(WaitForCrouch(input, other.transform));
     }
 
-    /* ======================================================== */
-    /* CAMERA HELPER                                            */
-    /* ======================================================== */
-
-    private void SwitchToTargetCamera()
+    /* ───────── Trigger Exit ───────── */
+    void OnTriggerExit(Collider other)
     {
-        if (targetCam == null) return;         
+        if (!other.CompareTag("Player")) return;
+        _playerInside = false;
 
-        if (currentCam) currentCam.Priority = camPriorityInactive;
-        targetCam.Priority = camPriorityActive;
+        if (!_triggered && _waitRoutine != null)
+        {
+            StopCoroutine(_waitRoutine);
+            _waitRoutine = null;
+        }
+    }
 
-        currentCam = targetCam;
-        targetCam = null;                     
+    /* ───────── Wait until crouch is pressed ───────── */
+    IEnumerator WaitForCrouch(StarterAssets.StarterAssetsInputs input, Transform player)
+    {
+        while (!_triggered && _playerInside)
+        {
+            if (input.crouch)
+            {
+                BeginPass(player, input);
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    /* ───────── Begin Pass ───────── */
+    void BeginPass(Transform player, StarterAssets.StarterAssetsInputs input)
+    {
+        _triggered = true;
+
+        if (requireCrouch && input.crouch)
+        {
+            CoreBus.Publish(new PlayerUncrouchEvent());
+            input.crouch = false;
+        }
+
+        StartCoroutine(DoStagePass(player));
+    }
+
+    /* ───────── Main Coroutine ───────── */
+    IEnumerator DoStagePass(Transform player)
+    {
+        var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
+        var input = player.GetComponent<StarterAssets.StarterAssetsInputs>();
+        var movementLock = player.GetComponent<MovementLock>();
+
+        if (controller)
+        {
+            controller.allowZMovementTemporarily = true;
+            controller.enabled = false;
+        }
+        if (input) input.enabled = false;
+        if (movementLock) movementLock.SetExternalLock(true);
+
+        foreach (var col in collidersToDisable)
+            if (col) col.enabled = false;
+
+        var anim = player.GetComponentInChildren<Animator>();
+        if (anim)
+        {
+            anim.SetBool("IsCrouching", false);               // safety
+            anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
+        }
+
+        yield return new WaitForSeconds(crossFadeTime);
+
+        if (targetCam)
+        {
+            if (currentCam) currentCam.Priority = camPriorityInactive;
+            targetCam.Priority = camPriorityActive;
+            currentCam = targetCam;
+            targetCam = null;
+        }
+
+        if (pathPoint)
+        {
+            float dist = Vector3.Distance(player.position, pathPoint.position);
+            float dur = dist / moveSpeed;
+
+            yield return player.DOMove(pathPoint.position, dur)
+                               .SetEase(Ease.Linear)
+                               .WaitForCompletion();
+        }
+
+        yield return new WaitForSeconds(endDelay);
+
+        if (controller)
+        {
+            controller.enabled = true;
+            controller.allowZMovementTemporarily = false;
+        }
+        if (input) input.enabled = true;
+        if (movementLock) movementLock.SetExternalLock(false);
+
+        foreach (var col in collidersToDisable)
+            if (col) col.enabled = true;
+
+        Destroy(this);
     }
 }
