@@ -18,8 +18,8 @@ public class CrossAnime : MonoBehaviour
 
     /* ───── Camera ───── */
     [Header("Camera")]
-    [SerializeField] private CinemachineVirtualCamera currentCam;
-    [SerializeField] private CinemachineVirtualCamera targetCam;
+    [SerializeField] private CinemachineCamera currentCam;  
+    [SerializeField] private CinemachineCamera targetCam;   
     [SerializeField] private int camPriorityActive = 20;
     [SerializeField] private int camPriorityInactive = 5;
 
@@ -127,8 +127,18 @@ public class CrossAnime : MonoBehaviour
 
         if (targetCam)
         {
-            if (currentCam) currentCam.Priority = camPriorityInactive;
+            targetCam.gameObject.SetActive(true);   
+            targetCam.enabled = true;               
+
+            if (currentCam)
+            {
+                currentCam.enabled = false;
+                currentCam.gameObject.SetActive(false);
+                currentCam.Priority = camPriorityInactive;
+            }
+
             targetCam.Priority = camPriorityActive;
+
             currentCam = targetCam;
             targetCam = null;
         }
