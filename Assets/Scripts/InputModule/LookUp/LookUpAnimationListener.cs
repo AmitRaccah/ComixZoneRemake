@@ -4,27 +4,37 @@ public class LookUpAnimationListener : MonoBehaviour
 {
     [SerializeField] private AnimationDriver animationDriver;
 
-    private void OnEnable()
+    // we’ll grab MovementLock on the same GameObject
+    MovementLock movementLock;
+
+    void Awake() => movementLock = GetComponent<MovementLock>();
+
+    void OnEnable()
     {
         CoreBus.Subscribe<PlayerLookUpEvent>(OnLookUpEvent);
         CoreBus.Subscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
     }
 
-private void OnDisable()
-{
-    CoreBus.Unsubscribe<PlayerLookUpEvent>(OnLookUpEvent);
-    CoreBus.Unsubscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
-}
+    void OnDisable()
+    {
+        CoreBus.Unsubscribe<PlayerLookUpEvent>(OnLookUpEvent);
+        CoreBus.Unsubscribe<PlayerUnLookUpEvent>(OnUnLookUpEvent);
+    }
 
-private void OnLookUpEvent(PlayerLookUpEvent evt)
-{
-    animationDriver.SetBool("IsLookUp", true);
-}
+    /* ——— callbacks ——— */
+    void OnLookUpEvent(PlayerLookUpEvent evt)
+    {
+        animationDriver.SetBool("IsLookUp", true);
 
-private void OnUnLookUpEvent(PlayerUnLookUpEvent e)
-{
-    animationDriver.SetBool("IsLookUp", false);
-}
+        // lock horizontal movement while looking up
+        if (movementLock) movementLock.SetExternalLock(true);
+    }
 
+    void OnUnLookUpEvent(PlayerUnLookUpEvent evt)
+    {
+        animationDriver.SetBool("IsLookUp", false);
 
+        // release the lock
+        if (movementLock) movementLock.SetExternalLock(false);
+    }
 }

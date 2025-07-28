@@ -85,6 +85,33 @@
                     "processors": "",
                     "interactions": "Press(behavior=2)",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "UseSlot1",
+                    "type": "Button",
+                    "id": "20720ea8-61f5-47ac-b78f-3f5e555daf89",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UseSlot2",
+                    "type": "Button",
+                    "id": "059b2b74-eada-4962-bcde-b636424ee370",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "UseSlot3",
+                    "type": "Button",
+                    "id": "9124c240-4782-48b4-a5ba-035b33861485",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -245,7 +272,7 @@
                 {
                     "name": "",
                     "id": "d1f75e53-74fc-4cce-b4b5-b7b6f5054eda",
-                    "path": "<Keyboard>/g",
+                    "path": "<Keyboard>/k",
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
@@ -256,7 +283,7 @@
                 {
                     "name": "",
                     "id": "3336c01b-9030-4a30-80ca-b2a2d313e672",
-                    "path": "<Keyboard>/h",
+                    "path": "<Keyboard>/l",
                     "interactions": "",
                     "processors": "",
                     "groups": ";KeyboardMouse",
@@ -283,6 +310,39 @@
                     "processors": "",
                     "groups": ";KeyboardMouse",
                     "action": "LookUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "17c0d7c6-f448-41e6-9e80-b78c832d4b1e",
+                    "path": "<Keyboard>/u",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseSlot1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3d6bf366-5ff3-4d08-be83-97f66731106d",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseSlot2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ae03cd0c-7e0e-44a4-a07a-0ed12b0c3398",
+                    "path": "<Keyboard>/o",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "UseSlot3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

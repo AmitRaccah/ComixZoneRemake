@@ -44,7 +44,7 @@ public class ComboController : MonoBehaviour
 
             curSeq = seq;
             StartStep(0);
-            return true;                    // מצאנו קומבו לופ‑ספאם והתחלנו אותו
+            return true;                   
         }
         return false;
     }
@@ -66,7 +66,6 @@ public class ComboController : MonoBehaviour
 
             if (stillInAttack)
             {
-                // נבדוק אם יש אינפוט שאפשר להתחיל איתו קומבו לופ‑ספאם
                 List<FrameInput> loopBuf = InputBuffer.Instance.GetBuffer();
                 if (loopBuf.Count > 0)
                 {
@@ -78,7 +77,6 @@ public class ComboController : MonoBehaviour
                     }
                 }
 
-                // אין קומבו לופ → מנקים כדי לא ליצור אגרוף רפאים
                 InputBuffer.Instance.GetBuffer().Clear();
                 queuedInput = null;
                 return;

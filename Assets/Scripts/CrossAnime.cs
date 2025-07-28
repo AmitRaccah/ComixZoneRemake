@@ -1,94 +1,170 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Unity.Cinemachine;      // Cinemachine 3.x namespace
+using DG.Tweening;
+using Unity.Cinemachine;    // Cinemachine 3.x
 
 public class CrossAnime : MonoBehaviour
 {
-    [Header("Animation Settings")]
-    [SerializeField] private string animationTriggerName = "Pass";
+    /* ───── Animation ───── */
+    [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
+    [SerializeField] private float crossFadeTime = 0.05f;   // blend time
 
+    /* ───── Movement ───── */
+    [Header("Movement")]
     [SerializeField] private Transform pathPoint;
-
-    [Header("Movement Settings")]
     [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float stoppingDistance = 0.05f;
+    [SerializeField] private float endDelay = 0.1f;
 
-    [Header("Camera Switch")]
-    [SerializeField] private CinemachineVirtualCamera currentCam;
-    [SerializeField] private CinemachineVirtualCamera targetCam;
+    /* ───── Camera ───── */
+    [Header("Camera")]
+    [SerializeField] private CinemachineCamera currentCam;  
+    [SerializeField] private CinemachineCamera targetCam;   
     [SerializeField] private int camPriorityActive = 20;
     [SerializeField] private int camPriorityInactive = 5;
 
-    [Header("Wall Collider")]
-    [SerializeField] private Collider wallCollider;
+    /* ───── Colliders to disable during pass ───── */
+    [Header("Colliders")]
+    [SerializeField] private Collider[] collidersToDisable;
 
-    private Coroutine _moveRoutine;
+    /* ───── Down‑Pass Settings ───── */
+    [Header("Down Pass")]
+    [SerializeField] private bool requireCrouch = false;
 
-    private void OnTriggerEnter(Collider other)
+    /* ───────── State ───────── */
+    bool _triggered;
+    bool _playerInside;
+    Coroutine _waitRoutine;
+
+    /* ───────── Trigger Entry ───────── */
+    void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player") || _moveRoutine != null) return;
-        _moveRoutine = StartCoroutine(MoveToPointSequence(other.transform));
+        if (_triggered || !other.CompareTag("Player")) return;
+        _playerInside = true;
+
+        var input = other.GetComponent<StarterAssets.StarterAssetsInputs>();
+        if (input == null) return;
+
+        if (!requireCrouch)
+        {
+            BeginPass(other.transform, input);
+            return;
+        }
+
+        if (input.crouch)
+            BeginPass(other.transform, input);
+        else
+            _waitRoutine = StartCoroutine(WaitForCrouch(input, other.transform));
     }
 
-    private IEnumerator MoveToPointSequence(Transform player)
+    /* ───────── Trigger Exit ───────── */
+    void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+        _playerInside = false;
+
+        if (!_triggered && _waitRoutine != null)
+        {
+            StopCoroutine(_waitRoutine);
+            _waitRoutine = null;
+        }
+    }
+
+    /* ───────── Wait until crouch is pressed ───────── */
+    IEnumerator WaitForCrouch(StarterAssets.StarterAssetsInputs input, Transform player)
+    {
+        while (!_triggered && _playerInside)
+        {
+            if (input.crouch)
+            {
+                BeginPass(player, input);
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
+    /* ───────── Begin Pass ───────── */
+    void BeginPass(Transform player, StarterAssets.StarterAssetsInputs input)
+    {
+        _triggered = true;
+
+        if (requireCrouch && input.crouch)
+        {
+            CoreBus.Publish(new PlayerUncrouchEvent());
+            input.crouch = false;
+        }
+
+        StartCoroutine(DoStagePass(player));
+    }
+
+    /* ───────── Main Coroutine ───────── */
+    IEnumerator DoStagePass(Transform player)
     {
         var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
-        if (controller != null)
+        var input = player.GetComponent<StarterAssets.StarterAssetsInputs>();
+        var movementLock = player.GetComponent<MovementLock>();
+
+        if (controller)
         {
             controller.allowZMovementTemporarily = true;
             controller.enabled = false;
         }
+        if (input) input.enabled = false;
+        if (movementLock) movementLock.SetExternalLock(true);
 
-        if (wallCollider != null)
-            wallCollider.enabled = false;
+        foreach (var col in collidersToDisable)
+            if (col) col.enabled = false;
 
         var anim = player.GetComponentInChildren<Animator>();
-        if (anim != null)
-            anim.SetTrigger(animationTriggerName);
-
-        yield return new WaitUntil(() =>
-            anim != null &&
-            !anim.IsInTransition(0) &&
-            anim.GetCurrentAnimatorStateInfo(0).IsName(animationStateName)
-        );
-
-        if (targetCam != null)
+        if (anim)
         {
-            if (currentCam != null) currentCam.Priority = camPriorityInactive;
+            anim.SetBool("IsCrouching", false);               // safety
+            anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
+        }
+
+        yield return new WaitForSeconds(crossFadeTime);
+
+        if (targetCam)
+        {
+            targetCam.gameObject.SetActive(true);   
+            targetCam.enabled = true;               
+
+            if (currentCam)
+            {
+                currentCam.enabled = false;
+                currentCam.gameObject.SetActive(false);
+                currentCam.Priority = camPriorityInactive;
+            }
+
             targetCam.Priority = camPriorityActive;
+
             currentCam = targetCam;
             targetCam = null;
         }
 
-        if (pathPoint != null)
+        if (pathPoint)
         {
-            float sqStop = stoppingDistance * stoppingDistance;
-            while ((player.position - pathPoint.position).sqrMagnitude > sqStop)
-            {
-                Vector3 dir = (pathPoint.position - player.position).normalized;
-                player.position = Vector3.MoveTowards(
-                    player.position,
-                    pathPoint.position,
-                    moveSpeed * Time.deltaTime
-                );
+            float dist = Vector3.Distance(player.position, pathPoint.position);
+            float dur = dist / moveSpeed;
 
-                player.forward = new Vector3(dir.x, 0f, dir.z);
-                yield return null;
-            }
-            player.position = pathPoint.position;
+            yield return player.DOMove(pathPoint.position, dur)
+                               .SetEase(Ease.Linear)
+                               .WaitForCompletion();
         }
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(endDelay);
 
-        if (controller != null)
+        if (controller)
         {
             controller.enabled = true;
             controller.allowZMovementTemporarily = false;
         }
+        if (input) input.enabled = true;
+        if (movementLock) movementLock.SetExternalLock(false);
 
-        if (wallCollider != null)
-            wallCollider.enabled = true;
+        foreach (var col in collidersToDisable)
+            if (col) col.enabled = true;
 
         Destroy(this);
     }
