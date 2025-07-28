@@ -21,7 +21,7 @@ namespace StarterAssets
 
         [Header("Mouse Cursor Settings")]
         public bool cursorLocked = true;
-        public bool cursorInputForLook = true;
+        //public bool cursorInputForLook = true;
 
         public bool crouch;
         public bool lookUp;
@@ -53,13 +53,13 @@ namespace StarterAssets
             MoveInput(value.Get<Vector2>());
         }
 
-        public void OnLook(InputValue value)
-        {
-            if (cursorInputForLook)
-            {
-                LookInput(value.Get<Vector2>());
-            }
-        }
+        //public void OnLook(InputValue value)
+        //{
+        //    if (cursorInputForLook)
+        //    {
+        //        LookInput(value.Get<Vector2>());
+        //    }
+        //}
 
         public void OnJump(InputValue value)
         {
@@ -136,10 +136,10 @@ namespace StarterAssets
             move = newMoveDirection;
         }
 
-        public void LookInput(Vector2 newLookDirection)
-        {
-            look = newLookDirection;
-        }
+        //public void LookInput(Vector2 newLookDirection)
+        //{
+        //    look = newLookDirection;
+        //}
 
         public void JumpInput(bool newJumpState)
         {
