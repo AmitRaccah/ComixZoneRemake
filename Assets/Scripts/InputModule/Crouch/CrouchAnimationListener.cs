@@ -4,30 +4,31 @@ public class CrouchAnimationListener : MonoBehaviour
 {
     [SerializeField] private AnimationDriver animationDriver;
 
-    private void OnEnable()
+    MovementLock movementLock;
+
+    void Awake() => movementLock = GetComponent<MovementLock>();
+
+    void OnEnable()
     {
-        Debug.Log("Crouch Listener Enabled");
         CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
         CoreBus.Subscribe<PlayerUncrouchEvent>(OnUncrouchEvent);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
         CoreBus.Unsubscribe<PlayerUncrouchEvent>(OnUncrouchEvent);
     }
 
-    private void OnCrouchEvent(PlayerCrouchEvent evt)
+    void OnCrouchEvent(PlayerCrouchEvent _)
     {
         animationDriver.SetBool("IsCrouching", true);
+        if (movementLock) movementLock.SetExternalLock(true);  
     }
 
-    private void OnUncrouchEvent(PlayerUncrouchEvent e)
+    void OnUncrouchEvent(PlayerUncrouchEvent _)
     {
-        Debug.Log("► Un-crouch event received");
         animationDriver.SetBool("IsCrouching", false);
+        if (movementLock) movementLock.SetExternalLock(false);
     }
-
-
-
 }
