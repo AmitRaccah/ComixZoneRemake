@@ -31,11 +31,11 @@ public class CameraShakeOnHit : MonoBehaviour
             _impulseSource.GenerateImpulse(Vector3.up * amplitude);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            _impulseSource.GenerateImpulse(Vector3.up * 1f);
-        }
-    }
+    //private void Update()
+    //{
+    //    if (Input.GetKeyDown(KeyCode.P))
+    //    {
+    //        _impulseSource.GenerateImpulse(Vector3.up * 1f);
+    //    }
+    //}
 }
