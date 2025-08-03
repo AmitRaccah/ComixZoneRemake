@@ -39,6 +39,9 @@ public class EnemyRecognizePlayer : MonoBehaviour
         //}
 
         FindPlayer();
+
+        _agent.SetVariableValue("PlayerTransform", _player.gameObject);
+
     }
 
     void Update()
