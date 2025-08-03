@@ -1,62 +1,110 @@
+
 using UnityEngine;
 using System.Collections;
+using Unity.Behavior;
+using Unity.AppUI.Core;
 
 
-[RequireComponent(typeof(SphereCollider))]
+[RequireComponent(typeof(BehaviorGraphAgent))]
+[RequireComponent(typeof(EnemyCore))]
 
 public class EnemyRecognizePlayer : MonoBehaviour
 {
-   private EnemyCore _core;
-    private bool _canSeePlayer = false;
+    public float viewDistance = 5f;
+    private BehaviorGraphAgent _agent;
+    private Transform _player;
 
-    public bool CanSeePlayer
+    public float eyeHeight = 1.6f;
+    public float attackDistance = 1.2f;
+    public Vector3 boxHalfExtents = new Vector3(0.5f, 0.9f, 0.1f);
+
+    private Blackboard _bb;
+
+    //private BlackboardVariable<bool> _canSeeVar;
+    //private BlackboardVariable<bool> _inRangeVar;
+
+   // public float radius = 0.5f;
+
+    void Awake()
     {
-        get { return _canSeePlayer; }
+        _agent = GetComponent<BehaviorGraphAgent>();
+
+        //foreach (BlackboardVariable v in _bb.Variables)
+        //{
+        //    if (v.Name == "CanSeePlayer")
+        //        _canSeeVar = v as BlackboardVariable<bool>;
+
+        //    if (v.Name == "IsInAttackRange")
+        //        _inRangeVar = v as BlackboardVariable<bool>;
+        //}
+
+        FindPlayer();
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-
-    public void Awake()
-    {
-        _core = GetComponent<EnemyCore>();
-
-        SphereCollider col = GetComponent<SphereCollider>();
-        col.isTrigger = true;
-        if (col.radius == 0)
-        {
-            col.radius = 2.5f;
-        }
-    }
-
-    private void OnEnterTrigger(Collider other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            if (!_canSeePlayer)
-            {
-                _canSeePlayer = true;
-        //        CombatBus.Publish(new EnemySpottedPlayerEvent(_core.gameObject.GetInstanceID()));
-            }
-        }
-    }
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
+        if (_player == null) return;
+
+        Vector3 dir = transform.forward;
+        Vector3 eye = transform.position + Vector3.up * eyeHeight;
+
         RaycastHit hit;
+        bool seeingPlayer =
+            Physics.BoxCast(eye,                 // start point
+                            boxHalfExtents,      // scale
+                            dir,                 // direction
+                            out hit,
+                            transform.rotation,  // box rotate
+                            viewDistance)        // distance
+            && hit.transform == _player;
 
-        float distanceToObstacle = 0;
+        if (seeingPlayer)
+            Debug.Log("BoxCast hit " + hit.transform.name);
 
-  //      Vector3 e1 = transform.position + _core;
 
-  //     if (Physics.SphereCast())
+        float dist = Vector3.Distance(transform.position, _player.position);
+        bool inRange = seeingPlayer && dist <= attackDistance;
+
+        _agent.SetVariableValue<bool>("CanSeePlayer", seeingPlayer);
+        _agent.SetVariableValue<bool>("IsInAttackRange", inRange);
+
+        Debug.DrawLine(eye, eye + dir * viewDistance,
+                       seeingPlayer ? Color.green : Color.red);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+#if UNITY_EDITOR
+        Vector3 eye = transform.position + Vector3.up * eyeHeight;
+        Vector3 dir = transform.forward;
+        Vector3 end = eye + dir * viewDistance;
+
+        var prevMatrix = UnityEditor.Handles.matrix;
+
+        UnityEditor.Handles.matrix = Matrix4x4.TRS(eye, transform.rotation, Vector3.one);
+        UnityEditor.Handles.color = Color.cyan;
+        UnityEditor.Handles.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
+
+        UnityEditor.Handles.matrix = Matrix4x4.TRS(end, transform.rotation, Vector3.one);
+        UnityEditor.Handles.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
+
+        UnityEditor.Handles.matrix = prevMatrix;
+        UnityEditor.Handles.DrawLine(eye, end);
+
+        UnityEditor.Handles.matrix = prevMatrix;
+#endif
+    }
+
+
+    private void FindPlayer()
+    {
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
         {
-   //         distanceToObstacle = hit.distance;
+            _player = player.transform;
         }
-        ;
+
+
     }
 }
