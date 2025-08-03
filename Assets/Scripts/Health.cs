@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class Health : MonoBehaviour
 {
-    [SerializeField] private int maxHp = 20;
+    [SerializeField] int maxHp = 20;
+    [SerializeField] bool useKnockback = true;   
 
-    int hp;            
-    int myId;          
-    Rigidbody rb;
+    int hp;
+    int myId;
+    Rigidbody rb;         
+    CharacterController cc;     
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
         myId = gameObject.GetInstanceID();
+        rb = GetComponent<Rigidbody>();        
+        cc = GetComponent<CharacterController>();
     }
 
     void OnEnable()
@@ -25,16 +27,15 @@ public class Health : MonoBehaviour
 
     void OnDamage(DamageEvent e)
     {
-        if (e.targetId != myId) return; 
+        if (e.targetId != myId) return;
 
         hp -= e.amount;
         Debug.Log($"{name} ► HP:{hp}");
 
-        if (e.knockback > 0)
+        if (useKnockback && e.knockback > 0)
             ApplyKnockback(e.attackerId, e.knockback);
 
-        if (hp <= 0)
-            Die(e.attackerId);
+        if (hp <= 0) Die(e.attackerId);
     }
 
     void ApplyKnockback(int attackerId, float force)
@@ -43,8 +44,16 @@ public class Health : MonoBehaviour
             return;
 
         Vector3 dir = (transform.position - atk.position).normalized;
-        dir.y = 0f;
-        rb.AddForce(dir * force, ForceMode.Impulse);
+        dir.y = 0;
+
+        if (rb != null)                               
+        {
+            rb.AddForce(dir * force, ForceMode.Impulse);
+        }
+        else if (cc != null)                        
+        {
+            cc.Move(dir * force * 0.05f);
+        }
     }
 
     void Die(int killerId)
@@ -58,14 +67,5 @@ public class Health : MonoBehaviour
     }
 }
 
-public struct EnemyDownEvent
-{
-    public int enemyId, killerId;
-    public EnemyDownEvent(int e, int k) { enemyId = e; killerId = k; }
-}
-
-public struct PlayerDownEvent
-{
-    public int playerId, killerId;
-    public PlayerDownEvent(int p, int k) { playerId = p; killerId = k; }
-}
+public struct EnemyDownEvent { public int enemyId, killerId; public EnemyDownEvent(int e, int k) { enemyId = e; killerId = k; } }
+public struct PlayerDownEvent { public int playerId, killerId; public PlayerDownEvent(int p, int k) { playerId = p; killerId = k; } }
