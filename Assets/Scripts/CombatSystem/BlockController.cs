@@ -4,23 +4,24 @@
 public class BlockController : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float blockStartup = 0.1f;
-    [SerializeField] private float blockRecovery = 0.15f;
+    [SerializeField] private float blockStartup = 0.10f;   
+    [SerializeField] private float blockRecovery = 0.15f;  
 
     private Animator anim;
-    private MovementLock mLock;    // ← NEW
+    private MovementLock mLock;
     private float stateTimer;
 
     private enum BState { Idle, Starting, Holding, Recovery }
-    private BState curState;
+    private BState curState = BState.Idle;
 
-    public bool IsBlocking { get { return curState == BState.Holding; } }
-    public bool IsInRecovery { get { return curState == BState.Recovery; } }
+    public bool IsBlocking => curState == BState.Holding;
+    public bool IsInRecovery => curState == BState.Recovery;
+
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        mLock = GetComponent<MovementLock>();   // יכול להיות null
+        mLock = GetComponent<MovementLock>();     
     }
 
     private void Update()
@@ -57,6 +58,7 @@ public class BlockController : MonoBehaviour
         }
     }
 
+
     private bool IsInHitAnimation()
     {
         AnimatorStateInfo cur = anim.GetCurrentAnimatorStateInfo(0);
@@ -92,6 +94,4 @@ public class BlockController : MonoBehaviour
 
         if (mLock != null) mLock.SetExternalLock(false);
     }
-
-
 }

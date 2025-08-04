@@ -21,12 +21,23 @@ public class HitboxController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (socket == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         transform.position = socket.TransformPoint(data.hitboxOffset);
 
-        if (!armed) { GetComponent<Collider>().enabled = true; armed = true; }
+        if (!armed)
+        {
+            GetComponent<Collider>().enabled = true;
+            armed = true;
+        }
 
         timer -= Time.deltaTime;
-        if (timer <= 0f) Destroy(gameObject);
+        if (timer <= 0f)
+            Destroy(gameObject);
     }
 
 
@@ -61,5 +72,7 @@ public class HitboxController : MonoBehaviour
             Instantiate(data.hitEffectPrefab, pos, socket.rotation);
         }
     }
+
+
 
 }
