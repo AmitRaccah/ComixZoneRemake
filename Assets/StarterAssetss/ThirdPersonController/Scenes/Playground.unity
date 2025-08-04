@@ -723,6 +723,7 @@ MonoBehaviour:
   useKnockback: 1
   deathTriggerName: Death
   removeDelay: 2
+  blockEffectPrefab: {fileID: 0}
 --- !u!114 &700303557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -754,6 +755,7 @@ MonoBehaviour:
   rightFootSocket: {fileID: 0}
   attacks:
   - {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
+  - {fileID: 11400000, guid: 5a3df0bfb2058724d8fcfe842da848c1, type: 2}
   hitboxPrefab: {fileID: 7213787313247441692, guid: 18db901701e80ef4e8ecd1f0e03b0a3f, type: 3}
   animator: {fileID: 700303562}
 --- !u!95 &700303562 stripped
@@ -819,6 +821,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 948cc17035c00934f81ebfe766bd19b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &700303572
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700303537}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e46b00a6c809c6144903accf08f5dbc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  myId: 0
 --- !u!1001 &746329221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1534,7 +1549,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.20000005
+      value: 3.34
       objectReference: {fileID: 0}
     - target: {fileID: 8944336655422409503, guid: f6d148d888ffbf54b9afe9936dfaec1f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2374,6 +2389,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 700303567}
+    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 700303572}
   m_SourcePrefab: {fileID: 100100000, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
 --- !u!1001 &1485712572387198493
 PrefabInstance:
@@ -2676,10 +2694,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fea9b7ce0d2afe4c83808bbdfb7a375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 20
+  maxHp: 100
   useKnockback: 1
   deathTriggerName: Death
   removeDelay: 2
+  blockEffectPrefab: {fileID: 0}
+--- !u!114 &2415317214193729974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273271560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9749ebe7483bf6f4bb66cb6ba7db8c47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockStartup: 0.1
+  blockRecovery: 0.15
 --- !u!1001 &4734669572394389155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3026,6 +3059,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6435533612568276109, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2415317214193729956}
+    - targetCorrespondingSourceObject: {fileID: 6435533612568276109, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2415317214193729974}
   m_SourcePrefab: {fileID: 100100000, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
 --- !u!1001 &6457730513962305502
 PrefabInstance:

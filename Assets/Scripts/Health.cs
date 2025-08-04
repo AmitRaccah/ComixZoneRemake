@@ -45,18 +45,50 @@ public class Health : MonoBehaviour
 
     private void OnDamage(DamageEvent e)
     {
-        if (isDead) return;                
-        if (e.targetId != myId) return;
+        if (isDead) return;                 
+        if (e.targetId != myId) return;     
+
+        BlockController bc = GetComponent<BlockController>();
+        bool blocked = bc != null && bc.IsBlocking && IsFacingAttacker(e.attackerId);
+
+        if (blocked)
+        {
+            Debug.Log($"{name} ► Blocked!");
+            SpawnBlockSpark();              
+            return;                        
+        }
 
         hp -= e.amount;
-        Debug.Log(name + " ► HP: " + hp);
+        Debug.Log($"{name} ► HP: {hp}");
 
-        if (useKnockback && e.knockback > 0)
+        if (useKnockback && e.knockback > 0f)
             ApplyKnockback(e.attackerId, e.knockback);
 
         if (hp <= 0)
             Die(e.attackerId);
     }
+
+    private bool IsFacingAttacker(int attackerId)
+    {
+        Transform atk;
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk))
+            return false;
+
+        Vector3 dir = (atk.position - transform.position).normalized; 
+        float dp = Vector3.Dot(transform.forward, dir);           
+        return dp > 0.3f;  
+    }
+
+    [SerializeField] private GameObject blockEffectPrefab;
+
+    private void SpawnBlockSpark()
+    {
+        if (blockEffectPrefab == null) return;
+
+        Vector3 pos = transform.position + Vector3.up * 1.2f;
+        Instantiate(blockEffectPrefab, pos, Quaternion.identity);
+    }
+
 
     private void ApplyKnockback(int attackerId, float force)
     {
@@ -107,7 +139,7 @@ public class Health : MonoBehaviour
         if (cc != null)
             cc.enabled = false;
 
-        // Colliders אחרים
+        // Colliders
         Collider[] cols = GetComponentsInChildren<Collider>();
         for (int i = 0; i < cols.Length; i++)
             cols[i].enabled = false;

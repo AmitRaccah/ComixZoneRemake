@@ -29,11 +29,21 @@ namespace StarterAssets
 
         public bool allowZMovementTemporarily = false;
 
+        public bool block;
+
 
         public void OnUseSlot1(InputValue v) { if (v.isPressed) UseSlot(0); }
         public void OnUseSlot2(InputValue v) { if (v.isPressed) UseSlot(1); }
         public void OnUseSlot3(InputValue v) { if (v.isPressed) UseSlot(2); }
 
+        public void OnBlock(InputValue v)
+        {
+            bool pressed = v.Get<float>() > 0.5f;
+            block = pressed;
+
+            if (pressed && InputBuffer.Instance != null)
+                InputBuffer.Instance.Add(InputType.Block);
+        }
 
         private void UseSlot(int idx)
         {

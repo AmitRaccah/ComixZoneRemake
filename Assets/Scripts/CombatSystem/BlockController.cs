@@ -1,0 +1,80 @@
+﻿using UnityEngine;
+
+[RequireComponent(typeof(Animator))]
+public class BlockController : MonoBehaviour
+{
+    [Header("Settings")]
+    [SerializeField] private float blockStartup = 0.1f;
+    [SerializeField] private float blockRecovery = 0.15f;
+
+    private Animator anim;
+    private MovementLock mLock;    // ← NEW
+    private float stateTimer;
+
+    private enum BState { Idle, Starting, Holding, Recovery }
+    private BState curState;
+
+    public bool IsBlocking { get { return curState == BState.Holding; } }
+    public bool IsInRecovery { get { return curState == BState.Recovery; } }
+
+    private void Awake()
+    {
+        anim = GetComponent<Animator>();
+        mLock = GetComponent<MovementLock>();   // יכול להיות null
+    }
+
+    private void Update()
+    {
+        stateTimer -= Time.deltaTime;
+
+        switch (curState)
+        {
+            case BState.Starting:
+                if (stateTimer <= 0f)
+                    EnterHolding();
+                break;
+
+            case BState.Recovery:
+                if (stateTimer <= 0f)
+                    curState = BState.Idle;
+                break;
+        }
+    }
+
+    public void SetBlockInput(bool pressed)
+    {
+        if (pressed)
+        {
+            if (curState == BState.Idle)
+                EnterStartup();
+        }
+        else
+        {
+            if (curState == BState.Holding)
+                EnterRecovery();
+        }
+    }
+
+    private void EnterStartup()
+    {
+        curState = BState.Starting;
+        stateTimer = blockStartup;
+        anim.SetBool("IsBlocking", true);
+
+        if (mLock != null) mLock.SetExternalLock(true);
+    }
+
+    private void EnterHolding()
+    {
+        curState = BState.Holding;
+    }
+
+    private void EnterRecovery()
+    {
+        curState = BState.Recovery;
+        stateTimer = blockRecovery;
+        anim.SetBool("IsBlocking", false);
+
+        if (mLock != null) mLock.SetExternalLock(false);
+    }
+}
