@@ -205,6 +205,7 @@ namespace StarterAssets
         private void Move()
         {
 
+
             if (GetComponent<MovementLock>().IsLocked) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;

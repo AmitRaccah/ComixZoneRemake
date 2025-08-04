@@ -43,6 +43,8 @@ public class BlockController : MonoBehaviour
 
     public void SetBlockInput(bool pressed)
     {
+        if (pressed && IsInHitAnimation()) return;
+
         if (pressed)
         {
             if (curState == BState.Idle)
@@ -53,6 +55,19 @@ public class BlockController : MonoBehaviour
             if (curState == BState.Holding)
                 EnterRecovery();
         }
+    }
+
+    private bool IsInHitAnimation()
+    {
+        AnimatorStateInfo cur = anim.GetCurrentAnimatorStateInfo(0);
+        if (cur.IsTag("Hit")) return true;
+
+        if (anim.IsInTransition(0))
+        {
+            AnimatorStateInfo next = anim.GetNextAnimatorStateInfo(0);
+            if (next.IsTag("Hit")) return true;
+        }
+        return false;
     }
 
     private void EnterStartup()
@@ -77,4 +92,6 @@ public class BlockController : MonoBehaviour
 
         if (mLock != null) mLock.SetExternalLock(false);
     }
+
+
 }

@@ -188,7 +188,9 @@ public class ComboController : MonoBehaviour
 
     public void EndStep()
     {
-        if (step == curSeq.steps.Length - 1) step = -1;
+        if (curSeq == null) return;
+        if (step == curSeq.steps.Length - 1)
+            step = -1;
     }
 }
 

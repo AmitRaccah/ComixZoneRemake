@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using StarterAssets;
 
 [RequireComponent(typeof(Animator))]
 public class Health : MonoBehaviour
@@ -119,6 +120,10 @@ public class Health : MonoBehaviour
             anim.SetTrigger(deathTriggerHash);
 
         DisableCollisions();
+
+        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
+        if (tpc != null)
+            tpc.enabled = false;
 
         StartCoroutine(RemoveAfterDelay());
     }

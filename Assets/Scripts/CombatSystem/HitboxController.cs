@@ -12,7 +12,7 @@ public class HitboxController : MonoBehaviour
     {
         data = d;
         socket = hand;
-        this.attackerId = attackerId; 
+        this.attackerId = attackerId;
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
@@ -28,6 +28,7 @@ public class HitboxController : MonoBehaviour
         timer -= Time.deltaTime;
         if (timer <= 0f) Destroy(gameObject);
     }
+
 
     void OnTriggerEnter(Collider other)
     {
