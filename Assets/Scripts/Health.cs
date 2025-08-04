@@ -1,112 +1,100 @@
 ﻿using UnityEngine;
 using System.Collections;
-using StarterAssets;
 
 [RequireComponent(typeof(Animator))]
 public class Health : MonoBehaviour
 {
     [Header("Stats")]
     [SerializeField] private int maxHp = 20;
-    [SerializeField] private bool useKnockback = true;
+    [SerializeField] private float defaultHitStun = 0.25f;
 
     [Header("Death")]
     [SerializeField] private string deathTriggerName = "Death";
-    [SerializeField] private float removeDelay = 2.0f; 
+    [SerializeField] private float removeDelay = 2f;
 
     private int hp;
+    private float stunTimer;
+    public bool IsStunned => stunTimer > 0f;
+
     private int myId;
     private bool isDead;
-
     private Rigidbody rb;
     private CharacterController cc;
     private Animator anim;
+    private int deathHash;
 
-    private int deathTriggerHash;
+    /* ────────── lifecycle ────────── */
 
-    private void Awake()
+    void Awake()
     {
         myId = gameObject.GetInstanceID();
         rb = GetComponent<Rigidbody>();
-        cc = GetComponent<CharacterController>();  
+        cc = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
-
-        deathTriggerHash = Animator.StringToHash(deathTriggerName);
+        deathHash = Animator.StringToHash(deathTriggerName);
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         hp = maxHp;
         CombatBus.Subscribe<DamageEvent>(OnDamage);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-    private void OnDamage(DamageEvent e)
+    void Update()
     {
-        if (isDead) return;                 
-        if (e.targetId != myId) return;     
+        if (stunTimer > 0f)
+            stunTimer -= Time.deltaTime;
+    }
+
+    /* ────────── damage ────────── */
+
+    void OnDamage(DamageEvent e)
+    {
+        if (isDead || e.targetId != myId) return;
 
         BlockController bc = GetComponent<BlockController>();
-        bool blocked = bc != null && bc.IsBlocking && IsFacingAttacker(e.attackerId);
-
-        if (blocked)
-        {
-            Debug.Log($"{name} ► Blocked!");
-            SpawnBlockSpark();              
-            return;                        
-        }
+        bool blocked = bc && bc.IsBlocking && IsFacingAttacker(e.attackerId);
+        if (blocked) return;
 
         hp -= e.amount;
-        Debug.Log($"{name} ► HP: {hp}");
+        stunTimer = defaultHitStun;
 
-        if (useKnockback && e.knockback > 0f)
+        if (e.knockback > 0f)
             ApplyKnockback(e.attackerId, e.knockback);
 
         if (hp <= 0)
             Die(e.attackerId);
     }
 
-    private bool IsFacingAttacker(int attackerId)
+    bool IsFacingAttacker(int attackerId)
     {
-        Transform atk;
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk))
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk))
             return false;
 
-        Vector3 dir = (atk.position - transform.position).normalized; 
-        float dp = Vector3.Dot(transform.forward, dir);           
-        return dp > 0.3f;  
+        Vector3 dir = (atk.position - transform.position).normalized;
+        return Vector3.Dot(transform.forward, dir) > 0.3f;
     }
 
-    [SerializeField] private GameObject blockEffectPrefab;
-
-    private void SpawnBlockSpark()
+    void ApplyKnockback(int attackerId, float force)
     {
-        if (blockEffectPrefab == null) return;
-
-        Vector3 pos = transform.position + Vector3.up * 1.2f;
-        Instantiate(blockEffectPrefab, pos, Quaternion.identity);
-    }
-
-
-    private void ApplyKnockback(int attackerId, float force)
-    {
-        Transform atk;
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk))
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk))
             return;
 
         Vector3 dir = (transform.position - atk.position).normalized;
         dir.y = 0f;
 
-        if (rb != null)
-            rb.AddForce(dir * force, ForceMode.Impulse);
-        else if (cc != null)
-            cc.Move(dir * force * 0.05f);
+        if (rb) rb.AddForce(dir * force, ForceMode.Impulse);
+        else if (cc) cc.Move(dir * force * 0.05f);
     }
 
-    private void Die(int killerId)
+    /* ────────── death ────────── */
+
+    void Die(int killerId)
     {
         if (isDead) return;
         isDead = true;
@@ -116,51 +104,31 @@ public class Health : MonoBehaviour
         else
             CombatBus.Publish(new EnemyDownEvent(myId, killerId));
 
-        if (anim != null)
-            anim.SetTrigger(deathTriggerHash);
-
+        anim.SetTrigger(deathHash);
         DisableCollisions();
 
-        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
-        if (tpc != null)
-            tpc.enabled = false;
+        var tpc = GetComponent<StarterAssets.ThirdPersonController>();
+        if (tpc) tpc.enabled = false;
 
         StartCoroutine(RemoveAfterDelay());
     }
 
-    private IEnumerator RemoveAfterDelay()
+    IEnumerator RemoveAfterDelay()
     {
         yield return new WaitForSeconds(removeDelay);
         Destroy(gameObject);
     }
 
-    private void DisableCollisions()
+    void DisableCollisions()
     {
-        // Rigidbody
-        if (rb != null)
-            rb.isKinematic = true;
+        if (rb) rb.isKinematic = true;
+        if (cc) cc.enabled = false;
 
-        // CharacterController
-        if (cc != null)
-            cc.enabled = false;
-
-        // Colliders
-        Collider[] cols = GetComponentsInChildren<Collider>();
-        for (int i = 0; i < cols.Length; i++)
-            cols[i].enabled = false;
+        foreach (var col in GetComponentsInChildren<Collider>())
+            col.enabled = false;
     }
 }
 
-public struct EnemyDownEvent
-{
-    public int enemyId;
-    public int killerId;
-    public EnemyDownEvent(int e, int k) { enemyId = e; killerId = k; }
-}
-
-public struct PlayerDownEvent
-{
-    public int playerId;
-    public int killerId;
-    public PlayerDownEvent(int p, int k) { playerId = p; killerId = k; }
-}
+/* events */
+public struct EnemyDownEvent { public int enemyId, killerId; public EnemyDownEvent(int e, int k) { enemyId = e; killerId = k; } }
+public struct PlayerDownEvent { public int playerId, killerId; public PlayerDownEvent(int p, int k) { playerId = p; killerId = k; } }

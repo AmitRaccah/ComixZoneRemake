@@ -76,26 +76,29 @@ namespace StarterAssets
             JumpInput(value.isPressed);
         }
 
+        // ----- PUNCH -----
+        public void OnPunch(InputValue v)
+        {
+            if (!v.isPressed) return;
+            if (GetComponent<Health>()?.IsStunned == true) return;  
+
+            InputBuffer.Instance?.Add(InputType.Punch);
+        }
+
+        // ----- HEAVY PUNCH -----
+        public void OnHeavyPunch(InputValue v)
+        {
+            if (!v.isPressed) return;
+            if (GetComponent<Health>()?.IsStunned == true) return;  
+
+            InputBuffer.Instance?.Add(InputType.HeavyPunch);
+        }
+
         public void OnSprint(InputValue value)
         {
             SprintInput(value.isPressed);
         }
 
-        public void OnPunch(InputValue v)
-        {
-            if (v.isPressed && InputBuffer.Instance != null)
-            {
-                InputBuffer.Instance.Add(InputType.Punch);
-            }
-        }
-
-        public void OnHeavyPunch(InputValue v)
-        {
-            if (v.isPressed && InputBuffer.Instance != null)
-            {
-                InputBuffer.Instance.Add(InputType.HeavyPunch);
-            }
-        }
 
         public void OnPickUp(InputValue value)
         {

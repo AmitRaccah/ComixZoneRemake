@@ -51,6 +51,17 @@ public class ComboController : MonoBehaviour
 
     void Update()
     {
+        if (GetComponent<Health>()?.IsStunned == true)
+        {
+            step = -1;
+            queuedInput = null;
+            InputBuffer.Instance?.GetBuffer().Clear();
+
+            activator.EndHitbox();      
+            return;
+        }
+
+
 
         if (InputBuffer.Instance == null)
         {
