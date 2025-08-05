@@ -1,153 +1,89 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
-using Unity.Cinemachine;    // Cinemachine 3.x
-public class CrossAnime : MonoBehaviour
+using StarterAssets;
+
+[RequireComponent(typeof(Collider))]
+public class PanelHop : MonoBehaviour
 {
-    /* ───── Animation ───── */
+    /* ───── Main Points ───── */
+    [Header("Key Transforms")]
+    [SerializeField] private Transform tracker;          // מיקום על הלוח
+    [SerializeField] private Transform worldLanding;     // נקודת נחיתה בפאנל-2
+
+    /* ───── Timings & Clip ───── */
+    [Header("Timings")]
+    [SerializeField] private float preTeleportDelay = 0.4f;   // ← חדש
+    [SerializeField] private float stayOnBoardTime = 0.5f;
+
     [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
-    [SerializeField] private float crossFadeTime = 0.05f;   // blend time
-    /* ───── Movement ───── */
-    [Header("Movement")]
-    [SerializeField] private Transform pathPoint;
-    [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float endDelay = 0.1f;
-    /* ───── Camera ───── */
-    [Header("Camera")]
-    [SerializeField] private CinemachineCamera currentCam;
-    [SerializeField] private CinemachineCamera targetCam;
-    [SerializeField] private int camPriorityActive = 20;
-    [SerializeField] private int camPriorityInactive = 5;
-    /* ───── Colliders to disable during pass ───── */
-    [Header("Colliders")]
+    [SerializeField] private float crossFadeTime = 0.05f;
+
+    /* ───── Optional Tracker control ───── */
+    [Header("Tracker Manual Control (optional)")]
+    [SerializeField] private TrackerManualControl trackerControl;
+
+    /* ───── Optional colliders to disable ───── */
     [SerializeField] private Collider[] collidersToDisable;
-    /* ───── Down‑Pass Settings ───── */
-    [Header("Down Pass")]
-    [SerializeField] private bool requireCrouch = false;
-    /* ───────── State ───────── */
-    bool _triggered;
-    bool _playerInside;
-    Coroutine _waitRoutine;
-    /* ───────── Trigger Entry ───────── */
+
+    bool triggered;
+
     void OnTriggerEnter(Collider other)
     {
-        if (_triggered || !other.CompareTag("Player")) return;
-        _playerInside = true;
-        var input = other.GetComponent<StarterAssets.StarterAssetsInputs>();
-        if (input == null) return;
-        if (!requireCrouch)
-        {
-            BeginPass(other.transform, input);
-            return;
-        }
-        if (input.crouch)
-            BeginPass(other.transform, input);
-        else
-            _waitRoutine = StartCoroutine(WaitForCrouch(input, other.transform));
+        if (triggered || !other.CompareTag("Player")) return;
+        triggered = true;
+        StartCoroutine(HopRoutine(other.transform));
     }
-    /* ───────── Trigger Exit ───────── */
-    void OnTriggerExit(Collider other)
+
+    IEnumerator HopRoutine(Transform player)
     {
-        if (!other.CompareTag("Player")) return;
-        _playerInside = false;
-        if (!_triggered && _waitRoutine != null)
-        {
-            StopCoroutine(_waitRoutine);
-            _waitRoutine = null;
-        }
-    }
-    /* ───────── Wait until crouch is pressed ───────── */
-    IEnumerator WaitForCrouch(StarterAssets.StarterAssetsInputs input, Transform player)
-    {
-        while (!_triggered && _playerInside)
-        {
-            if (input.crouch)
-            {
-                BeginPass(player, input);
-                yield break;
-            }
-            yield return null;
-        }
-    }
-    /* ───────── Begin Pass ───────── */
-    void BeginPass(Transform player, StarterAssets.StarterAssetsInputs input)
-    {
-        _triggered = true;
-        if (requireCrouch && input.crouch)
-        {
-            CoreBus.Publish(new PlayerUncrouchEvent());
-            input.crouch = false;
-        }
-        var toggler = GetComponent<TriggerDelayedActivator>();
-        if (toggler) toggler.BeginTimers();
-        StartCoroutine(DoStagePass(player));
-    }
-    /* ───────── Main Coroutine ───────── */
-    IEnumerator DoStagePass(Transform player)
-    {
-        var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
-        var input = player.GetComponent<StarterAssets.StarterAssetsInputs>();
-        var movementLock = player.GetComponent<MovementLock>();
-        if (controller)
-        {
-            controller.allowZMovementTemporarily = true;
-            controller.enabled = false;
-        }
-        if (input) input.enabled = false;
-        if (movementLock) movementLock.SetExternalLock(true);
-        foreach (var col in collidersToDisable)
-            if (col) col.enabled = false;
+        /* 1. נעל את השחקן */
+        var ctrl = player.GetComponent<ThirdPersonController>();
+        var inp = player.GetComponent<StarterAssetsInputs>();
+        var mLck = player.GetComponent<MovementLock>();
+
+        if (ctrl) { ctrl.allowZMovementTemporarily = true; ctrl.enabled = false; }
+        if (inp) inp.enabled = false;
+        if (mLck) mLck.SetExternalLock(true);
+        foreach (var c in collidersToDisable) if (c) c.enabled = false;
+
+        /* 2. כבה שליטה ידנית ב-Tracker במהלך המעבר */
+        if (trackerControl) trackerControl.enabled = false;
+
+        /* 3. הפעל קליפ + המתנה לפני טלפורט */
         var anim = player.GetComponentInChildren<Animator>();
         if (anim)
-        {
-            anim.SetBool("IsCrouching", false);               // safety
             anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
-        }
-        yield return new WaitForSeconds(crossFadeTime);
-        if (targetCam)
-        {
-            targetCam.gameObject.SetActive(true);
-            targetCam.enabled = true;
-            if (currentCam)
-            {
-                currentCam.enabled = false;
-                currentCam.gameObject.SetActive(false);
-                currentCam.Priority = camPriorityInactive;
-            }
-            targetCam.Priority = camPriorityActive;
-            currentCam = targetCam;
-            targetCam = null;
-        }
-        if (pathPoint)
-        {
-            float dist = Vector3.Distance(player.position, pathPoint.position);
-            float dur = dist / moveSpeed;
-            yield return player.DOMove(pathPoint.position, dur)
-                               .SetEase(Ease.Linear)
-                               .WaitForCompletion();
-        }
-        yield return new WaitForSeconds(endDelay);
-        if (controller)
-        {
-            controller.enabled = true;
-            controller.allowZMovementTemporarily = false;
-        }
-        if (input) input.enabled = true;
-        if (movementLock) movementLock.SetExternalLock(false);
-        foreach (var col in collidersToDisable)
-            if (col) col.enabled = true;
+
+        yield return new WaitForSeconds(Mathf.Max(preTeleportDelay, crossFadeTime));
+
+        /* 4. טלפורט אל ה-Tracker */
+        float yRot = player.eulerAngles.y;
+        Warp(player, tracker.position, yRot);
+
+        /* 5. שהייה על הלוח */
+        yield return new WaitForSeconds(stayOnBoardTime);
+
+        /* 6. טלפורט לנחיתה בפאנל-2 */
+        Warp(player, worldLanding.position, yRot);
+
+        /* 7. שחרר הכול */
+        if (ctrl) { ctrl.enabled = true; ctrl.allowZMovementTemporarily = false; }
+        if (inp) inp.enabled = true;
+        if (mLck) mLck.SetExternalLock(false);
+        foreach (var c in collidersToDisable) if (c) c.enabled = true;
+
+        if (trackerControl) trackerControl.enabled = true;
+
         Destroy(this);
     }
+
+    /* helper */
+    static void Warp(Transform t, Vector3 pos, float yRot)
+    {
+        if (!t) return;
+        t.position = pos;
+        t.rotation = Quaternion.Euler(0f, yRot, 0f);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
