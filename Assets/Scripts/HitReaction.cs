@@ -1,40 +1,54 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class HitReaction : MonoBehaviour
 {
-    [Header("Animator")]
-    [SerializeField] private string triggerName = "Hit";
+    [Header("Names")]
+    [SerializeField] private string hitTrigger = "Hit";
+    [SerializeField] private string attackTag = "Attack";
 
-    private Animator anim;
-    private int myId;
-    private int triggerHash;
+    Animator anim;
+    int myId, hitHash;
+    bool queuedHit = false;          // ← דגל
 
-    private void Awake()
+    void Awake()
     {
         anim = GetComponent<Animator>();
         myId = gameObject.GetInstanceID();
-        triggerHash = Animator.StringToHash(triggerName);
+        hitHash = Animator.StringToHash(hitTrigger);
     }
 
-    private void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
-    private void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+    void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
+    void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
 
-    private void OnDamage(DamageEvent e)
+    void OnDamage(DamageEvent e)
     {
-        if (e.targetId != myId) return;                
+        if (e.targetId != myId) return;
 
-        BlockController bc = GetComponent<BlockController>();
-        if (bc != null && bc.IsBlocking && IsFacingAttacker(e.attackerId))
-            return;                                    
+        var bc = GetComponent<BlockController>();
+        if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId)) return;
 
-        anim.SetTrigger(triggerHash);                  
+        if (anim.GetCurrentAnimatorStateInfo(0).IsTag(attackTag) ||
+            (anim.IsInTransition(0) &&
+             anim.GetNextAnimatorStateInfo(0).IsTag(attackTag)))
+        {
+            queuedHit = true;
+            return;
+        }
+
+        anim.SetTrigger(hitHash);
     }
 
-    private bool IsFacingAttacker(int attackerId)
+    public void CheckQueuedHit()
     {
-        Transform atk;
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk))
+        if (!queuedHit) return;
+        queuedHit = false;
+        anim.SetTrigger(hitHash);
+    }
+
+    bool IsFacingAttacker(int attackerId)
+    {
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk))
             return false;
 
         Vector3 dir = (atk.position - transform.position).normalized;
