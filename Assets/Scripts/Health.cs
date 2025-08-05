@@ -25,6 +25,8 @@ public class Health : MonoBehaviour
 
     /* ────────── lifecycle ────────── */
 
+
+
     void Awake()
     {
         myId = gameObject.GetInstanceID();
@@ -48,7 +50,16 @@ public class Health : MonoBehaviour
     void Update()
     {
         if (stunTimer > 0f)
+        {
             stunTimer -= Time.deltaTime;
+            if (!anim.GetBool("CanAttack"))
+                anim.SetBool("CanAttack", false);   
+        }
+        else
+        {
+            if (!anim.GetBool("CanAttack"))
+                anim.SetBool("CanAttack", true);  
+        }
     }
 
     /* ────────── damage ────────── */
@@ -63,6 +74,7 @@ public class Health : MonoBehaviour
 
         hp -= e.amount;
         stunTimer = defaultHitStun;
+        anim.SetBool("CanAttack", false); 
 
         if (e.knockback > 0f)
             ApplyKnockback(e.attackerId, e.knockback);

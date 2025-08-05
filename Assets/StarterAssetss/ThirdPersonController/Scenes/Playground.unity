@@ -719,11 +719,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fea9b7ce0d2afe4c83808bbdfb7a375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 50
-  useKnockback: 1
+  maxHp: 200
+  defaultHitStun: 1
   deathTriggerName: Death
-  removeDelay: 2
-  blockEffectPrefab: {fileID: 0}
+  removeDelay: 4
 --- !u!114 &700303557
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -796,7 +795,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 583fbd3b4fd22e740b8014d35465641d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 0}
+  animator: {fileID: 700303562}
 --- !u!114 &700303566
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2259,7 +2258,7 @@ PrefabInstance:
     - target: {fileID: 8789070096694402854, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: e583efbc3a9dd984da753d674c45e2d1, type: 2}
+      objectReference: {fileID: 9100000, guid: 4e20d99dc751949448ceabc7f0ea342f, type: 2}
     - target: {fileID: 8789070096694402854, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
@@ -2297,9 +2296,6 @@ PrefabInstance:
       addedObject: {fileID: 700303548}
     - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 700303549}
-    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 700303557}
     - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       insertIndex: -1
@@ -2328,6 +2324,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 700303579}
+    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 700303549}
   m_SourcePrefab: {fileID: 100100000, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
 --- !u!1001 &1984724468169976127
 PrefabInstance:
@@ -2573,11 +2572,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fea9b7ce0d2afe4c83808bbdfb7a375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 500
-  useKnockback: 1
+  maxHp: 200
+  defaultHitStun: 0.25
   deathTriggerName: Death
   removeDelay: 2
-  blockEffectPrefab: {fileID: 0}
 --- !u!114 &2415317214193729974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2940,6 +2938,10 @@ PrefabInstance:
       propertyPath: 'attacks.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: 50b6254c194fa604fa866f4be2d11442, type: 2}
+    - target: {fileID: 5475519076379174595, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: 'attacks.Array.data[6]'
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 6435533612568276109, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       propertyPath: m_Name
       value: Player
