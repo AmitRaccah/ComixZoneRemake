@@ -47,20 +47,21 @@ public class Health : MonoBehaviour
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-    void Update()
+void Update()
+{
+    if (stunTimer > 0f)
     {
-        if (stunTimer > 0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if (!anim.GetBool("CanAttack"))
-                anim.SetBool("CanAttack", false);   
-        }
-        else
-        {
-            if (!anim.GetBool("CanAttack"))
-                anim.SetBool("CanAttack", true);  
-        }
+        stunTimer -= Time.deltaTime;
+        if (anim.GetBool("CanAttack"))
+            anim.SetBool("CanAttack", false);
     }
+    else
+    {
+        if (!anim.GetBool("CanAttack"))
+            anim.SetBool("CanAttack", true);
+    }
+}
+
 
     /* ────────── damage ────────── */
 
@@ -74,7 +75,7 @@ public class Health : MonoBehaviour
 
         hp -= e.amount;
         stunTimer = defaultHitStun;
-        anim.SetBool("CanAttack", false); 
+        anim.SetBool("CanAttack", false);
 
         if (e.knockback > 0f)
             ApplyKnockback(e.attackerId, e.knockback);
