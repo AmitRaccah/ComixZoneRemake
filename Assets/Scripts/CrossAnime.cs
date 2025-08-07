@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using StarterAssets;
 
@@ -11,19 +11,15 @@ public class PanelHop : MonoBehaviour
 
     [SerializeField] private Transform trackerTargetEmpty;
 
-    [Header("Timings")]
     [SerializeField] private float preTeleportDelay = 0.4f;
 
-    [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
     [SerializeField] private float crossFadeTime = 0.05f;
 
-    [Header("Tracker Manual Control (optional)")]
     [SerializeField] private TrackerManualControl trackerControl;
 
     [SerializeField] private Collider[] collidersToDisable;
 
-    [Header("Tracker Follow Settings")]
     [SerializeField] private float trackerMoveSpeed = 3f;
 
     [SerializeField] private float trackerArrivalThreshold = 0.01f;
@@ -97,6 +93,7 @@ public class PanelHop : MonoBehaviour
         foreach (var c in collidersToDisable) if (c) c.enabled = true;
         if (trackerControl) trackerControl.enabled = true;
 
+        // TODO: CHANGE TO DESTROY
         triggered = false;
     }
 

@@ -1,28 +1,35 @@
-﻿using UnityEngine;
-using StarterAssets;        
+using UnityEngine;
+using StarterAssets;
 
 public class TrackerManualControl : MonoBehaviour
 {
-    /* ───────────── Refs ───────────── */
     [Header("Refs")]
     public StarterAssetsInputs input;
-
     public MovementLock movementLock;
 
-    /* ──────────── Tuning ──────────── */
     [Header("Tuning")]
     public float speed = 2f;
 
-    /* ─────────── Update ─────────── */
+    [Header("Limits")]
+    public float minX = 0f;  
+    public float maxX = 100f;
+
     void Update()
     {
         if (!input) return;
-        if (movementLock && movementLock.IsLocked) return;   
+        if (movementLock && movementLock.IsLocked) return;
 
-        float horiz = input.move.x;                         
-        if (Mathf.Abs(horiz) < 0.01f) return;               
+        float horiz = input.move.x;
+        if (Mathf.Abs(horiz) < 0.01f) return;
 
-        Vector3 delta = Vector3.right * horiz * speed * Time.deltaTime;
-        transform.position += delta;
+        float nextX = transform.position.x + horiz * speed * Time.deltaTime;
+
+        if (nextX < minX)
+            nextX = minX;
+
+        if (nextX > maxX)
+            nextX = maxX;
+
+        transform.position = new Vector3(nextX, transform.position.y, transform.position.z);
     }
 }
