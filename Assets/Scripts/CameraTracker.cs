@@ -1,32 +1,35 @@
 ﻿using UnityEngine;
-using StarterAssets;        // StarterAssetsInputs
+using StarterAssets;
 
-/// מזיז את ה-Tracker על ציר **X** לפי A/D כל עוד השחקן לא נעול
 public class TrackerManualControl : MonoBehaviour
 {
-    /* ───────────── Refs ───────────── */
     [Header("Refs")]
-    [Tooltip("קומפוננטת הקלט מהשחקן")]
     public StarterAssetsInputs input;
-
-    [Tooltip("קומפוננטת MovementLock של השחקן (לא חובה)")]
     public MovementLock movementLock;
 
-    /* ──────────── Tuning ──────────── */
     [Header("Tuning")]
-    [Tooltip("מהירות (Units/sec) כשהלחיצה מלאה")]
     public float speed = 2f;
 
-    /* ─────────── Update ─────────── */
+    [Header("Limits")]
+    public float minX = 0f;  
+    public float maxX = 100f;
+
     void Update()
     {
         if (!input) return;
-        if (movementLock && movementLock.IsLocked) return;   // השחקן נעול
+        if (movementLock && movementLock.IsLocked) return;
 
-        float horiz = input.move.x;                          // A = -1, D = 1
-        if (Mathf.Abs(horiz) < 0.01f) return;                // אין קלט
+        float horiz = input.move.x;
+        if (Mathf.Abs(horiz) < 0.01f) return;
 
-        Vector3 delta = Vector3.right * horiz * speed * Time.deltaTime; // ← ציר X
-        transform.position += delta;
+        float nextX = transform.position.x + horiz * speed * Time.deltaTime;
+
+        if (nextX < minX)
+            nextX = minX;
+
+        if (nextX > maxX)
+            nextX = maxX;
+
+        transform.position = new Vector3(nextX, transform.position.y, transform.position.z);
     }
 }
