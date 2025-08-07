@@ -1,153 +1,198 @@
 ﻿using UnityEngine;
 using System.Collections;
-using DG.Tweening;
-using Unity.Cinemachine;    // Cinemachine 3.x
-public class CrossAnime : MonoBehaviour
+using StarterAssets;
+
+[RequireComponent(typeof(Collider))]
+public class PanelHop : MonoBehaviour
 {
-    /* ───── Animation ───── */
+    [SerializeField] private Transform tracker;
+    [SerializeField] private Transform worldLanding;
+    [SerializeField] private Transform trackerTargetEmpty;
+
+    [Header("Timings")]
+    [SerializeField] private float preTeleportDelay = 0.4f;
+    [SerializeField] private float preTrackerMovementDelay = 0.3f;
+
     [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
-    [SerializeField] private float crossFadeTime = 0.05f;   // blend time
-    /* ───── Movement ───── */
-    [Header("Movement")]
-    [SerializeField] private Transform pathPoint;
-    [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private float endDelay = 0.1f;
-    /* ───── Camera ───── */
-    [Header("Camera")]
-    [SerializeField] private CinemachineCamera currentCam;
-    [SerializeField] private CinemachineCamera targetCam;
-    [SerializeField] private int camPriorityActive = 20;
-    [SerializeField] private int camPriorityInactive = 5;
-    /* ───── Colliders to disable during pass ───── */
-    [Header("Colliders")]
+    [SerializeField] private float crossFadeTime = 0.05f;
+
+    [Header("Tracker Manual Control (optional)")]
+    [SerializeField] private TrackerManualControl trackerControl;
+
     [SerializeField] private Collider[] collidersToDisable;
-    /* ───── Down‑Pass Settings ───── */
-    [Header("Down Pass")]
+
+    [Header("Tracker Follow Settings")]
+    [SerializeField] private float trackerMoveSpeed = 3f;
+    [SerializeField] private float trackerArrivalThreshold = 0.01f;
+
+    [Header("Tracker End Point")]
+    [SerializeField] private Transform trackerEndPoint;
+    [SerializeField] private float trackerEndMoveSpeed = 2f;
+
+    [Header("Down-Pass Settings")]
     [SerializeField] private bool requireCrouch = false;
-    /* ───────── State ───────── */
-    bool _triggered;
-    bool _playerInside;
-    Coroutine _waitRoutine;
-    /* ───────── Trigger Entry ───────── */
+
+    private bool triggered = false;
+    private bool isHopping = false;
+    private Vector3 trackerTarget;
+    private Coroutine crouchWaitRoutine = null;
+
     void OnTriggerEnter(Collider other)
     {
-        if (_triggered || !other.CompareTag("Player")) return;
-        _playerInside = true;
-        var input = other.GetComponent<StarterAssets.StarterAssetsInputs>();
+        if (triggered || !other.CompareTag("Player")) return;
+
+        var input = other.GetComponent<StarterAssetsInputs>();
         if (input == null) return;
-        if (!requireCrouch)
-        {
-            BeginPass(other.transform, input);
-            return;
-        }
-        if (input.crouch)
-            BeginPass(other.transform, input);
-        else
-            _waitRoutine = StartCoroutine(WaitForCrouch(input, other.transform));
-    }
-    /* ───────── Trigger Exit ───────── */
-    void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag("Player")) return;
-        _playerInside = false;
-        if (!_triggered && _waitRoutine != null)
-        {
-            StopCoroutine(_waitRoutine);
-            _waitRoutine = null;
-        }
-    }
-    /* ───────── Wait until crouch is pressed ───────── */
-    IEnumerator WaitForCrouch(StarterAssets.StarterAssetsInputs input, Transform player)
-    {
-        while (!_triggered && _playerInside)
+
+        if (requireCrouch)
         {
             if (input.crouch)
             {
-                BeginPass(player, input);
+                BeginHop(other.transform, input);
+            }
+            else
+            {
+                crouchWaitRoutine = StartCoroutine(WaitForCrouch(other.transform, input));
+            }
+        }
+        else
+        {
+            BeginHop(other.transform, input);
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        if (crouchWaitRoutine != null)
+        {
+            StopCoroutine(crouchWaitRoutine);
+            crouchWaitRoutine = null;
+        }
+    }
+
+    IEnumerator WaitForCrouch(Transform player, StarterAssetsInputs input)
+    {
+        while (!triggered)
+        {
+            if (input == null || player == null) yield break;
+
+            if (input.crouch)
+            {
+                BeginHop(player, input);
                 yield break;
             }
+
             yield return null;
         }
     }
-    /* ───────── Begin Pass ───────── */
-    void BeginPass(Transform player, StarterAssets.StarterAssetsInputs input)
+
+    void BeginHop(Transform player, StarterAssetsInputs input)
     {
-        _triggered = true;
-        if (requireCrouch && input.crouch)
+        triggered = true;
+
+        if (requireCrouch)
         {
             CoreBus.Publish(new PlayerUncrouchEvent());
             input.crouch = false;
         }
-        var toggler = GetComponent<TriggerDelayedActivator>();
-        if (toggler) toggler.BeginTimers();
-        StartCoroutine(DoStagePass(player));
+
+        StartCoroutine(HopRoutine(player));
     }
-    /* ───────── Main Coroutine ───────── */
-    IEnumerator DoStagePass(Transform player)
+
+    void Update()
     {
-        var controller = player.GetComponent<StarterAssets.ThirdPersonController>();
-        var input = player.GetComponent<StarterAssets.StarterAssetsInputs>();
-        var movementLock = player.GetComponent<MovementLock>();
-        if (controller)
+        if (isHopping)
         {
-            controller.allowZMovementTemporarily = true;
-            controller.enabled = false;
+            tracker.position = Vector3.MoveTowards(
+                tracker.position,
+                trackerTarget,
+                trackerMoveSpeed * Time.deltaTime
+            );
         }
-        if (input) input.enabled = false;
-        if (movementLock) movementLock.SetExternalLock(true);
-        foreach (var col in collidersToDisable)
-            if (col) col.enabled = false;
+    }
+
+    IEnumerator HopRoutine(Transform player)
+    {
+        var ctrl = player.GetComponent<ThirdPersonController>();
+        var inp = player.GetComponent<StarterAssetsInputs>();
+        var mLck = player.GetComponent<MovementLock>();
+
+        if (ctrl) { ctrl.allowZMovementTemporarily = true; ctrl.enabled = false; }
+        if (inp) inp.enabled = false;
+        if (mLck) mLck.SetExternalLock(true);
+        foreach (var c in collidersToDisable) if (c) c.enabled = false;
+        if (trackerControl) trackerControl.enabled = false;
+
         var anim = player.GetComponentInChildren<Animator>();
         if (anim)
         {
-            anim.SetBool("IsCrouching", false);               // safety
+            anim.SetBool("IsCrouching", false);
             anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
         }
-        yield return new WaitForSeconds(crossFadeTime);
-        if (targetCam)
+
+        yield return new WaitForSeconds(Mathf.Max(preTeleportDelay, crossFadeTime));
+
+        float yRot = player.eulerAngles.y;
+        Warp(player, tracker.position, yRot);
+
+        if (trackerTargetEmpty != null)
         {
-            targetCam.gameObject.SetActive(true);
-            targetCam.enabled = true;
-            if (currentCam)
+            trackerTarget = trackerTargetEmpty.position;
+
+            yield return new WaitForSeconds(preTrackerMovementDelay);
+            isHopping = true;
+
+            while (Vector3.Distance(tracker.position, trackerTarget) > trackerArrivalThreshold)
             {
-                currentCam.enabled = false;
-                currentCam.gameObject.SetActive(false);
-                currentCam.Priority = camPriorityInactive;
+                Warp(player, tracker.position, yRot);
+                yield return null;
             }
-            targetCam.Priority = camPriorityActive;
-            currentCam = targetCam;
-            targetCam = null;
         }
-        if (pathPoint)
+
+        // Warp player to final landing position
+        Warp(player, worldLanding.position, yRot);
+
+        // End tracker follow
+        isHopping = false;
+
+        // Restore control to player
+        if (ctrl) { ctrl.enabled = true; ctrl.allowZMovementTemporarily = false; }
+        if (inp) inp.enabled = true;
+        if (mLck) mLck.SetExternalLock(false);
+        foreach (var c in collidersToDisable) if (c) c.enabled = true;
+        if (trackerControl) trackerControl.enabled = true;
+
+        triggered = false;
+
+        // Continue tracker to its final end point in background
+        if (trackerEndPoint != null)
         {
-            float dist = Vector3.Distance(player.position, pathPoint.position);
-            float dur = dist / moveSpeed;
-            yield return player.DOMove(pathPoint.position, dur)
-                               .SetEase(Ease.Linear)
-                               .WaitForCompletion();
+            StartCoroutine(MoveTrackerToEndPoint());
         }
-        yield return new WaitForSeconds(endDelay);
-        if (controller)
+    }
+
+    IEnumerator MoveTrackerToEndPoint()
+    {
+        Vector3 endTarget = trackerEndPoint.position;
+
+        while (Vector3.Distance(tracker.position, endTarget) > trackerArrivalThreshold)
         {
-            controller.enabled = true;
-            controller.allowZMovementTemporarily = false;
+            tracker.position = Vector3.MoveTowards(
+                tracker.position,
+                endTarget,
+                trackerEndMoveSpeed * Time.deltaTime
+            );
+            yield return null;
         }
-        if (input) input.enabled = true;
-        if (movementLock) movementLock.SetExternalLock(false);
-        foreach (var col in collidersToDisable)
-            if (col) col.enabled = true;
-        Destroy(this);
+    }
+
+    static void Warp(Transform t, Vector3 pos, float yRot)
+    {
+        if (!t) return;
+        t.position = new Vector3(pos.x, pos.y, 0f);
+        t.rotation = Quaternion.Euler(0f, yRot, 0f);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
