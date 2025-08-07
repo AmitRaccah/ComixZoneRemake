@@ -6,9 +6,7 @@ using StarterAssets;
 public class PanelHop : MonoBehaviour
 {
     [SerializeField] private Transform tracker;
-
     [SerializeField] private Transform worldLanding;
-
     [SerializeField] private Transform trackerTargetEmpty;
 
     [Header("Timings")]
@@ -25,18 +23,78 @@ public class PanelHop : MonoBehaviour
 
     [Header("Tracker Follow Settings")]
     [SerializeField] private float trackerMoveSpeed = 3f;
-
     [SerializeField] private float trackerArrivalThreshold = 0.01f;
+
+    [Header("Down-Pass Settings")]
+    [SerializeField] private bool requireCrouch = false;
 
     private bool triggered = false;
     private bool isHopping = false;
     private Vector3 trackerTarget;
+    private Coroutine crouchWaitRoutine = null;
 
     void OnTriggerEnter(Collider other)
     {
         if (triggered || !other.CompareTag("Player")) return;
+
+        var input = other.GetComponent<StarterAssetsInputs>();
+        if (input == null) return;
+
+        if (requireCrouch)
+        {
+            if (input.crouch)
+            {
+                BeginHop(other.transform, input);
+            }
+            else
+            {
+                crouchWaitRoutine = StartCoroutine(WaitForCrouch(other.transform, input));
+            }
+        }
+        else
+        {
+            BeginHop(other.transform, input);
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        if (crouchWaitRoutine != null)
+        {
+            StopCoroutine(crouchWaitRoutine);
+            crouchWaitRoutine = null;
+        }
+    }
+
+    IEnumerator WaitForCrouch(Transform player, StarterAssetsInputs input)
+    {
+        while (!triggered)
+        {
+            if (input == null || player == null) yield break;
+
+            if (input.crouch)
+            {
+                BeginHop(player, input);
+                yield break;
+            }
+
+            yield return null;
+        }
+    }
+
+    void BeginHop(Transform player, StarterAssetsInputs input)
+    {
         triggered = true;
-        StartCoroutine(HopRoutine(other.transform));
+
+        if (requireCrouch)
+        {
+            CoreBus.Publish(new PlayerUncrouchEvent());
+            input.crouch = false;
+        }
+
+        StartCoroutine(HopRoutine(player));
     }
 
     void Update()
@@ -65,7 +123,10 @@ public class PanelHop : MonoBehaviour
 
         var anim = player.GetComponentInChildren<Animator>();
         if (anim)
+        {
+            anim.SetBool("IsCrouching", false); // safety
             anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
+        }
 
         yield return new WaitForSeconds(Mathf.Max(preTeleportDelay, crossFadeTime));
 
@@ -103,7 +164,6 @@ public class PanelHop : MonoBehaviour
     static void Warp(Transform t, Vector3 pos, float yRot)
     {
         if (!t) return;
-
         t.position = new Vector3(pos.x, pos.y, 0f);
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
     }
