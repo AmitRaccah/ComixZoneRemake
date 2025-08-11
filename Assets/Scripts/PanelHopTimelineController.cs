@@ -13,9 +13,10 @@ public class PanelHopTimelineController : MonoBehaviour
     public string playerTag = "Player";
 
     [Header("Refs - Player (ROOT עם CC)")]
-    public Transform player;                 // ה־Root עם CharacterController
-    public Animator playerAnimator;          // ה־Animator על PlayerArmature (אם צריך)
-    public ThirdPersonController controller; // קומפוננט התנועה
+    public Transform player;                 
+    public Animator playerAnimator;          
+    public ThirdPersonController controller;
+    public CharacterController characterControl;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
 
@@ -26,111 +27,170 @@ public class PanelHopTimelineController : MonoBehaviour
 
     private bool triggered = false;
 
-    void Awake()
+    // Follow state
+    private bool followTracker = false;
+    private float followYaw = 0f;
+
+    private void Awake()
     {
-        if (!director) director = GetComponent<PlayableDirector>();
+        if (director == null)
+        {
+            director = GetComponent<PlayableDirector>();
+        }
     }
 
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         if (triggered) return;
         if (!other.CompareTag(playerTag)) return;
 
         if (requireCrouch)
         {
-            var inp = other.GetComponent<StarterAssetsInputs>();
+            StarterAssetsInputs inp = other.GetComponent<StarterAssetsInputs>();
             if (inp == null || !inp.crouch) return;
         }
 
         StartTimeline();
     }
 
-    void StartTimeline()
+    private void StartTimeline()
     {
-        if (!director) return;
+        if (director == null) return;
+
         triggered = true;
-        director.time = 0;
+        director.time = 0.0;
         director.stopped += OnDirectorStopped;
         director.Play();
     }
 
-    void OnDirectorStopped(PlayableDirector d)
+    private void OnDirectorStopped(PlayableDirector d)
     {
-        d.stopped -= OnDirectorStopped;
+        if (d != null)
+        {
+            d.stopped -= OnDirectorStopped;
+        }
         triggered = false;
     }
 
-    /* ---------- נקראות מה-Signal Track ---------- */
+    /* ---------- -Signal Track ---------- */
 
     public void LockPlayer()
     {
-        if (controller) { controller.allowZMovementTemporarily = true; controller.enabled = false; }  // השבתת שליטה
-        if (inputs) inputs.enabled = false;
-        if (movementLock) movementLock.SetExternalLock(true);
-        if (trackerCtrl) trackerCtrl.enabled = false;
+        if (controller != null)
+        {
+            controller.allowZMovementTemporarily = true;
+            controller.enabled = false;
+            characterControl.enabled = false;
+        }
+
+        if (inputs != null)
+        {
+            inputs.enabled = false;
+        }
+
+        if (movementLock != null)
+        {
+            movementLock.SetExternalLock(true);
+        }
+
+        if (trackerCtrl != null)
+        {
+            trackerCtrl.enabled = false;
+        }
     }
 
     public void TeleportToTracker()
     {
-        if (!player || !tracker) return;
-        SafeTeleport(player, tracker.position, player.eulerAngles.y);
+        if (player == null || tracker == null) return;
+        float yRot = player.eulerAngles.y;
+        SafeTeleport(player, tracker.position, yRot);
     }
 
     public void StartFollowTracker()
     {
-        if (player) _followYaw = player.eulerAngles.y;
-        _followTracker = true;
+        if (player != null)
+        {
+            followYaw = player.eulerAngles.y;
+        }
+        followTracker = true;
     }
 
     public void StopFollowTracker()
     {
-        _followTracker = false;
+        followTracker = false;
     }
 
     public void TeleportToWorld()
     {
-        if (!player || !worldLanding) return;
-        SafeTeleport(player, worldLanding.position, player.eulerAngles.y);
+        if (player == null || worldLanding == null) return;
+        float yRot = player.eulerAngles.y;
+        SafeTeleport(player, worldLanding.position, yRot);
     }
 
     public void ReleaseControl()
     {
-        if (movementLock) movementLock.SetExternalLock(false);
-        if (inputs) inputs.enabled = true;
-        if (controller) { controller.enabled = true; controller.allowZMovementTemporarily = false; }
-        if (trackerCtrl) trackerCtrl.enabled = true;
+        if (movementLock != null)
+        {
+            movementLock.SetExternalLock(false);
+        }
+
+        if (inputs != null)
+        {
+            inputs.enabled = true;
+        }
+
+        if (controller != null)
+        {
+            controller.enabled = true;
+            characterControl.enabled = true;
+            controller.allowZMovementTemporarily = false;
+        }
+
+        if (trackerCtrl != null)
+        {
+            trackerCtrl.enabled = true;
+        }
     }
 
-    // חיתוך סופי של הטיים־ליין (מומלץ לשים סיגנל פריים אחרי TeleportToWorld)
     public void StopTimeline()
     {
-        if (!director) return;
+        if (director == null) return;
         director.Stop();
     }
 
-    /* ---------- Follow לטרקר ---------- */
+    /* ---------- Follow tracker ---------- */
 
-    bool _followTracker = false;
-    float _followYaw = 0f;
-
-    void LateUpdate()
+    private void LateUpdate()
     {
-        if (_followTracker && player && tracker)
-            SafeTeleport(player, tracker.position, _followYaw);
+        if (followTracker && player != null && tracker != null)
+        {
+            SafeTeleport(player, tracker.position, followYaw);
+        }
     }
 
     /* ---------- Utils ---------- */
 
-    // טלפורט בטוח: מכבה לרגע את CharacterController כדי שלא "יתקן" מיקום
-    void SafeTeleport(Transform t, Vector3 pos, float yRot)
+    private void SafeTeleport(Transform t, Vector3 pos, float yRot)
     {
-        if (!t) return;
-        var cc = controller ? controller.GetComponent<CharacterController>() : null;
-        if (cc) cc.enabled = false;
+        if (t == null) return;
+
+        CharacterController cc = null;
+        if (controller != null)
+        {
+            cc = controller.GetComponent<CharacterController>();
+        }
+
+        if (cc != null)
+        {
+            cc.enabled = false;
+        }
 
         t.position = new Vector3(pos.x, pos.y, 0f);
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
 
-        if (cc) cc.enabled = true;
+        if (cc != null)
+        {
+            cc.enabled = true;
+        }
     }
 }
