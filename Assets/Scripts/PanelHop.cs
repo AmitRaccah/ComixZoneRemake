@@ -196,3 +196,4 @@ public class PanelHop : MonoBehaviour
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
     }
 }
+
