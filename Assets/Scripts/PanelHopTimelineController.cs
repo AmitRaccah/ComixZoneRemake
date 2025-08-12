@@ -185,7 +185,8 @@ public class PanelHopTimelineController : MonoBehaviour
             cc.enabled = false;
         }
 
-        t.position = new Vector3(pos.x, pos.y, 0f);
+        // t.position = new Vector3(pos.x, pos.y, 0f);
+        t.position = new Vector3(pos.x, pos.y, pos.z);
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
 
         if (cc != null)
