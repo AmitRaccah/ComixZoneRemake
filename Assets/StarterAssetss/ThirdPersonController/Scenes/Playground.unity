@@ -750,15 +750,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0038c16c34866b4f9e25c9c0dc0f7e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Graph: {fileID: 1767513627651888046, guid: ad37dcbf9f3c6cc469d9d4c6850e0897, type: 2}
+  m_Graph: {fileID: 1767513627651888046, guid: ba83c0c4753ab6641af549728a411cc7, type: 2}
   m_BlackboardVariableOverridesList:
   - rid: 5783462025978184103
-  - rid: 5783462025978184107
+  - rid: 4177865193454043266
   m_IsInitialised: 0
   m_IsStarted: 0
   references:
     version: 2
     RefIds:
+    - rid: 4177865193454043266
+      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
+      data:
+        GUID:
+          m_Value0: 13387831076648673249
+          m_Value1: 18387205806188357260
+        Name: PlayerTransform
+        m_Value: {fileID: 273271560}
     - rid: 5783462025978184103
       type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
       data:
@@ -767,14 +775,6 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 700303537}
-    - rid: 5783462025978184107
-      type: {class: 'BlackboardVariable`1[[UnityEngine.GameObject, UnityEngine.CoreModule]]', ns: Unity.Behavior, asm: Unity.Behavior}
-      data:
-        GUID:
-          m_Value0: 13387831076648673249
-          m_Value1: 18387205806188357260
-        Name: PlayerTransform
-        m_Value: {fileID: 273271560}
 --- !u!195 &700303548
 NavMeshAgent:
   m_ObjectHideFlags: 0
