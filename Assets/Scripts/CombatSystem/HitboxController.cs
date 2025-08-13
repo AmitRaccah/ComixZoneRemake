@@ -8,6 +8,8 @@ public class HitboxController : MonoBehaviour
     bool armed;
     public event System.Action OnFirstHit;
     int attackerId;
+    private Vector3 hitPositionWorld;
+
     public void Init(AttackData d, Transform hand, int attackerId)
     {
         data = d;
@@ -51,6 +53,34 @@ public class HitboxController : MonoBehaviour
 
         if (root == socket.root) return;
 
+        hitPositionWorld = other.ClosestPoint(transform.position);
+
+        if (data.hitEffectPrefab)
+        {
+            Vector3 pos = hitPositionWorld
+                + transform.up * data.hitEffectOffset.y
+                + transform.forward * data.hitEffectOffset.z
+                + transform.right * data.hitEffectOffset.x;
+
+            Instantiate(data.hitEffectPrefab, pos, Quaternion.identity);
+        }
+
+        if (data.additionalHitEffects != null)
+        {
+            foreach (var fx in data.additionalHitEffects)
+            {
+                if (fx.prefab != null)
+                {
+                    Vector3 pos = hitPositionWorld
+                        + transform.up * fx.localOffset.y
+                        + transform.forward * fx.localOffset.z
+                        + transform.right * fx.localOffset.x;
+
+                    Instantiate(fx.prefab, pos, Quaternion.identity);
+                }
+            }
+        }
+
         CombatBus.Publish(new DamageEvent
         {
             attackerId = attackerId,
@@ -65,13 +95,8 @@ public class HitboxController : MonoBehaviour
 
         OnFirstHit?.Invoke();
         Destroy(gameObject);
-
-        if (data.hitEffectPrefab)
-        {
-            Vector3 pos = socket.TransformPoint(data.hitEffectOffset);
-            Instantiate(data.hitEffectPrefab, pos, socket.rotation);
-        }
     }
+
 
 
 

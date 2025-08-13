@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Combat/Attack Data")]
@@ -19,6 +20,9 @@ public class AttackData : ScriptableObject
 
     public GameObject hitEffectPrefab;
     public Vector3 hitEffectOffset;
+
+    public List<ParticleEffectData> additionalHitEffects = new List<ParticleEffectData>();
+
 }
 
 public enum DamageType
