@@ -5,22 +5,19 @@ using StarterAssets;
 [RequireComponent(typeof(Collider))]
 public class PanelHopTimelineController : MonoBehaviour
 {
-    [Header("Playable Director")]
     public PlayableDirector director;
 
     [Header("Gate Settings")]
     public bool requireCrouch = false;
     public string playerTag = "Player";
 
-    [Header("Refs - Player (ROOT עם CC)")]
-    public Transform player;                 
-    public Animator playerAnimator;          
+    public Transform player;
+    public Animator playerAnimator;
     public ThirdPersonController controller;
     public CharacterController characterControl;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
 
-    [Header("Refs - Tracker / Targets")]
     public Transform tracker;
     public Transform worldLanding;
     public TrackerManualControl trackerCtrl;
@@ -53,6 +50,18 @@ public class PanelHopTimelineController : MonoBehaviour
         StartTimeline();
     }
 
+    public void EnableRootMotion()
+    {
+        if (playerAnimator != null)
+            playerAnimator.applyRootMotion = true;
+    }
+
+    public void DisableRootMotion()
+    {
+        if (playerAnimator != null)
+            playerAnimator.applyRootMotion = false;
+    }
+
     private void StartTimeline()
     {
         if (director == null) return;
@@ -72,15 +81,13 @@ public class PanelHopTimelineController : MonoBehaviour
         triggered = false;
     }
 
-    /* ---------- -Signal Track ---------- */
+    /* ---------- Signal Track ---------- */
 
     public void LockPlayer()
     {
-        if (controller != null)
+        if (movementLock != null)
         {
-            controller.allowZMovementTemporarily = true;
-            controller.enabled = false;
-            characterControl.enabled = false;
+            movementLock.SetExternalLock(true);
         }
 
         if (inputs != null)
@@ -88,14 +95,14 @@ public class PanelHopTimelineController : MonoBehaviour
             inputs.enabled = false;
         }
 
-        if (movementLock != null)
-        {
-            movementLock.SetExternalLock(true);
-        }
-
         if (trackerCtrl != null)
         {
             trackerCtrl.enabled = false;
+        }
+
+        if (controller != null)
+        {
+            controller.allowZMovementTemporarily = true;
         }
     }
 
@@ -139,16 +146,14 @@ public class PanelHopTimelineController : MonoBehaviour
             inputs.enabled = true;
         }
 
-        if (controller != null)
-        {
-            controller.enabled = true;
-            characterControl.enabled = true;
-            controller.allowZMovementTemporarily = false;
-        }
-
         if (trackerCtrl != null)
         {
             trackerCtrl.enabled = true;
+        }
+
+        if (controller != null)
+        {
+            controller.allowZMovementTemporarily = false;
         }
     }
 
@@ -185,7 +190,6 @@ public class PanelHopTimelineController : MonoBehaviour
             cc.enabled = false;
         }
 
-        // t.position = new Vector3(pos.x, pos.y, 0f);
         t.position = new Vector3(pos.x, pos.y, pos.z);
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
 
