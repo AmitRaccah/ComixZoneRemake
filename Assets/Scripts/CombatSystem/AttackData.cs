@@ -18,8 +18,8 @@ public class AttackData : ScriptableObject
     public float shakeAmplitude = 1f;
     public float freezeFrameDuration = 0.1f;
 
-    public GameObject hitEffectPrefab;
-    public Vector3 hitEffectOffset;
+    //public GameObject hitEffectPrefab;
+    //public Vector3 hitEffectOffset;
 
     public List<ParticleEffectData> additionalHitEffects = new List<ParticleEffectData>();
 

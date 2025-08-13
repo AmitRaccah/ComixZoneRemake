@@ -55,15 +55,15 @@ public class HitboxController : MonoBehaviour
 
         hitPositionWorld = other.ClosestPoint(transform.position);
 
-        if (data.hitEffectPrefab)
-        {
-            Vector3 pos = hitPositionWorld
-                + transform.up * data.hitEffectOffset.y
-                + transform.forward * data.hitEffectOffset.z
-                + transform.right * data.hitEffectOffset.x;
+        //if (data.hitEffectPrefab)
+        //{
+        //    Vector3 pos = hitPositionWorld
+        //        + transform.up * data.hitEffectOffset.y
+        //        + transform.forward * data.hitEffectOffset.z
+        //        + transform.right * data.hitEffectOffset.x;
 
-            Instantiate(data.hitEffectPrefab, pos, Quaternion.identity);
-        }
+        //    Instantiate(data.hitEffectPrefab, pos, Quaternion.identity);
+        //}
 
         if (data.additionalHitEffects != null)
         {
