@@ -1,43 +1,56 @@
-//using UnityEngine;
-//using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 
-//public class FrameFreezeOnHit : MonoBehaviour
-//{
-//    private int myId;
-//    private float originalFixedDeltaTime;
+/// Attach this script to every character (player & enemies).
+/// It freezes only when:
+///   • this object is the target,  OR
+///   • the attackerId belongs to a component in this hierarchy.
+public class FrameFreezeOnHit : MonoBehaviour
+{
+    private float storedFixedDelta;
+    private bool isFreezing;
 
-//    private void Awake()
-//    {
-//        myId = gameObject.GetInstanceID();
-//        originalFixedDeltaTime = Time.fixedDeltaTime;
-//    }
+    void Awake() => storedFixedDelta = Time.fixedDeltaTime;
 
-//    private void OnEnable()
-//    {
-//        CombatBus.Subscribe<DamageEvent>(OnDamage);
-//    }
+    void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
+    void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
 
-//    private void OnDisable()
-//    {
-//        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
-//    }
+    void OnDamage(DamageEvent e)
+    {
+        if (!IsMe(e.attackerId) && !IsMe(e.targetId))
+            return;                                 // not related to me
 
-//    private void OnDamage(DamageEvent e)
-//    {
-//        if (e.attackerId == myId || e.targetId == myId)
-//        {
-//            StartCoroutine(FreezeFrame(e.freezeFrameDuration));
-//        }
-//    }
+        float dur = (e.attackData != null)
+                  ? e.attackData.freezeFrameDuration
+                  : e.freezeFrameDuration;
 
-//    private IEnumerator FreezeFrame(float duration)
-//    {
-//        Time.timeScale = 0f;
-//        Time.fixedDeltaTime = originalFixedDeltaTime * Time.timeScale;
+        if (dur <= 0f) return;
+        if (!isFreezing) StartCoroutine(Freeze(dur));
+    }
 
-//        yield return new WaitForSecondsRealtime(duration);
+    /* -------------------------------------------------- */
 
-//        Time.timeScale = 1f;
-//        Time.fixedDeltaTime = originalFixedDeltaTime;
-//    }
-//}
+    bool IsMe(int id)
+    {
+        if (id == gameObject.GetInstanceID()) return true;
+
+        // attackerId belongs to AttackActivator (stored in dictionary)
+        if (AttackActivator.TransformsById.TryGetValue(id, out var t))
+            return t.root == transform;            // same hierarchy
+
+        return false;
+    }
+
+    IEnumerator Freeze(float dur)
+    {
+        isFreezing = true;
+        Time.timeScale = 0f;
+        Time.fixedDeltaTime = 0f;
+
+        yield return new WaitForSecondsRealtime(dur);
+
+        Time.timeScale = 1f;
+        Time.fixedDeltaTime = storedFixedDelta;
+        isFreezing = false;
+    }
+}

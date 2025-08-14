@@ -1,28 +1,24 @@
-﻿using UnityEngine;
-using UnityEngine.Rendering;
+﻿//using UnityEngine;
 
-public class EnemyHitReaction : MonoBehaviour
-{
+//public class EnemyHitReaction : MonoBehaviour
+//{
+//    Animator anim;
 
-    Animator anim;
+//    void Awake() => anim = GetComponent<Animator>();
 
-    private void OnEnable()
-    {
-        anim = GetComponent<Animator>();
-        CombatBus.Subscribe<DamageEvent>(OnDamage);
-    }
+//    void OnEnable()
+//    {
+//        CombatBus.Subscribe<DamageEvent>(OnDamage);
+//    }
 
-    private void OnDisable()
-    {
-        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
-    }
+//    void OnDisable()
+//    {
+//        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+//    }
 
-    private void OnDamage(DamageEvent e)
-    {
-        if (e.targetId != gameObject.GetInstanceID())
-        {
-            return;
-        }
-        anim.SetTrigger("Hit");
-    }
-}
+//    void OnDamage(DamageEvent e)
+//    {
+//        if (e.targetId != gameObject.GetInstanceID()) return;
+//        anim.SetTrigger("Hit");
+//    }
+//}
