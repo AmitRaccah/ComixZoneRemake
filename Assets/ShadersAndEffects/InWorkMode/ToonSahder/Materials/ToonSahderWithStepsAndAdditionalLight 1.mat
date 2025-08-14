@@ -8,9 +8,9 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: ToonSahderWithStepsAndAdditionalLight 1
-  m_Shader: {fileID: -6465566751694194690, guid: 6bdd5302492f4cb47a44e39e290ba4a8, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
+  m_Shader: {fileID: -6465566751694194690, guid: a7d9c10db7cfd74459720bf8d5a66a2c, type: 3}
+  m_Parent: {fileID: 2100000, guid: c79179a9b8b7c38419c59e2ae682c395, type: 2}
+  m_ModifiedSerializedProperties: 2
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 2
@@ -28,31 +28,15 @@ Material:
         m_Texture: {fileID: 2800000, guid: 7b2347269bbdbd849a6b609a435385b2, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
     - _AmbientStrength: 0.2
     - _FalloffAmount: 20
     - _FresnelSize: 0.23
     - _LightingCutoff: -0.53
-    - _QueueControl: 0
-    - _QueueOffset: 0
-    - _Smoothness: 1000
+    - _Outline_Width: 0.03
     - _Step: 2.1
     m_Colors:
-    - _DiffuseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

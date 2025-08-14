@@ -29,21 +29,11 @@ namespace StarterAssets
 
         public bool allowZMovementTemporarily = false;
 
-        public bool block;
-
 
         public void OnUseSlot1(InputValue v) { if (v.isPressed) UseSlot(0); }
         public void OnUseSlot2(InputValue v) { if (v.isPressed) UseSlot(1); }
         public void OnUseSlot3(InputValue v) { if (v.isPressed) UseSlot(2); }
 
-        public void OnBlock(InputValue v)
-        {
-            bool pressed = v.Get<float>() > 0.5f;
-            block = pressed;
-
-            if (pressed && InputBuffer.Instance != null)
-                InputBuffer.Instance.Add(InputType.Block);
-        }
 
         private void UseSlot(int idx)
         {
@@ -76,29 +66,26 @@ namespace StarterAssets
             JumpInput(value.isPressed);
         }
 
-        // ----- PUNCH -----
-        public void OnPunch(InputValue v)
-        {
-            if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
-
-            InputBuffer.Instance?.Add(InputType.Punch);
-        }
-
-        // ----- HEAVY PUNCH -----
-        public void OnHeavyPunch(InputValue v)
-        {
-            if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
-
-            InputBuffer.Instance?.Add(InputType.HeavyPunch);
-        }
-
         public void OnSprint(InputValue value)
         {
             SprintInput(value.isPressed);
         }
 
+        public void OnPunch(InputValue v)
+        {
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
+                InputBuffer.Instance.Add(InputType.Punch);
+            }
+        }
+
+        public void OnHeavyPunch(InputValue v)
+        {
+            if (v.isPressed && InputBuffer.Instance != null)
+            {
+                InputBuffer.Instance.Add(InputType.HeavyPunch);
+            }
+        }
 
         public void OnPickUp(InputValue value)
         {
