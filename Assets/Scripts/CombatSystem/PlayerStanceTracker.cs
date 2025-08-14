@@ -1,33 +1,28 @@
-using StarterAssets;
 using UnityEngine;
+using StarterAssets;
 
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(StarterAssetsInputs))]
 [RequireComponent(typeof(CharacterController))]
 public class PlayerStanceTracker : MonoBehaviour
 {
     public static PlayerStance Current;
 
-    Animator anim;
-    CharacterController cc;
+    private StarterAssetsInputs input;
+    private CharacterController cc;
 
-    void Awake()
+    private void Awake()
     {
-        anim = GetComponent<Animator>();
+        input = GetComponent<StarterAssetsInputs>();
         cc = GetComponent<CharacterController>();
     }
 
-    void Update()
+    private void Update()
     {
-        var input = GetComponent<StarterAssetsInputs>();
+        if (input == null) return;               
 
-        if (input.crouch)                    
-            Current = PlayerStance.Crouching;
-        else if (input.lookUp)              
-            Current = PlayerStance.LookingUp;
-        else if (!cc.isGrounded)
-            Current = PlayerStance.Airborne;
-        else
-            Current = PlayerStance.Standing;
+        if (input.crouch) Current = PlayerStance.Crouching;
+        else if (input.lookUp) Current = PlayerStance.LookingUp;
+        else if (!cc.isGrounded) Current = PlayerStance.Airborne;
+        else Current = PlayerStance.Standing;
     }
-
 }

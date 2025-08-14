@@ -8,11 +8,13 @@ public class HitboxController : MonoBehaviour
     bool armed;
     public event System.Action OnFirstHit;
     int attackerId;
+    private Vector3 hitPositionWorld;
+
     public void Init(AttackData d, Transform hand, int attackerId)
     {
         data = d;
         socket = hand;
-        this.attackerId = attackerId; 
+        this.attackerId = attackerId;
         timer = d.activeTime;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
@@ -21,13 +23,25 @@ public class HitboxController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (socket == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         transform.position = socket.TransformPoint(data.hitboxOffset);
 
-        if (!armed) { GetComponent<Collider>().enabled = true; armed = true; }
+        if (!armed)
+        {
+            GetComponent<Collider>().enabled = true;
+            armed = true;
+        }
 
         timer -= Time.deltaTime;
-        if (timer <= 0f) Destroy(gameObject);
+        if (timer <= 0f)
+            Destroy(gameObject);
     }
+
 
     void OnTriggerEnter(Collider other)
     {
@@ -38,6 +52,34 @@ public class HitboxController : MonoBehaviour
                          other.transform.root;
 
         if (root == socket.root) return;
+
+        hitPositionWorld = other.ClosestPoint(transform.position);
+
+        //if (data.hitEffectPrefab)
+        //{
+        //    Vector3 pos = hitPositionWorld
+        //        + transform.up * data.hitEffectOffset.y
+        //        + transform.forward * data.hitEffectOffset.z
+        //        + transform.right * data.hitEffectOffset.x;
+
+        //    Instantiate(data.hitEffectPrefab, pos, Quaternion.identity);
+        //}
+
+        if (data.additionalHitEffects != null)
+        {
+            foreach (var fx in data.additionalHitEffects)
+            {
+                if (fx.prefab != null)
+                {
+                    Vector3 pos = hitPositionWorld
+                        + transform.up * fx.localOffset.y
+                        + transform.forward * fx.localOffset.z
+                        + transform.right * fx.localOffset.x;
+
+                    Instantiate(fx.prefab, pos, Quaternion.identity);
+                }
+            }
+        }
 
         CombatBus.Publish(new DamageEvent
         {
@@ -53,12 +95,9 @@ public class HitboxController : MonoBehaviour
 
         OnFirstHit?.Invoke();
         Destroy(gameObject);
-
-        if (data.hitEffectPrefab)
-        {
-            Vector3 pos = socket.TransformPoint(data.hitEffectOffset);
-            Instantiate(data.hitEffectPrefab, pos, socket.rotation);
-        }
     }
+
+
+
 
 }

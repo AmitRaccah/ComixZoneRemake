@@ -126,6 +126,11 @@ namespace StarterAssets
 
         private void Update()
         {
+
+            BlockController bc = GetComponent<BlockController>();
+            if (bc != null)
+                bc.SetBlockInput(_input.block);
+
             _hasAnimator = TryGetComponent(out _animator);
 
             var locker = GetComponent<MovementLock>();
@@ -199,6 +204,7 @@ namespace StarterAssets
 
         private void Move()
         {
+
 
             if (GetComponent<MovementLock>().IsLocked) return;
 

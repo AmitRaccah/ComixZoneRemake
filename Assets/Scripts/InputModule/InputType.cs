@@ -8,6 +8,7 @@ public enum InputType
     MoveUp,
     LookUp,
         PickUp,
-        HeavyPunch
+        HeavyPunch,
+        Block
 
 }
