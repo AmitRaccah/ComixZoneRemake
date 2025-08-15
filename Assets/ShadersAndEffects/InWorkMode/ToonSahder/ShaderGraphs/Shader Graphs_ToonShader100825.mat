@@ -55,27 +55,29 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientStrength: 0.02
+    - _AmbientStrength: 0.0226
     - _FalloffAmount: 0.05
     - _FresnelSize: 0.1
     - _LightingCutoff: 0
-    - _Midtone_Threshold: 0.4
+    - _Midtone_Threshold: 0.036
     - _Outline_Width: 0.03
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Rim_Intensity: 1
-    - _Rim_Power: 2
-    - _Shadow_Threshold: 0.1
+    - _Rim_Intensity: 2
+    - _Rim_Power: 2.95
+    - _Shadow_Threshold: 0
     - _Smoothness: 1000
-    - _Speculat_Smoothnes: 0.2
-    - _Speculat_threshold: 1
+    - _Speculat_Smoothnes: 0
+    - _Speculat_threshold: 0
     - _Step: 3
     m_Colors:
     - _DiffuseColor: {r: 1, g: 1, b: 1, a: 1}
     - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
     - _HighkightColor: {r: 1, g: 0.9490196, b: 0.8, a: 0}
-    - _ShadowColor: {r: 0.7, g: 0.8, b: 1, a: 0}
+    - _HighlightColor: {r: 1, g: 0.9490196, b: 0.8, a: 0}
+    - _ShadowColor: {r: 0.3584906, g: 0.3584906, b: 0.3584906, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
+    - _midtone_color: {r: 0, g: 0, b: 0, a: 0}
     - _outlineColor: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
