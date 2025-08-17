@@ -22,5 +22,6 @@ MonoBehaviour:
   side: 1
   shakeAmplitude: 0.1
   freezeFrameDuration: 0
-  hitEffectPrefab: {fileID: 6925533621942992133, guid: e15ac9282f350b845804d8a9a948175f, type: 3}
-  hitEffectOffset: {x: 0, y: 0, z: 0}
+  additionalHitEffects:
+  - prefab: {fileID: 1092234087039896, guid: b67d326910dc13b4fb27b823efcafcdf, type: 3}
+    localOffset: {x: 0, y: 0, z: -2}
