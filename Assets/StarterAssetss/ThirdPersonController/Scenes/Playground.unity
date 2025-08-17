@@ -810,7 +810,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 200
-  defaultHitStun: 1
+  defaultHitStun: 0.25
   deathTriggerName: Death
   removeDelay: 4
 --- !u!114 &700303557
@@ -962,6 +962,40 @@ MonoBehaviour:
   pickUp: 0
   allowZMovementTemporarily: 0
   block: 0
+--- !u!114 &700303580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700303537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 660bf55520abb624fb4361397c26f4a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultHitStun: 0.25
+  stunTimer: 0
+  myId: 0
+  rb: {fileID: 0}
+  cc: {fileID: 0}
+  anim: {fileID: 0}
+  aiAgent: {fileID: 0}
+  previousStunTimer: 0
+--- !u!114 &700303585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 700303537}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0aadddc98e12ed4ba13eeba34851366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knockbackDuration: 1
+  dampingFactor: 5
 --- !u!1001 &746329221
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2407,6 +2441,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       insertIndex: -1
       addedObject: {fileID: 700303549}
+    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 700303580}
+    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 700303585}
   m_SourcePrefab: {fileID: 100100000, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
 --- !u!1001 &1984724468169976127
 PrefabInstance:
@@ -2670,7 +2710,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 200
-  defaultHitStun: 0.75
+  defaultHitStun: 0.25
   deathTriggerName: Death
   removeDelay: 2
 --- !u!114 &2415317214193729974
@@ -2697,6 +2737,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4c8da1d6fe0c660459e1d788ea39fed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2415317214193730011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273271560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ae50ebe24be99640b7d60a4f5c05bd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &4734669572394389155
@@ -3071,6 +3123,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6435533612568276109, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2415317214193729992}
+    - targetCorrespondingSourceObject: {fileID: 6435533612568276109, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2415317214193730011}
   m_SourcePrefab: {fileID: 100100000, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
 --- !u!1001 &8248094985383737707
 PrefabInstance:
