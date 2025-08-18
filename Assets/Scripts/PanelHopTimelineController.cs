@@ -1,7 +1,7 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Playables;
 using StarterAssets;
+
 [RequireComponent(typeof(Collider))]
 public class PanelHopTimelineController : MonoBehaviour
 {
@@ -19,10 +19,9 @@ public class PanelHopTimelineController : MonoBehaviour
     public Transform worldLanding;
     public TrackerManualControl trackerCtrl;
     private bool triggered = false;
-
     private bool followTracker = false;
     private float followYaw = 0f;
-  
+
     private float initialYaw = 0f;
     float yRot;
     private void Awake()
@@ -144,6 +143,8 @@ public class PanelHopTimelineController : MonoBehaviour
         if (trackerCtrl != null)
         {
             trackerCtrl.enabled = true;
+            // Update the tracker limits for this collider after the transition completes
+            trackerCtrl.SetLimitsForCollider(GetComponent<Collider>());
         }
         if (controller != null)
         {
