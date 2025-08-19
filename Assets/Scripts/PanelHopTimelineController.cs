@@ -38,6 +38,7 @@ public class PanelHopTimelineController : MonoBehaviour
         if (requireCrouch)
         {
             StarterAssetsInputs inp = other.GetComponent<StarterAssetsInputs>();
+            Debug.Log("Crouch input detected: " + (inp != null && inp.crouch));
             if (inp == null || !inp.crouch) return;
         }
         if (player != null)
