@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Playables;
 using StarterAssets;
+using System.Collections;
 
 [RequireComponent(typeof(Collider))]
 public class PanelHopTimelineController : MonoBehaviour
@@ -21,9 +22,9 @@ public class PanelHopTimelineController : MonoBehaviour
     private bool triggered = false;
     private bool followTracker = false;
     private float followYaw = 0f;
-
     private float initialYaw = 0f;
     float yRot;
+
     private void Awake()
     {
         if (director == null)
@@ -31,15 +32,30 @@ public class PanelHopTimelineController : MonoBehaviour
             director = GetComponent<PlayableDirector>();
         }
     }
-    private void OnTriggerEnter(Collider other)
+
+    private IEnumerator OnTriggerEnter(Collider other)
     {
-        if (triggered) return;
-        if (!other.CompareTag(playerTag)) return;
+        if (triggered) yield break;
+        if (!other.CompareTag(playerTag)) yield break;
         if (requireCrouch)
         {
             StarterAssetsInputs inp = other.GetComponent<StarterAssetsInputs>();
-            Debug.Log("Crouch input detected: " + (inp != null && inp.crouch));
-            if (inp == null || !inp.crouch) return;
+            Debug.Log("Crouch input detected initial: " + (inp != null && inp.crouch));
+            if (inp == null) yield break;
+            if (inp.crouch)
+            {
+                BeginTimeline(other.transform, inp);
+                yield break;
+            }
+            while (!triggered && inp != null && !inp.crouch)
+            {
+                yield return null;
+            }
+            if (inp.crouch)
+            {
+                BeginTimeline(other.transform, inp);
+            }
+            yield break;
         }
         if (player != null)
         {
@@ -47,16 +63,34 @@ public class PanelHopTimelineController : MonoBehaviour
         }
         StartTimeline();
     }
+
+    private void BeginTimeline(Transform player, StarterAssetsInputs inputs)
+    {
+        if (player != null)
+        {
+            initialYaw = player.eulerAngles.y;
+        }
+        StartTimeline();
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag(playerTag)) return;
+        triggered = true; // עוצר את ההמתנה אם השחקן יוצא מהקוליידר
+    }
+
     public void EnableRootMotion()
     {
         if (playerAnimator != null)
             playerAnimator.applyRootMotion = true;
     }
+
     public void DisableRootMotion()
     {
         if (playerAnimator != null)
             playerAnimator.applyRootMotion = false;
     }
+
     private void StartTimeline()
     {
         if (director == null) return;
@@ -64,7 +98,9 @@ public class PanelHopTimelineController : MonoBehaviour
         director.time = 0.0;
         director.stopped += OnDirectorStopped;
         director.Play();
+        Debug.Log("Starting Timeline for transition"); // לוג להצגת הפעלת ה-Timeline
     }
+
     public void ResetAnimatorPose()
     {
         if (playerAnimator != null)
@@ -73,6 +109,7 @@ public class PanelHopTimelineController : MonoBehaviour
             player.rotation = Quaternion.Euler(0f, initialYaw, 0f);
         }
     }
+
     private void OnDirectorStopped(PlayableDirector d)
     {
         if (d != null)
@@ -81,6 +118,7 @@ public class PanelHopTimelineController : MonoBehaviour
         }
         triggered = false;
     }
+
     public void LockPlayer()
     {
         if (movementLock != null)
@@ -100,6 +138,7 @@ public class PanelHopTimelineController : MonoBehaviour
             controller.allowZMovementTemporarily = true;
         }
     }
+
     public void TeleportToTracker()
     {
         if (player == null || tracker == null) return;
@@ -113,6 +152,7 @@ public class PanelHopTimelineController : MonoBehaviour
         }
         SafeTeleport(player, tracker.position, yRot);
     }
+
     public void StartFollowTracker()
     {
         if (player != null)
@@ -121,16 +161,19 @@ public class PanelHopTimelineController : MonoBehaviour
         }
         followTracker = true;
     }
+
     public void StopFollowTracker()
     {
         followTracker = false;
     }
+
     public void TeleportToWorld()
     {
         if (player == null || worldLanding == null) return;
         float yRot = player.eulerAngles.y;
         SafeTeleport(player, worldLanding.position, yRot);
     }
+
     public void ReleaseControl()
     {
         if (movementLock != null)
@@ -144,7 +187,6 @@ public class PanelHopTimelineController : MonoBehaviour
         if (trackerCtrl != null)
         {
             trackerCtrl.enabled = true;
-            // Update the tracker limits for this collider after the transition completes
             trackerCtrl.SetLimitsForCollider(GetComponent<Collider>());
         }
         if (controller != null)
@@ -152,20 +194,21 @@ public class PanelHopTimelineController : MonoBehaviour
             controller.allowZMovementTemporarily = false;
         }
     }
+
     public void StopTimeline()
     {
         if (director == null) return;
         director.Stop();
     }
+
     private void LateUpdate()
     {
         if (followTracker && player != null && tracker != null)
         {
             SafeTeleport(player, tracker.position, followYaw);
-            //Debug.Log("Following tracker at position: " + tracker.position + ", player at: " + player.position);
-            //Debug.Log("Root Motion active: " + (playerAnimator != null && playerAnimator.applyRootMotion) + ", Delta Position: " + (playerAnimator != null ? playerAnimator.deltaPosition : Vector3.zero));
         }
     }
+
     private void SafeTeleport(Transform t, Vector3 pos, float yRot)
     {
         if (t == null) return;
