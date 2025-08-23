@@ -2004,12 +2004,9 @@ GameObject:
   - component: {fileID: 2317244825595603622}
   - component: {fileID: 1169153592768455618}
   - component: {fileID: 7824569621136530035}
-  - component: {fileID: 7607952351151310169}
-  - component: {fileID: 1231016068637251204}
   - component: {fileID: 6139360203762116193}
   - component: {fileID: 7481172296733344537}
   - component: {fileID: 7793781765556366066}
-  - component: {fileID: 933913639960815373}
   - component: {fileID: 5500542205102033532}
   m_Layer: 0
   m_Name: Enemy 1
@@ -2269,39 +2266,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 6319283360640182047}
---- !u!114 &7607952351151310169
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7587928964291355952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 605d9c3dfe9ff754797aaf7a8ffea9ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  combos:
-  - sequence: {fileID: 11400000, guid: cd19b3ba4d893744b9fe80a5373e4f17, type: 2}
-  - sequence: {fileID: 11400000, guid: 009e77855d61fa94dbb50dbb542fda53, type: 2}
-  - sequence: {fileID: 11400000, guid: 0450aa820c861fc41880062172ae51a7, type: 2}
-  - sequence: {fileID: 11400000, guid: 481a42299ff911c4c9adbec525756264, type: 2}
-  - sequence: {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
-  - sequence: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
-  - sequence: {fileID: 11400000, guid: 5540e29af3fed6146b5ad37c8a1959f2, type: 2}
-  activator: {fileID: 1169153592768455618}
---- !u!114 &1231016068637251204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7587928964291355952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6fadf9593dde6124b8ddfe185449f287, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6139360203762116193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2340,31 +2304,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b4489a770284364fb421870d28ac7b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &933913639960815373
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7587928964291355952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e087ecce43ebbff45a1b360637807d93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  move: {x: 0, y: 0}
-  look: {x: 0, y: 0}
-  jump: 0
-  sprint: 0
-  punch: 0
-  heavyPunch: 0
-  analogMovement: 0
-  cursorLocked: 1
-  crouch: 0
-  lookUp: 0
-  pickUp: 0
-  allowZMovementTemporarily: 0
-  block: 0
 --- !u!114 &5500542205102033532
 MonoBehaviour:
   m_ObjectHideFlags: 0
