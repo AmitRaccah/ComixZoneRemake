@@ -115,7 +115,7 @@ public class PanelHopTimelineController : MonoBehaviour
         playerInsideGate = false;
 
         director.time = 0.0;
-        director.stopped += OnDirectorStopped;
+        //director.stopped += OnDirectorStopped;
         director.Play();
     }
 
@@ -129,12 +129,12 @@ public class PanelHopTimelineController : MonoBehaviour
         }
     }
 
-    void OnDirectorStopped(PlayableDirector d)
-    {
-        if (d != null) d.stopped -= OnDirectorStopped;
-        DisableRootMotion();
-        triggered = false;
-    }
+    //void OnDirectorStopped(PlayableDirector d)
+    //{
+    //    if (d != null) d.stopped -= OnDirectorStopped;
+    //    DisableRootMotion();
+    //    triggered = false;
+    //}
 
     public void LockPlayer()
     {
