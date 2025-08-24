@@ -21,7 +21,9 @@ public class PanelHopTimelineController : MonoBehaviour
 
     public Transform tracker;
     public Transform worldLanding;
-    public TrackerManualControl trackerCtrl;
+
+    public TrackerFollowDeltaX trackerFollow;
+    public string enterRoomId;
 
     private bool triggered = false;
     private bool followTracker = false;
@@ -31,36 +33,33 @@ public class PanelHopTimelineController : MonoBehaviour
     private Vector3 initialPosition = Vector3.zero;
     private float yRot;
 
-    // Fix: event-driven crouch gating (no cross-gate memory)
     private bool playerInsideGate = false;
     private static PanelHopTimelineController waitingCrouchGate = null;
 
-    private void Awake()
+    void Awake()
     {
-        if (director == null)
-            director = GetComponent<PlayableDirector>();
+        if (director == null) director = GetComponent<PlayableDirector>();
     }
 
-    private void OnEnable()
+    void OnEnable()
     {
         CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
         if (waitingCrouchGate == this) waitingCrouchGate = null;
         playerInsideGate = false;
     }
 
-    private IEnumerator OnTriggerEnter(Collider other)
+    IEnumerator OnTriggerEnter(Collider other)
     {
         if (triggered) yield break;
         if (!other.CompareTag(playerTag)) yield break;
 
         if (requireCrouch)
         {
-            // Arm this gate and wait for crouch via EventBus (no coroutine wait here)
             playerInsideGate = true;
             waitingCrouchGate = this;
             yield break;
@@ -74,23 +73,20 @@ public class PanelHopTimelineController : MonoBehaviour
         StartTimeline();
     }
 
-    private void OnTriggerExit(Collider other)
+    void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag(playerTag)) return;
 
-        // Leaving cancels arming for this gate only
         playerInsideGate = false;
-        if (waitingCrouchGate == this)
-            waitingCrouchGate = null;
+        if (waitingCrouchGate == this) waitingCrouchGate = null;
     }
 
-    // Called globally from StarterAssetsInputs via CoreBus when crouch is pressed
-    private void OnCrouchEvent(PlayerCrouchEvent _)
+    void OnCrouchEvent(PlayerCrouchEvent _)
     {
         if (!requireCrouch) return;
-        if (triggered) return;                 // already running a timeline
-        if (!playerInsideGate) return;         // must still be inside this gate
-        if (waitingCrouchGate != this) return; // only the armed gate can fire
+        if (triggered) return;
+        if (!playerInsideGate) return;
+        if (waitingCrouchGate != this) return;
 
         if (player != null)
         {
@@ -102,23 +98,19 @@ public class PanelHopTimelineController : MonoBehaviour
 
     public void EnableRootMotion()
     {
-        if (playerAnimator != null)
-            playerAnimator.applyRootMotion = true;
+        if (playerAnimator != null) playerAnimator.applyRootMotion = true;
     }
 
     public void DisableRootMotion()
     {
-        if (playerAnimator != null)
-            playerAnimator.applyRootMotion = false;
+        if (playerAnimator != null) playerAnimator.applyRootMotion = false;
     }
 
-    private void StartTimeline()
+    void StartTimeline()
     {
         if (director == null) return;
 
         triggered = true;
-
-        // Clear any pending crouch from any gate to avoid cross-gate memory
         waitingCrouchGate = null;
         playerInsideGate = false;
 
@@ -137,30 +129,20 @@ public class PanelHopTimelineController : MonoBehaviour
         }
     }
 
-    private void OnDirectorStopped(PlayableDirector d)
+    void OnDirectorStopped(PlayableDirector d)
     {
-        if (d != null)
-            d.stopped -= OnDirectorStopped;
-
-        // Safety: ensure root motion is OFF when the timeline ends
+        if (d != null) d.stopped -= OnDirectorStopped;
         DisableRootMotion();
-
         triggered = false;
     }
 
     public void LockPlayer()
     {
-        if (movementLock != null)
-            movementLock.SetExternalLock(true);
+        if (movementLock != null) movementLock.SetExternalLock(true);
+        if (inputs != null) inputs.enabled = false;
+        if (controller != null) controller.allowZMovementTemporarily = true;
 
-        if (inputs != null)
-            inputs.enabled = false;
-
-        if (trackerCtrl != null)
-            trackerCtrl.enabled = false;
-
-        if (controller != null)
-            controller.allowZMovementTemporarily = true;
+        if (trackerFollow != null) trackerFollow.enabled = false;
     }
 
     public void TeleportToTracker()
@@ -173,9 +155,7 @@ public class PanelHopTimelineController : MonoBehaviour
 
     public void StartFollowTracker()
     {
-        if (player != null)
-            followYaw = player.eulerAngles.y;
-
+        if (player != null) followYaw = player.eulerAngles.y;
         followTracker = true;
     }
 
@@ -194,20 +174,16 @@ public class PanelHopTimelineController : MonoBehaviour
 
     public void ReleaseControl()
     {
-        if (movementLock != null)
-            movementLock.SetExternalLock(false);
+        if (movementLock != null) movementLock.SetExternalLock(false);
+        if (inputs != null) inputs.enabled = true;
+        if (controller != null) controller.allowZMovementTemporarily = false;
 
-        if (inputs != null)
-            inputs.enabled = true;
-
-        if (trackerCtrl != null)
+        if (trackerFollow != null)
         {
-            trackerCtrl.enabled = true;
-            trackerCtrl.SetLimitsForCollider(GetComponent<Collider>());
+            if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
+            trackerFollow.enabled = true;
+            trackerFollow.ResetSync();
         }
-
-        if (controller != null)
-            controller.allowZMovementTemporarily = false;
     }
 
     public void StopTimeline()
@@ -216,27 +192,61 @@ public class PanelHopTimelineController : MonoBehaviour
         director.Stop();
     }
 
-    private void LateUpdate()
+    void LateUpdate()
     {
         if (followTracker && player != null && tracker != null)
+        {
             SafeTeleport(player, tracker.position, followYaw);
+        }
     }
 
-    private void SafeTeleport(Transform t, Vector3 pos, float yRot)
+    void SafeTeleport(Transform t, Vector3 pos, float yaw)
     {
         if (t == null) return;
 
         CharacterController cc = null;
-        if (controller != null)
-            cc = controller.GetComponent<CharacterController>();
-
-        if (cc != null)
-            cc.enabled = false;
+        if (controller != null) cc = controller.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
 
         t.position = pos;
-        t.rotation = Quaternion.Euler(0f, yRot, 0f);
+        t.rotation = Quaternion.Euler(0f, yaw, 0f);
 
-        if (cc != null)
-            cc.enabled = true;
+        if (cc != null) cc.enabled = true;
+    }
+
+    // ===== Timeline helper methods =====
+
+    public void TrackerApplyConfiguredRoom()
+    {
+        if (trackerFollow == null) return;
+        if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
+        trackerFollow.ResetSync();
+    }
+
+    public void TrackerApplyRoom(string roomId)
+    {
+        if (trackerFollow == null) return;
+        trackerFollow.ApplyRoom(roomId);
+        trackerFollow.ResetSync();
+    }
+
+    public void TrackerSetSpeed(float s)
+    {
+        if (trackerFollow == null) return;
+        trackerFollow.SetSpeed(s);
+        trackerFollow.ResetSync();
+    }
+
+    public void TrackerDisableFollow()
+    {
+        if (trackerFollow == null) return;
+        trackerFollow.enabled = false;
+    }
+
+    public void TrackerEnableFollow()
+    {
+        if (trackerFollow == null) return;
+        trackerFollow.enabled = true;
+        trackerFollow.ResetSync();
     }
 }

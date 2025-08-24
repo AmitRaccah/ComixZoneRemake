@@ -1,114 +1,80 @@
 ﻿using UnityEngine;
 
-using StarterAssets;
-
-public class TrackerManualControl : MonoBehaviour
-
+public class TrackerFollowDeltaX : MonoBehaviour
 {
-
-    [Header("Refs")]
-
-    public StarterAssetsInputs input;
-
-    public MovementLock movementLock;
-
-    [Header("Tuning")]
-
-    public float speed = 2f;
-
-    public float runSpeed = 4f;
-
-    [Header("Limits")]
-
-    public float initialMinX = 0f;
-
-    public float initialMaxX = 100f;
-
-    public PanelLimit[] panelLimits;
-
-    // Current limits (updated dynamically)
-
-    private float currentMinX;
-
-    private float currentMaxX;
-
-    void Start()
-
+    [System.Serializable]
+    public struct RoomSpeed
     {
-
-        currentMinX = initialMinX;
-
-        currentMaxX = initialMaxX;
-
+        public string roomId;
+        public float speed;
     }
 
-    void Update()
+    public Transform player;
+    public float speed = 1f;
+    public RoomSpeed[] roomSpeeds;
 
+    public string CurrentRoomId { get; private set; }
+
+    float lastX;
+    bool haveLast;
+
+    void OnEnable()
     {
-
-        if (!input) return;
-
-        if (movementLock && movementLock.IsLocked) return;
-
-        float horiz = input.move.x;
-
-        if (Mathf.Abs(horiz) < 0.01f) return;
-
-        float currentSpeed = input.sprint ? runSpeed : speed;
-
-        float nextX = transform.position.x + horiz * currentSpeed * Time.deltaTime;
-
-        if (nextX < currentMinX)
-
-            nextX = currentMinX;
-
-        if (nextX > currentMaxX)
-
-            nextX = currentMaxX;
-
-        transform.position = new Vector3(nextX, transform.position.y, transform.position.z);
-
+        haveLast = player != null;
+        if (haveLast) lastX = player.position.x;
     }
 
-    public void SetLimitsForCollider(Collider triggeredCollider)
-
+    public void ResetSync()
     {
+        if (!player) return;
+        lastX = player.position.x;
+        haveLast = true;
+    }
 
-        foreach (var limit in panelLimits)
-
+    public void ApplyRoom(string roomId)
+    {
+        if (string.IsNullOrEmpty(roomId))
         {
-
-            if (limit.triggerCollider == triggeredCollider)
-
-            {
-
-                currentMinX = limit.minX;
-
-                currentMaxX = limit.maxX;
-
-                return;
-
-            }
-
+            CurrentRoomId = string.Empty;
+            return;
         }
 
-        Debug.LogWarning("No matching panel limit found for collider: " + triggeredCollider.name);
+        for (int i = 0; i < roomSpeeds.Length; i++)
+        {
+            if (roomSpeeds[i].roomId == roomId)
+            {
+                speed = roomSpeeds[i].speed;
+                CurrentRoomId = roomId;
+                return;
+            }
+        }
 
+        CurrentRoomId = roomId;
     }
 
+    public void SetSpeed(float s)
+    {
+        speed = s;
+    }
+
+    void LateUpdate()
+    {
+        if (!player) return;
+
+        if (!haveLast)
+        {
+            lastX = player.position.x;
+            haveLast = true;
+            return;
+        }
+
+        float dx = player.position.x - lastX;
+        lastX = player.position.x;
+
+        if (dx == 0f) return;
+
+        Vector3 p = transform.position;
+        p.x += dx * speed;
+        transform.position = p;
+    }
 }
-
-[System.Serializable]
-
-public struct PanelLimit
-
-{
-
-    public Collider triggerCollider;
-
-    public float minX;
-
-    public float maxX;
-
-}
-

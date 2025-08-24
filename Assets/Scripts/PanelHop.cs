@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using StarterAssets;
+using Unity.Cinemachine;
 
 [RequireComponent(typeof(Collider))]
 public class PanelHop : MonoBehaviour
@@ -9,40 +10,37 @@ public class PanelHop : MonoBehaviour
     [SerializeField] private Transform worldLanding;
     [SerializeField] private Transform trackerTargetEmpty;
 
-    [Header("Timings")]
     [SerializeField] private float preTeleportDelay = 0.4f;
     [SerializeField] private float preTrackerMovementDelay = 0.3f;
 
-    [Header("Animation")]
     [SerializeField] private string animationStateName = "Stage_Pass";
-    [SerializeField] private float crossFadeTime = 0.05f;
 
-    [Header("Tracker Manual Control (optional)")]
-    [SerializeField] private TrackerManualControl trackerControl;
+    [SerializeField] private TrackerFollowDeltaX trackerFollow;
 
-    [SerializeField] private Collider[] collidersToDisable;
-
-    [Header("Tracker Follow Settings")]
     [SerializeField] private float trackerMoveSpeed = 3f;
-    [SerializeField] private float trackerArrivalThreshold = 0.01f;
 
-    [Header("Tracker End Point")]
     [SerializeField] private Transform trackerEndPoint;
     [SerializeField] private float trackerEndMoveSpeed = 2f;
 
-    [Header("Down-Pass Settings")]
     [SerializeField] private bool requireCrouch = false;
+
+    [SerializeField] private CinemachineCamera currentCamera;
+    [SerializeField] private CinemachineCamera nextCamera;
+
+    [SerializeField] private string enterRoomId;
 
     private bool triggered = false;
     private bool isHopping = false;
+    private bool didSwitchCameras = false;
     private Vector3 trackerTarget;
     private Coroutine crouchWaitRoutine = null;
 
     void OnTriggerEnter(Collider other)
     {
-        if (triggered || !other.CompareTag("Player")) return;
+        if (triggered) return;
+        if (!other.CompareTag("Player")) return;
 
-        var input = other.GetComponent<StarterAssetsInputs>();
+        StarterAssetsInputs input = other.GetComponent<StarterAssetsInputs>();
         if (input == null) return;
 
         if (requireCrouch)
@@ -78,13 +76,11 @@ public class PanelHop : MonoBehaviour
         while (!triggered)
         {
             if (input == null || player == null) yield break;
-
             if (input.crouch)
             {
                 BeginHop(player, input);
                 yield break;
             }
-
             yield return null;
         }
     }
@@ -116,27 +112,33 @@ public class PanelHop : MonoBehaviour
 
     IEnumerator HopRoutine(Transform player)
     {
-        var ctrl = player.GetComponent<ThirdPersonController>();
-        var inp = player.GetComponent<StarterAssetsInputs>();
-        var mLck = player.GetComponent<MovementLock>();
+        ThirdPersonController ctrl = player.GetComponent<ThirdPersonController>();
+        StarterAssetsInputs inp = player.GetComponent<StarterAssetsInputs>();
+        MovementLock mLck = player.GetComponent<MovementLock>();
 
-        if (ctrl) { ctrl.allowZMovementTemporarily = true; ctrl.enabled = false; }
-        if (inp) inp.enabled = false;
-        if (mLck) mLck.SetExternalLock(true);
-        foreach (var c in collidersToDisable) if (c) c.enabled = false;
-        if (trackerControl) trackerControl.enabled = false;
+        if (ctrl != null)
+        {
+            ctrl.allowZMovementTemporarily = true;
+            ctrl.enabled = false;
+        }
+        if (inp != null) inp.enabled = false;
+        if (mLck != null) mLck.SetExternalLock(true);
 
-        var anim = player.GetComponentInChildren<Animator>();
-        if (anim)
+        if (trackerFollow != null) trackerFollow.enabled = false;
+
+        Animator anim = player.GetComponentInChildren<Animator>();
+        if (anim != null)
         {
             anim.SetBool("IsCrouching", false);
-            anim.CrossFadeInFixedTime(animationStateName, crossFadeTime, 0, 0f);
+            anim.Play(animationStateName, 0, 0f);
         }
 
-        yield return new WaitForSeconds(Mathf.Max(preTeleportDelay, crossFadeTime));
+        yield return new WaitForSeconds(preTeleportDelay);
 
         float yRot = player.eulerAngles.y;
         Warp(player, tracker.position, yRot);
+
+        if (!didSwitchCameras) SwitchToNextCamera();
 
         if (trackerTargetEmpty != null)
         {
@@ -145,32 +147,39 @@ public class PanelHop : MonoBehaviour
             yield return new WaitForSeconds(preTrackerMovementDelay);
             isHopping = true;
 
-            while (Vector3.Distance(tracker.position, trackerTarget) > trackerArrivalThreshold)
+            while (tracker.position != trackerTarget)
             {
                 Warp(player, tracker.position, yRot);
                 yield return null;
             }
         }
 
-        // Warp player to final landing position
         Warp(player, worldLanding.position, yRot);
 
-        // End tracker follow
         isHopping = false;
 
-        // Restore control to player
-        if (ctrl) { ctrl.enabled = true; ctrl.allowZMovementTemporarily = false; }
-        if (inp) inp.enabled = true;
-        if (mLck) mLck.SetExternalLock(false);
-        foreach (var c in collidersToDisable) if (c) c.enabled = true;
-        if (trackerControl) trackerControl.enabled = true;
+        if (ctrl != null)
+        {
+            ctrl.enabled = true;
+            ctrl.allowZMovementTemporarily = false;
+        }
+        if (inp != null) inp.enabled = true;
+        if (mLck != null) mLck.SetExternalLock(false);
 
         triggered = false;
 
-        // Continue tracker to its final end point in background
         if (trackerEndPoint != null)
         {
             StartCoroutine(MoveTrackerToEndPoint());
+        }
+        else
+        {
+            if (trackerFollow != null)
+            {
+                trackerFollow.ApplyRoom(enterRoomId);
+                trackerFollow.enabled = true;
+                trackerFollow.ResetSync();
+            }
         }
     }
 
@@ -178,7 +187,7 @@ public class PanelHop : MonoBehaviour
     {
         Vector3 endTarget = trackerEndPoint.position;
 
-        while (Vector3.Distance(tracker.position, endTarget) > trackerArrivalThreshold)
+        while (tracker.position != endTarget)
         {
             tracker.position = Vector3.MoveTowards(
                 tracker.position,
@@ -187,13 +196,35 @@ public class PanelHop : MonoBehaviour
             );
             yield return null;
         }
+
+        if (trackerFollow != null)
+        {
+            trackerFollow.ApplyRoom(enterRoomId);
+            trackerFollow.enabled = true;
+            trackerFollow.ResetSync();
+        }
+    }
+
+    void SwitchToNextCamera()
+    {
+        if (nextCamera == null) return;
+
+        if (!nextCamera.gameObject.activeSelf) nextCamera.gameObject.SetActive(true);
+        if (nextCamera.Follow == null) nextCamera.Follow = tracker;
+        if (nextCamera.LookAt == null) nextCamera.LookAt = tracker;
+
+        if (currentCamera != null && currentCamera.gameObject.activeSelf)
+        {
+            currentCamera.gameObject.SetActive(false);
+        }
+
+        didSwitchCameras = true;
     }
 
     static void Warp(Transform t, Vector3 pos, float yRot)
     {
-        if (!t) return;
+        if (t == null) return;
         t.position = new Vector3(pos.x, pos.y, 0f);
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
     }
 }
-
