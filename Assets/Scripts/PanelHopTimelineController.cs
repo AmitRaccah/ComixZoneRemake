@@ -7,32 +7,24 @@ using System.Collections;
 public class PanelHopTimelineController : MonoBehaviour
 {
     public PlayableDirector director;
-
-    [Header("Gate Settings")]
     public bool requireCrouch = false;
     public string playerTag = "Player";
-
     public Transform player;
     public Animator playerAnimator;
     public ThirdPersonController controller;
-    public CharacterController characterControl;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
-
     public Transform tracker;
     public Transform worldLanding;
-
     public TrackerFollowDeltaX trackerFollow;
     public string enterRoomId;
 
     private bool triggered = false;
     private bool followTracker = false;
     private float followYaw = 0f;
-
     private float initialYaw = 0f;
     private Vector3 initialPosition = Vector3.zero;
-    private float yRot;
-
+    private float yRot = 0f;
     private bool playerInsideGate = false;
     private static PanelHopTimelineController waitingCrouchGate = null;
 
@@ -76,7 +68,6 @@ public class PanelHopTimelineController : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if (!other.CompareTag(playerTag)) return;
-
         playerInsideGate = false;
         if (waitingCrouchGate == this) waitingCrouchGate = null;
     }
@@ -109,13 +100,10 @@ public class PanelHopTimelineController : MonoBehaviour
     void StartTimeline()
     {
         if (director == null) return;
-
         triggered = true;
         waitingCrouchGate = null;
         playerInsideGate = false;
-
         director.time = 0.0;
-        //director.stopped += OnDirectorStopped;
         director.Play();
     }
 
@@ -129,26 +117,17 @@ public class PanelHopTimelineController : MonoBehaviour
         }
     }
 
-    //void OnDirectorStopped(PlayableDirector d)
-    //{
-    //    if (d != null) d.stopped -= OnDirectorStopped;
-    //    DisableRootMotion();
-    //    triggered = false;
-    //}
-
     public void LockPlayer()
     {
         if (movementLock != null) movementLock.SetExternalLock(true);
         if (inputs != null) inputs.enabled = false;
         if (controller != null) controller.allowZMovementTemporarily = true;
-
         if (trackerFollow != null) trackerFollow.enabled = false;
     }
 
     public void TeleportToTracker()
     {
         if (player == null || tracker == null) return;
-
         yRot = Mathf.Approximately(player.eulerAngles.y, 0f) ? initialYaw : player.eulerAngles.y;
         SafeTeleport(player, tracker.position, yRot);
     }
@@ -167,7 +146,6 @@ public class PanelHopTimelineController : MonoBehaviour
     public void TeleportToWorld()
     {
         if (player == null || worldLanding == null) return;
-
         float rot = player.eulerAngles.y;
         SafeTeleport(player, worldLanding.position, rot);
     }
@@ -203,50 +181,11 @@ public class PanelHopTimelineController : MonoBehaviour
     void SafeTeleport(Transform t, Vector3 pos, float yaw)
     {
         if (t == null) return;
-
         CharacterController cc = null;
         if (controller != null) cc = controller.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
-
         t.position = pos;
         t.rotation = Quaternion.Euler(0f, yaw, 0f);
-
         if (cc != null) cc.enabled = true;
-    }
-
-    // ===== Timeline helper methods =====
-
-    public void TrackerApplyConfiguredRoom()
-    {
-        if (trackerFollow == null) return;
-        if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
-        trackerFollow.ResetSync();
-    }
-
-    public void TrackerApplyRoom(string roomId)
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.ApplyRoom(roomId);
-        trackerFollow.ResetSync();
-    }
-
-    public void TrackerSetSpeed(float s)
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.SetSpeed(s);
-        trackerFollow.ResetSync();
-    }
-
-    public void TrackerDisableFollow()
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.enabled = false;
-    }
-
-    public void TrackerEnableFollow()
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.enabled = true;
-        trackerFollow.ResetSync();
     }
 }
