@@ -6,37 +6,31 @@ using StarterAssets;
 public class PanelHopTimelineController : MonoBehaviour
 {
     public PlayableDirector director;
-
-    [Header("Gate Settings")]
     public bool requireCrouch = false;
     public string playerTag = "Player";
-
     public Transform player;
     public Animator playerAnimator;
     public ThirdPersonController controller;
-    public CharacterController characterControl;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
-
-    public Transform tracker;
+    public Transform emptyTarget;
     public Transform worldLanding;
-    public TrackerManualControl trackerCtrl;
 
     private bool triggered = false;
 
-    // Follow state
-    private bool followTracker = false;
-    private float followYaw = 0f;
-
-    private void Awake()
+    void Awake()
     {
-        if (director == null)
-        {
-            director = GetComponent<PlayableDirector>();
-        }
+        if (director == null) director = GetComponent<PlayableDirector>();
+        if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
 
-    private void OnTriggerEnter(Collider other)
+    void OnDisable()
+    {
+        if (director != null) director.stopped -= OnDirectorStopped;
+        SafeReleaseControl();
+    }
+
+    void OnTriggerEnter(Collider other)
     {
         if (triggered) return;
         if (!other.CompareTag(playerTag)) return;
@@ -50,81 +44,47 @@ public class PanelHopTimelineController : MonoBehaviour
         StartTimeline();
     }
 
-    public void EnableRootMotion()
-    {
-        if (playerAnimator != null)
-            playerAnimator.applyRootMotion = true;
-    }
-
-    public void DisableRootMotion()
-    {
-        if (playerAnimator != null)
-            playerAnimator.applyRootMotion = false;
-    }
-
-    private void StartTimeline()
+    void StartTimeline()
     {
         if (director == null) return;
-
         triggered = true;
+
+        if (playerAnimator != null) playerAnimator.applyRootMotion = true;
+
         director.time = 0.0;
         director.stopped += OnDirectorStopped;
         director.Play();
     }
 
-    private void OnDirectorStopped(PlayableDirector d)
+    void OnDirectorStopped(PlayableDirector d)
     {
-        if (d != null)
-        {
-            d.stopped -= OnDirectorStopped;
-        }
+        if (d != null) d.stopped -= OnDirectorStopped;
         triggered = false;
+        SafeReleaseControl();
     }
 
-    /* ---------- Signal Track ---------- */
+    public void EnableRootMotion()
+    {
+        if (playerAnimator != null) playerAnimator.applyRootMotion = true;
+    }
+
+    public void DisableRootMotion()
+    {
+        if (playerAnimator != null) playerAnimator.applyRootMotion = false;
+    }
 
     public void LockPlayer()
     {
-        if (movementLock != null)
-        {
-            movementLock.SetExternalLock(true);
-        }
-
-        if (inputs != null)
-        {
-            inputs.enabled = false;
-        }
-
-        if (trackerCtrl != null)
-        {
-            trackerCtrl.enabled = false;
-        }
-
-        if (controller != null)
-        {
-            controller.allowZMovementTemporarily = true;
-        }
+        if (movementLock != null) movementLock.SetExternalLock(true);
+        if (inputs != null) inputs.enabled = false;
+        if (controller != null) controller.allowZMovementTemporarily = true;
     }
 
     public void TeleportToTracker()
     {
-        if (player == null || tracker == null) return;
+        if (player == null || emptyTarget == null) return;
         float yRot = player.eulerAngles.y;
-        SafeTeleport(player, tracker.position, yRot);
-    }
-
-    public void StartFollowTracker()
-    {
-        if (player != null)
-        {
-            followYaw = player.eulerAngles.y;
-        }
-        followTracker = true;
-    }
-
-    public void StopFollowTracker()
-    {
-        followTracker = false;
+        SafeTeleport(player, emptyTarget.position, yRot);
     }
 
     public void TeleportToWorld()
@@ -136,25 +96,7 @@ public class PanelHopTimelineController : MonoBehaviour
 
     public void ReleaseControl()
     {
-        if (movementLock != null)
-        {
-            movementLock.SetExternalLock(false);
-        }
-
-        if (inputs != null)
-        {
-            inputs.enabled = true;
-        }
-
-        if (trackerCtrl != null)
-        {
-            trackerCtrl.enabled = true;
-        }
-
-        if (controller != null)
-        {
-            controller.allowZMovementTemporarily = false;
-        }
+        SafeReleaseControl();
     }
 
     public void StopTimeline()
@@ -163,39 +105,24 @@ public class PanelHopTimelineController : MonoBehaviour
         director.Stop();
     }
 
-    /* ---------- Follow tracker ---------- */
-
-    private void LateUpdate()
-    {
-        if (followTracker && player != null && tracker != null)
-        {
-            SafeTeleport(player, tracker.position, followYaw);
-        }
-    }
-
-    /* ---------- Utils ---------- */
-
-    private void SafeTeleport(Transform t, Vector3 pos, float yRot)
+    void SafeTeleport(Transform t, Vector3 pos, float yRot)
     {
         if (t == null) return;
 
         CharacterController cc = null;
-        if (controller != null)
-        {
-            cc = controller.GetComponent<CharacterController>();
-        }
+        if (controller != null) cc = controller.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
 
-        if (cc != null)
-        {
-            cc.enabled = false;
-        }
-
-        t.position = new Vector3(pos.x, pos.y, pos.z);
+        t.position = pos;
         t.rotation = Quaternion.Euler(0f, yRot, 0f);
 
-        if (cc != null)
-        {
-            cc.enabled = true;
-        }
+        if (cc != null) cc.enabled = true;
+    }
+
+    void SafeReleaseControl()
+    {
+        if (movementLock != null) movementLock.SetExternalLock(false);
+        if (inputs != null) inputs.enabled = true;
+        if (controller != null) controller.allowZMovementTemporarily = false;
     }
 }
