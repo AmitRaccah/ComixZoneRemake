@@ -1,114 +1,40 @@
 ﻿using UnityEngine;
 
-using StarterAssets;
-
-public class TrackerManualControl : MonoBehaviour
-
+public class TrackerFollowDeltaX : MonoBehaviour
 {
+    public Transform player;
 
-    [Header("Refs")]
+    public float speed = 1f;
 
-    public StarterAssetsInputs input;
+    float lastX;
+    bool haveLast;
 
-    public MovementLock movementLock;
-
-    [Header("Tuning")]
-
-    public float speed = 2f;
-
-    public float runSpeed = 4f;
-
-    [Header("Limits")]
-
-    public float initialMinX = 0f;
-
-    public float initialMaxX = 100f;
-
-    public PanelLimit[] panelLimits;
-
-    // Current limits (updated dynamically)
-
-    private float currentMinX;
-
-    private float currentMaxX;
-
-    void Start()
-
+    void OnEnable()
     {
-
-        currentMinX = initialMinX;
-
-        currentMaxX = initialMaxX;
-
+        haveLast = player != null;
+        if (haveLast) lastX = player.position.x;
     }
 
-    void Update()
-
+    public void ResetSync()
     {
-
-        if (!input) return;
-
-        if (movementLock && movementLock.IsLocked) return;
-
-        float horiz = input.move.x;
-
-        if (Mathf.Abs(horiz) < 0.01f) return;
-
-        float currentSpeed = input.sprint ? runSpeed : speed;
-
-        float nextX = transform.position.x + horiz * currentSpeed * Time.deltaTime;
-
-        if (nextX < currentMinX)
-
-            nextX = currentMinX;
-
-        if (nextX > currentMaxX)
-
-            nextX = currentMaxX;
-
-        transform.position = new Vector3(nextX, transform.position.y, transform.position.z);
-
+        if (!player) return;
+        lastX = player.position.x;
+        haveLast = true;
     }
 
-    public void SetLimitsForCollider(Collider triggeredCollider)
-
+    void LateUpdate()
     {
+        if (!player) return;
 
-        foreach (var limit in panelLimits)
+        if (!haveLast) { lastX = player.position.x; haveLast = true; return; }
 
-        {
+        float dx = player.position.x - lastX;
+        lastX = player.position.x;
 
-            if (limit.triggerCollider == triggeredCollider)
+        if (dx == 0f) return;
 
-            {
-
-                currentMinX = limit.minX;
-
-                currentMaxX = limit.maxX;
-
-                return;
-
-            }
-
-        }
-
-        Debug.LogWarning("No matching panel limit found for collider: " + triggeredCollider.name);
-
+        Vector3 p = transform.position;
+        p.x += dx * speed;   
+        transform.position = p;
     }
-
 }
-
-[System.Serializable]
-
-public struct PanelLimit
-
-{
-
-    public Collider triggerCollider;
-
-    public float minX;
-
-    public float maxX;
-
-}
-
