@@ -4,6 +4,7 @@ using Unity.Behavior;
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(BehaviorGraphAgent))]
+[RequireComponent(typeof(EnemyCombatState))]
 public class EnemyCore : MonoBehaviour
 {
     public Animator Anim { get; private set; }
@@ -12,6 +13,7 @@ public class EnemyCore : MonoBehaviour
     [Header("Lane-Lock")]
     [SerializeField] private float laneZ = 0f;
     private int myId;
+    private EnemyCombatState combatState;
 
     void Awake()
     {
@@ -19,6 +21,7 @@ public class EnemyCore : MonoBehaviour
         Body = GetComponent<Rigidbody>();
         AI = GetComponent<BehaviorGraphAgent>();
         myId = gameObject.GetInstanceID();
+        combatState = GetComponent<EnemyCombatState>();
     }
 
     void Start()
@@ -43,6 +46,7 @@ public class EnemyCore : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId) return;
+        combatState?.RegisterHit();
         if (AI != null)
         {
             AI.SetVariableValue("IsStunned", true);
@@ -51,6 +55,13 @@ public class EnemyCore : MonoBehaviour
 
     void Update()
     {
+        if (AI != null && combatState != null)
+        {
+            AI.SetVariableValue<bool>("GotHit",         combatState.GotHit);
+            AI.SetVariableValue<bool>("HitRecently",    combatState.HitRecently);
+            AI.SetVariableValue<bool>("IsBeingSpammed", combatState.IsBeingSpammed);
+        }
+        
         Health health = GetComponent<Health>();
         if (health != null && !health.IsStunned)
         {
@@ -60,4 +71,5 @@ public class EnemyCore : MonoBehaviour
             }
         }
     }
+    
 }
