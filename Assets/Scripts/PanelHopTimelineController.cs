@@ -13,7 +13,6 @@ public class PanelHopTimelineController : MonoBehaviour
     public ThirdPersonController controller;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
-    public Transform emptyTarget;
     public Transform worldLanding;
 
     private bool triggered = false;
@@ -24,11 +23,11 @@ public class PanelHopTimelineController : MonoBehaviour
         if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
 
-    void OnDisable()
-    {
-        if (director != null) director.stopped -= OnDirectorStopped;
-        SafeReleaseControl();
-    }
+    //void OnDisable()
+    //{
+    //    if (director != null) director.stopped -= OnDirectorStopped;
+    //    SafeReleaseControl();
+    //}
 
     void OnTriggerEnter(Collider other)
     {
@@ -47,11 +46,12 @@ public class PanelHopTimelineController : MonoBehaviour
     void StartTimeline()
     {
         if (director == null) return;
+
         triggered = true;
 
         if (playerAnimator != null) playerAnimator.applyRootMotion = true;
 
-        director.time = 0.0;
+        director.time = 0.0f;
         director.stopped += OnDirectorStopped;
         director.Play();
     }
@@ -80,18 +80,17 @@ public class PanelHopTimelineController : MonoBehaviour
         if (controller != null) controller.allowZMovementTemporarily = true;
     }
 
-    public void TeleportToTracker()
-    {
-        if (player == null || emptyTarget == null) return;
-        float yRot = player.eulerAngles.y;
-        SafeTeleport(player, emptyTarget.position, yRot);
-    }
-
     public void TeleportToWorld()
     {
         if (player == null || worldLanding == null) return;
-        float yRot = player.eulerAngles.y;
-        SafeTeleport(player, worldLanding.position, yRot);
+
+        CharacterController cc = null;
+        if (controller != null) cc = controller.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
+
+        player.position = worldLanding.position; // position-only
+
+        if (cc != null) cc.enabled = true;
     }
 
     public void ReleaseControl()
@@ -103,20 +102,6 @@ public class PanelHopTimelineController : MonoBehaviour
     {
         if (director == null) return;
         director.Stop();
-    }
-
-    void SafeTeleport(Transform t, Vector3 pos, float yRot)
-    {
-        if (t == null) return;
-
-        CharacterController cc = null;
-        if (controller != null) cc = controller.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
-
-        t.position = pos;
-        t.rotation = Quaternion.Euler(0f, yRot, 0f);
-
-        if (cc != null) cc.enabled = true;
     }
 
     void SafeReleaseControl()
