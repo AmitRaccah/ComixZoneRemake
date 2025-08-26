@@ -1,252 +1,252 @@
-﻿using UnityEngine;
-using UnityEngine.Playables;
-using StarterAssets;
-using System.Collections;
+﻿//using UnityEngine;
+//using UnityEngine.Playables;
+//using StarterAssets;
+//using System.Collections;
 
-[RequireComponent(typeof(Collider))]
-public class PanelHopTimelineController : MonoBehaviour
-{
-    public PlayableDirector director;
+//[RequireComponent(typeof(Collider))]
+//public class PanelHopTimelineController : MonoBehaviour
+//{
+//    public PlayableDirector director;
 
-    [Header("Gate Settings")]
-    public bool requireCrouch = false;
-    public string playerTag = "Player";
+//    [Header("Gate Settings")]
+//    public bool requireCrouch = false;
+//    public string playerTag = "Player";
 
-    public Transform player;
-    public Animator playerAnimator;
-    public ThirdPersonController controller;
-    public CharacterController characterControl;
-    public StarterAssetsInputs inputs;
-    public MovementLock movementLock;
+//    public Transform player;
+//    public Animator playerAnimator;
+//    public ThirdPersonController controller;
+//    public CharacterController characterControl;
+//    public StarterAssetsInputs inputs;
+//    public MovementLock movementLock;
 
-    public Transform tracker;
-    public Transform worldLanding;
+//    public Transform tracker;
+//    public Transform worldLanding;
 
-    public TrackerFollowDeltaX trackerFollow;
-    public string enterRoomId;
+//    public TrackerFollowDeltaX trackerFollow;
+//    public string enterRoomId;
 
-    private bool triggered = false;
-    private bool followTracker = false;
-    private float followYaw = 0f;
+//    private bool triggered = false;
+//    private bool followTracker = false;
+//    private float followYaw = 0f;
 
-    private float initialYaw = 0f;
-    private Vector3 initialPosition = Vector3.zero;
-    private float yRot;
+//    private float initialYaw = 0f;
+//    private Vector3 initialPosition = Vector3.zero;
+//    private float yRot;
 
-    private bool playerInsideGate = false;
-    private static PanelHopTimelineController waitingCrouchGate = null;
+//    private bool playerInsideGate = false;
+//    private static PanelHopTimelineController waitingCrouchGate = null;
 
-    void Awake()
-    {
-        if (director == null) director = GetComponent<PlayableDirector>();
-    }
+//    void Awake()
+//    {
+//        if (director == null) director = GetComponent<PlayableDirector>();
+//    }
 
-    void OnEnable()
-    {
-        CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
-    }
+//    void OnEnable()
+//    {
+//        CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
+//    }
 
-    void OnDisable()
-    {
-        CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
-        if (waitingCrouchGate == this) waitingCrouchGate = null;
-        playerInsideGate = false;
-    }
+//    void OnDisable()
+//    {
+//        CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
+//        if (waitingCrouchGate == this) waitingCrouchGate = null;
+//        playerInsideGate = false;
+//    }
 
-    IEnumerator OnTriggerEnter(Collider other)
-    {
-        if (triggered) yield break;
-        if (!other.CompareTag(playerTag)) yield break;
+//    IEnumerator OnTriggerEnter(Collider other)
+//    {
+//        if (triggered) yield break;
+//        if (!other.CompareTag(playerTag)) yield break;
 
-        if (requireCrouch)
-        {
-            playerInsideGate = true;
-            waitingCrouchGate = this;
-            yield break;
-        }
+//        if (requireCrouch)
+//        {
+//            playerInsideGate = true;
+//            waitingCrouchGate = this;
+//            yield break;
+//        }
 
-        if (player != null)
-        {
-            initialYaw = player.eulerAngles.y;
-            initialPosition = player.position;
-        }
-        StartTimeline();
-    }
+//        if (player != null)
+//        {
+//            initialYaw = player.eulerAngles.y;
+//            initialPosition = player.position;
+//        }
+//        StartTimeline();
+//    }
 
-    void OnTriggerExit(Collider other)
-    {
-        if (!other.CompareTag(playerTag)) return;
+//    void OnTriggerExit(Collider other)
+//    {
+//        if (!other.CompareTag(playerTag)) return;
 
-        playerInsideGate = false;
-        if (waitingCrouchGate == this) waitingCrouchGate = null;
-    }
+//        playerInsideGate = false;
+//        if (waitingCrouchGate == this) waitingCrouchGate = null;
+//    }
 
-    void OnCrouchEvent(PlayerCrouchEvent _)
-    {
-        if (!requireCrouch) return;
-        if (triggered) return;
-        if (!playerInsideGate) return;
-        if (waitingCrouchGate != this) return;
+//    void OnCrouchEvent(PlayerCrouchEvent _)
+//    {
+//        if (!requireCrouch) return;
+//        if (triggered) return;
+//        if (!playerInsideGate) return;
+//        if (waitingCrouchGate != this) return;
 
-        if (player != null)
-        {
-            initialYaw = player.eulerAngles.y;
-            initialPosition = player.position;
-        }
-        StartTimeline();
-    }
+//        if (player != null)
+//        {
+//            initialYaw = player.eulerAngles.y;
+//            initialPosition = player.position;
+//        }
+//        StartTimeline();
+//    }
 
-    public void EnableRootMotion()
-    {
-        if (playerAnimator != null) playerAnimator.applyRootMotion = true;
-    }
+//    public void EnableRootMotion()
+//    {
+//        if (playerAnimator != null) playerAnimator.applyRootMotion = true;
+//    }
 
-    public void DisableRootMotion()
-    {
-        if (playerAnimator != null) playerAnimator.applyRootMotion = false;
-    }
+//    public void DisableRootMotion()
+//    {
+//        if (playerAnimator != null) playerAnimator.applyRootMotion = false;
+//    }
 
-    void StartTimeline()
-    {
-        if (director == null) return;
+//    void StartTimeline()
+//    {
+//        if (director == null) return;
 
-        triggered = true;
-        waitingCrouchGate = null;
-        playerInsideGate = false;
+//        triggered = true;
+//        waitingCrouchGate = null;
+//        playerInsideGate = false;
 
-        director.time = 0.0;
-        director.stopped += OnDirectorStopped;
-        director.Play();
-    }
+//        director.time = 0.0;
+//        director.stopped += OnDirectorStopped;
+//        director.Play();
+//    }
 
-    public void ResetAnimatorPose()
-    {
-        if (playerAnimator != null && player != null)
-        {
-            playerAnimator.Rebind();
-            player.rotation = Quaternion.Euler(0f, initialYaw, 0f);
-            player.position = initialPosition;
-        }
-    }
+//    public void ResetAnimatorPose()
+//    {
+//        if (playerAnimator != null && player != null)
+//        {
+//            playerAnimator.Rebind();
+//            player.rotation = Quaternion.Euler(0f, initialYaw, 0f);
+//            player.position = initialPosition;
+//        }
+//    }
 
-    void OnDirectorStopped(PlayableDirector d)
-    {
-        if (d != null) d.stopped -= OnDirectorStopped;
-        DisableRootMotion();
-        triggered = false;
-    }
+//    void OnDirectorStopped(PlayableDirector d)
+//    {
+//        if (d != null) d.stopped -= OnDirectorStopped;
+//        DisableRootMotion();
+//        triggered = false;
+//    }
 
-    public void LockPlayer()
-    {
-        if (movementLock != null) movementLock.SetExternalLock(true);
-        if (inputs != null) inputs.enabled = false;
-        if (controller != null) controller.allowZMovementTemporarily = true;
+//    public void LockPlayer()
+//    {
+//        if (movementLock != null) movementLock.SetExternalLock(true);
+//        if (inputs != null) inputs.enabled = false;
+//        if (controller != null) controller.allowZMovementTemporarily = true;
 
-        if (trackerFollow != null) trackerFollow.enabled = false;
-    }
+//        if (trackerFollow != null) trackerFollow.enabled = false;
+//    }
 
-    public void TeleportToTracker()
-    {
-        if (player == null || tracker == null) return;
+//    public void TeleportToTracker()
+//    {
+//        if (player == null || tracker == null) return;
 
-        yRot = Mathf.Approximately(player.eulerAngles.y, 0f) ? initialYaw : player.eulerAngles.y;
-        SafeTeleport(player, tracker.position, yRot);
-    }
+//        yRot = Mathf.Approximately(player.eulerAngles.y, 0f) ? initialYaw : player.eulerAngles.y;
+//        SafeTeleport(player, tracker.position, yRot);
+//    }
 
-    public void StartFollowTracker()
-    {
-        if (player != null) followYaw = player.eulerAngles.y;
-        followTracker = true;
-    }
+//    public void StartFollowTracker()
+//    {
+//        if (player != null) followYaw = player.eulerAngles.y;
+//        followTracker = true;
+//    }
 
-    public void StopFollowTracker()
-    {
-        followTracker = false;
-    }
+//    public void StopFollowTracker()
+//    {
+//        followTracker = false;
+//    }
 
-    public void TeleportToWorld()
-    {
-        if (player == null || worldLanding == null) return;
+//    public void TeleportToWorld()
+//    {
+//        if (player == null || worldLanding == null) return;
 
-        float rot = player.eulerAngles.y;
-        SafeTeleport(player, worldLanding.position, rot);
-    }
+//        float rot = player.eulerAngles.y;
+//        SafeTeleport(player, worldLanding.position, rot);
+//    }
 
-    public void ReleaseControl()
-    {
-        if (movementLock != null) movementLock.SetExternalLock(false);
-        if (inputs != null) inputs.enabled = true;
-        if (controller != null) controller.allowZMovementTemporarily = false;
+//    public void ReleaseControl()
+//    {
+//        if (movementLock != null) movementLock.SetExternalLock(false);
+//        if (inputs != null) inputs.enabled = true;
+//        if (controller != null) controller.allowZMovementTemporarily = false;
 
-        if (trackerFollow != null)
-        {
-            if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
-            trackerFollow.enabled = true;
-            trackerFollow.ResetSync();
-        }
-    }
+//        if (trackerFollow != null)
+//        {
+//            if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
+//            trackerFollow.enabled = true;
+//            trackerFollow.ResetSync();
+//        }
+//    }
 
-    public void StopTimeline()
-    {
-        if (director == null) return;
-        director.Stop();
-    }
+//    public void StopTimeline()
+//    {
+//        if (director == null) return;
+//        director.Stop();
+//    }
 
-    void LateUpdate()
-    {
-        if (followTracker && player != null && tracker != null)
-        {
-            SafeTeleport(player, tracker.position, followYaw);
-        }
-    }
+//    void LateUpdate()
+//    {
+//        if (followTracker && player != null && tracker != null)
+//        {
+//            SafeTeleport(player, tracker.position, followYaw);
+//        }
+//    }
 
-    void SafeTeleport(Transform t, Vector3 pos, float yaw)
-    {
-        if (t == null) return;
+//    void SafeTeleport(Transform t, Vector3 pos, float yaw)
+//    {
+//        if (t == null) return;
 
-        CharacterController cc = null;
-        if (controller != null) cc = controller.GetComponent<CharacterController>();
-        if (cc != null) cc.enabled = false;
+//        CharacterController cc = null;
+//        if (controller != null) cc = controller.GetComponent<CharacterController>();
+//        if (cc != null) cc.enabled = false;
 
-        t.position = pos;
-        t.rotation = Quaternion.Euler(0f, yaw, 0f);
+//        t.position = pos;
+//        t.rotation = Quaternion.Euler(0f, yaw, 0f);
 
-        if (cc != null) cc.enabled = true;
-    }
+//        if (cc != null) cc.enabled = true;
+//    }
 
-    // ===== Timeline helper methods =====
+//    // ===== Timeline helper methods =====
 
-    public void TrackerApplyConfiguredRoom()
-    {
-        if (trackerFollow == null) return;
-        if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
-        trackerFollow.ResetSync();
-    }
+//    public void TrackerApplyConfiguredRoom()
+//    {
+//        if (trackerFollow == null) return;
+//        if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
+//        trackerFollow.ResetSync();
+//    }
 
-    public void TrackerApplyRoom(string roomId)
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.ApplyRoom(roomId);
-        trackerFollow.ResetSync();
-    }
+//    public void TrackerApplyRoom(string roomId)
+//    {
+//        if (trackerFollow == null) return;
+//        trackerFollow.ApplyRoom(roomId);
+//        trackerFollow.ResetSync();
+//    }
 
-    public void TrackerSetSpeed(float s)
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.SetSpeed(s);
-        trackerFollow.ResetSync();
-    }
+//    public void TrackerSetSpeed(float s)
+//    {
+//        if (trackerFollow == null) return;
+//        trackerFollow.SetSpeed(s);
+//        trackerFollow.ResetSync();
+//    }
 
-    public void TrackerDisableFollow()
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.enabled = false;
-    }
+//    public void TrackerDisableFollow()
+//    {
+//        if (trackerFollow == null) return;
+//        trackerFollow.enabled = false;
+//    }
 
-    public void TrackerEnableFollow()
-    {
-        if (trackerFollow == null) return;
-        trackerFollow.enabled = true;
-        trackerFollow.ResetSync();
-    }
-}
+//    public void TrackerEnableFollow()
+//    {
+//        if (trackerFollow == null) return;
+//        trackerFollow.enabled = true;
+//        trackerFollow.ResetSync();
+//    }
+//}
