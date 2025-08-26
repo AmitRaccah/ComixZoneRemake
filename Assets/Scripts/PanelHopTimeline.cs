@@ -20,7 +20,7 @@ public class PanelHopTimeline : MonoBehaviour
     void Awake()
     {
         //    if (director == null) director = GetComponent<PlayableDirector>();
-        if (director != null) director.extrapolationMode = DirectorWrapMode.None;
+       // if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
 
     //void OnDisable()
