@@ -20,10 +20,31 @@ public class PanelHopTimeline : MonoBehaviour
 
     private bool triggered = false;
 
+    //private bool playerInsideGate = false;
+    //private static PanelHopTimeline waitingCrouchGate = null;
+
+
+
+
+
     void Awake()
     {
         if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
+
+
+    //void OnEnable()
+    //{
+    //    CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
+    //}
+
+    //void OnDisable()
+    //{
+    //    CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
+    //    if (waitingCrouchGate == this) waitingCrouchGate = null;
+    //    playerInsideGate = false;
+    //}
+
 
     void OnTriggerEnter(Collider other)
     {
@@ -116,4 +137,15 @@ public class PanelHopTimeline : MonoBehaviour
         if (inputs != null) inputs.enabled = true;
         if (controller != null) controller.allowZMovementTemporarily = false;
     }
+
+    //void OnCrouchEvent(PlayerCrouchEvent _)
+    //{
+    //    if (!requireCrouch) return;
+    //    if (triggered) return;
+    //    if (!playerInsideGate) return;
+    //    if (waitingCrouchGate != this) return;
+
+    //    StartTimeline();
+    //}
+
 }
