@@ -15,19 +15,15 @@ public class PanelHopTimeline : MonoBehaviour
     public MovementLock movementLock;
     public Transform worldLanding;
 
+    public TrackerFollowDeltaX trackerFollow;
+    public string enterRoomId;
+
     private bool triggered = false;
 
     void Awake()
     {
-        //    if (director == null) director = GetComponent<PlayableDirector>();
-       // if (director != null) director.extrapolationMode = DirectorWrapMode.None;
+        if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
-
-    //void OnDisable()
-    //{
-    //    if (director != null) director.stopped -= OnDirectorStopped;
-    //    SafeReleaseControl();
-    //}
 
     void OnTriggerEnter(Collider other)
     {
@@ -61,6 +57,13 @@ public class PanelHopTimeline : MonoBehaviour
         if (d != null) d.stopped -= OnDirectorStopped;
         triggered = false;
         SafeReleaseControl();
+
+        // rep tracker
+        if (trackerFollow != null)
+        {
+            if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
+            trackerFollow.ResetSync();
+        }
     }
 
     public void EnableRootMotion()
@@ -88,9 +91,12 @@ public class PanelHopTimeline : MonoBehaviour
         if (controller != null) cc = controller.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
 
-        player.position = worldLanding.position; // position-only
+        player.position = worldLanding.position;
 
         if (cc != null) cc.enabled = true;
+
+        // optional safety: resync tracker after position jump
+        if (trackerFollow != null) trackerFollow.ResetSync();
     }
 
     public void ReleaseControl()
