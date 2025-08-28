@@ -14,60 +14,66 @@ public class PanelHopTimeline : MonoBehaviour
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
     public Transform worldLanding;
-
     public TrackerFollowDeltaX trackerFollow;
     public string enterRoomId;
-
     private bool triggered = false;
-
-    //private bool playerInsideGate = false;
-    //private static PanelHopTimeline waitingCrouchGate = null;
-
-
-
-
+    private bool playerInsideGate = false;
+    private static PanelHopTimeline waitingCrouchGate = null;
 
     void Awake()
     {
         if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
 
-
-    //void OnEnable()
-    //{
-    //    CoreBus.Subscribe<PlayerCrouchEvent>(OnCrouchEvent);
-    //}
-
-    //void OnDisable()
-    //{
-    //    CoreBus.Unsubscribe<PlayerCrouchEvent>(OnCrouchEvent);
-    //    if (waitingCrouchGate == this) waitingCrouchGate = null;
-    //    playerInsideGate = false;
-    //}
-
-
     void OnTriggerEnter(Collider other)
     {
         if (triggered) return;
         if (!other.CompareTag(playerTag)) return;
 
+        var inp = other.GetComponent<StarterAssetsInputs>();
+        if (inp == null) return;
+        inputs = inp;
+
         if (requireCrouch)
         {
-            StarterAssetsInputs inp = other.GetComponent<StarterAssetsInputs>();
-            if (inp == null || !inp.crouch) return;
+            if (inputs.crouch)
+            {
+                StartTimeline();
+            }
+            else
+            {
+                playerInsideGate = true;
+                waitingCrouchGate = this;
+            }
         }
+        else
+        {
+            StartTimeline();
+        }
+    }
 
-        StartTimeline();
+    void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag(playerTag)) return;
+        playerInsideGate = false;
+        if (waitingCrouchGate == this) waitingCrouchGate = null;
+    }
+
+    void Update()
+    {
+        if (playerInsideGate && waitingCrouchGate == this && inputs != null && inputs.crouch && !triggered)
+        {
+            playerInsideGate = false;
+            waitingCrouchGate = null;
+            StartTimeline();
+        }
     }
 
     void StartTimeline()
     {
         if (director == null) return;
-
         triggered = true;
-
         if (playerAnimator != null) playerAnimator.applyRootMotion = true;
-
         director.time = 0.0f;
         director.stopped += OnDirectorStopped;
         director.Play();
@@ -78,7 +84,6 @@ public class PanelHopTimeline : MonoBehaviour
         if (d != null) d.stopped -= OnDirectorStopped;
         triggered = false;
         SafeReleaseControl();
-
         // rep tracker
         if (trackerFollow != null)
         {
@@ -107,15 +112,11 @@ public class PanelHopTimeline : MonoBehaviour
     public void TeleportToWorld()
     {
         if (player == null || worldLanding == null) return;
-
         CharacterController cc = null;
         if (controller != null) cc = controller.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
-
         player.position = worldLanding.position;
-
         if (cc != null) cc.enabled = true;
-
         // optional safety: resync tracker after position jump
         if (trackerFollow != null) trackerFollow.ResetSync();
     }
@@ -137,15 +138,4 @@ public class PanelHopTimeline : MonoBehaviour
         if (inputs != null) inputs.enabled = true;
         if (controller != null) controller.allowZMovementTemporarily = false;
     }
-
-    //void OnCrouchEvent(PlayerCrouchEvent _)
-    //{
-    //    if (!requireCrouch) return;
-    //    if (triggered) return;
-    //    if (!playerInsideGate) return;
-    //    if (waitingCrouchGate != this) return;
-
-    //    StartTimeline();
-    //}
-
 }
