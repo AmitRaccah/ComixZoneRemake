@@ -9,9 +9,5 @@ public class Item : ScriptableObject
     public int maxStack = 1;
     public string description = "Item description here";
 
-    // You can add more properties here, like:
-    // public int damage;
-    // public float weight;
-    // public ItemType itemType;
 }
 

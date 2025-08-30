@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Animator))]
 public class BlockController : MonoBehaviour
 {
     [Header("Settings")]

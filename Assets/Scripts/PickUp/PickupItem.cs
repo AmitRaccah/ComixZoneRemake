@@ -6,9 +6,15 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private PickupType pickupType;
     [SerializeField] private float pickupRange = 2f;
 
+
     //   [SerializeField] private LayerMask playerLayerMask;
 
+
     private Transform player;
+
+    private void Awake()
+    {
+    }
 
     private void OnEnable() =>
         CoreBus.Subscribe<PlayerPickUpEvent>(TryPickup);
@@ -24,9 +30,11 @@ public class PickupItem : MonoBehaviour
 
         if (accepted)
         {
+            AnimationHelper.Instance?.Trigger("Pickup");
             Debug.Log("Picked up! " + pickupType);
             Destroy(gameObject);
         }
+
     }
 
     bool IsPlayerInRange()
