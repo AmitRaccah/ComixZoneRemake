@@ -66,7 +66,6 @@ public class InventoryManager : MonoBehaviour
             if (allItems[i] != null && allItems[i].pickupType == type)
             { newItem = allItems[i]; break; }
         if (newItem == null) return false;
-        // Find free slot (no more typeToSlot - more flexible)
         ItemSlot slot = itemSlots.Find(s => s.m_item == null);
         if (slot == null)
             return false;
@@ -78,7 +77,6 @@ public class InventoryManager : MonoBehaviour
 
     private void ManageItemSlots(Item newItem)
     {
-        // Find free slot
         ItemSlot slot = itemSlots.Find(s => s.m_item == null);
         if (slot == null)
         {
