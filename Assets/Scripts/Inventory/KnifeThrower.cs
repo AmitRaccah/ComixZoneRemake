@@ -5,7 +5,7 @@ public class KnifeThrower : MonoBehaviour
 {
     [SerializeField] private GameObject knifePrefab;
     [SerializeField] private Transform throwSocket;
-    [SerializeField] private string throwAnimationTrigger = "ThrowKnife";
+    [SerializeField] private string throwAnimationTrigger = "Knife";
     private int playerId;
     private void Awake()
     {
