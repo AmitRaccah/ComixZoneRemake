@@ -34,11 +34,13 @@ public class Health : MonoBehaviour
     {
         hp = maxHp;
         CombatBus.Subscribe<DamageEvent>(OnDamage);
+        CoreBus.Subscribe<PotionConsumedEvent>(OnPotionConsumed);
     }
 
     void OnDisable()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+        CoreBus.Unsubscribe<PotionConsumedEvent>(OnPotionConsumed);
     }
 
     void Update()
@@ -127,7 +129,16 @@ public class Health : MonoBehaviour
             col.enabled = false;
         }
     }
+
+    private void OnPotionConsumed(PotionConsumedEvent e)
+    {
+        if (isDead || !CompareTag("Player")) return;  
+        hp = Mathf.Min(hp + e.healAmount, maxHp);
+        AnimationHelper.Instance?.Trigger("Drink");  
+        Debug.Log($"Healed {e.healAmount} HP. Current HP: {hp}/{maxHp}");
+    }
 }
+
 
 public struct EnemyDownEvent
 {

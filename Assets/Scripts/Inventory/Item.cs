@@ -1,7 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item", menuName = "Inventory/Item")]
-public class Item : ScriptableObject
+public abstract class Item : ScriptableObject
 {
     public PickupType pickupType;
     public Sprite icon = null;
@@ -9,5 +8,8 @@ public class Item : ScriptableObject
     public int maxStack = 1;
     public string description = "Item description here";
 
-}
+    public virtual void Use()
+    {
 
+    }
+}
