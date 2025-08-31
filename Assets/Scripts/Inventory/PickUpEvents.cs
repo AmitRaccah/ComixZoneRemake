@@ -14,3 +14,19 @@ public struct PotionConsumedEvent
         healAmount = amount;
     }
 }
+
+public struct KnifeThrownEvent
+{
+    public int damage;
+    public float speed;
+    public float distance;
+    public float rotationSpeed;
+
+    public KnifeThrownEvent(int dmg, float spd, float dist, float rotSpeed)
+    {
+        damage = dmg;
+        speed = spd;
+        distance = dist;
+        rotationSpeed = rotSpeed;
+    }
+}
