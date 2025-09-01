@@ -52,3 +52,12 @@ public struct KnockbackEvent
     public int attackerId;
     public float force;
 }
+
+[System.Serializable]
+public struct Step
+{
+    public InputType input;
+    public PlayerStance stance;
+    public string trigger;
+    public AttackData attack;
+}
