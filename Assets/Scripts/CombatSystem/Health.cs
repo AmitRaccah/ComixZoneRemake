@@ -140,22 +140,3 @@ public class Health : MonoBehaviour
 }
 
 
-public struct EnemyDownEvent
-{
-    public int enemyId, killerId;
-    public EnemyDownEvent(int e, int k)
-    {
-        enemyId = e;
-        killerId = k;
-    }
-}
-
-public struct PlayerDownEvent
-{
-    public int playerId, killerId;
-    public PlayerDownEvent(int p, int k)
-    {
-        playerId = p;
-        killerId = k;
-    }
-}
