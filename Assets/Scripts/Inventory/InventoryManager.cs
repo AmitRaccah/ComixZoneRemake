@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -42,47 +42,50 @@ public class InventoryManager : MonoBehaviour
 
     private void OnItemPickedUp(ItemPickedUpEvent e)
     {
-        inventory.RemoveAll(it => it == null);
-        if (inventory.Exists(it => it.pickupType == e.pickupType)) return;
-        if (!IsFreeSlot()) return;
-        Item newItem = allItems.Find(x => x.pickupType == e.pickupType);
-        if (newItem == null)
-        {
-            return;
-        }
-        inventory.Add(newItem);
-        ManageItemSlots(newItem);
-        CoreBus.Publish(new InventoryChangedEvent());
+        AddItem(e.pickupType);
     }
 
-    public bool TryAddItem(PickupType type)
+    public bool TryAddItem(PickupType type) => AddItem(type);
+
+    public bool TryUseSlot(ItemSlot slot)
+    {
+        if (slot == null || slot.m_item == null) return false;
+
+        var item = slot.m_item;
+        bool used = item.Use();
+        if (!used) return false;
+
+        if (item.IsConsumable)
+        {
+            inventory.Remove(item);
+            slot.Clear();
+            CoreBus.Publish(new InventoryChangedEvent());
+        }
+        return true;
+    }
+
+    public bool AddItem(PickupType type)
     {
         for (int i = 0; i < inventory.Count; i++)
             if (inventory[i] != null && inventory[i].pickupType == type)
                 return false;
-        if (!IsFreeSlot()) return false;
+
+        ItemSlot slot = itemSlots.Find(s => s != null && s.m_item == null);
+        if (slot == null) { Debug.Log("Inventory Full!"); return false; }
+
         Item newItem = null;
         for (int i = 0; i < allItems.Count; i++)
             if (allItems[i] != null && allItems[i].pickupType == type)
             { newItem = allItems[i]; break; }
-        if (newItem == null) return false;
-        ItemSlot slot = itemSlots.Find(s => s.m_item == null);
-        if (slot == null)
-            return false;
+
+        if (newItem == null) { Debug.LogWarning($"AddItem: Item not found for {type}"); return false; }
+
         inventory.Add(newItem);
         slot.Initialize(newItem);
+
         CoreBus.Publish(new InventoryChangedEvent());
         return true;
     }
 
-    private void ManageItemSlots(Item newItem)
-    {
-        ItemSlot slot = itemSlots.Find(s => s.m_item == null);
-        if (slot == null)
-        {
-            Debug.LogError("No free slot found");
-            return;
-        }
-        slot.Initialize(newItem);
-    }
+
 }

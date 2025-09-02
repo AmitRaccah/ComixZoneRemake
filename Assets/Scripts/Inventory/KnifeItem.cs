@@ -8,9 +8,10 @@ public class KnifeItem : Item
     public float speed = 10f;
     public float distance = 15f;
     public float rotationSpeed = 720f;
-    public override void Use()
+    public override bool Use()
     {
-        if (attackData == null) return;
-        CoreBus.Publish(new KnifeThrownEvent(attackData, speed, distance, rotationSpeed)); 
+        if (attackData == null) return false;
+        CoreBus.Publish(new KnifeThrownEvent(attackData, speed, distance, rotationSpeed));
+        return true;
     }
 }
