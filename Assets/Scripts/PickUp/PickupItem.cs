@@ -48,15 +48,15 @@ public class PickupItem : MonoBehaviour
 
 
 
-    private bool PlayerInRange()
-    {
-        if (player == null)
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+    //private bool PlayerInRange()
+    //{
+    //    if (player == null)
+    //        player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        if (player == null) return false;
+    //    if (player == null) return false;
 
-        return Vector3.Distance(transform.position, player.position) <= pickupRange;
-    }
+    //    return Vector3.Distance(transform.position, player.position) <= pickupRange;
+    //}
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
