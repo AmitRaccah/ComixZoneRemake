@@ -1,59 +1,97 @@
-using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public static class EventBus
 {
-    private static Dictionary<Type, Delegate> listeners = new Dictionary<Type, Delegate>();
+    private static readonly Dictionary<Type, Delegate> listeners = new Dictionary<Type, Delegate>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlayEnter()
+    {
+        listeners.Clear();
+    }
+
+    public static void ClearAll()
+    {
+        listeners.Clear();
+    }
+
+    public static int CountListeners<T>() where T : struct
+    {
+        Delegate d;
+        if (!listeners.TryGetValue(typeof(T), out d) || d == null) return 0;
+        return d.GetInvocationList().Length;
+    }
 
     public static void Subscribe<T>(Action<T> listener) where T : struct
     {
-        Type type = typeof(T);
+        if (listener == null) return;
 
-        if (listeners.ContainsKey(type))
+        var type = typeof(T);
+        Delegate existing;
+        listeners.TryGetValue(type, out existing);
+
+        var action = existing as Action<T>;
+
+        if (action != null)
         {
-            listeners[type] = Delegate.Combine(listeners[type], listener);
+            var inv = action.GetInvocationList();
+            for (int i = 0; i < inv.Length; i++)
+            {
+                var a = (Action<T>)inv[i];
+                if (a.Target == listener.Target && a.Method == listener.Method)
+                    return; 
+            }
+            action += listener;
         }
         else
         {
-            listeners[type] = listener;
+            action = listener;
         }
+
+        listeners[type] = action;
     }
 
     public static void Publish<T>(T publishEvent) where T : struct
     {
-        Type type = typeof(T);
+        var type = typeof(T);
 
-        if (listeners.ContainsKey(type))
+        Delegate d;
+        if (!listeners.TryGetValue(type, out d) || d == null) return;
+
+        var action = d as Action<T>;
+        if (action == null) return;
+
+        var inv = action.GetInvocationList();
+        for (int i = 0; i < inv.Length; i++)
         {
-            Action<T> action = listeners[type] as Action<T>;
-
-            if (action != null)
+            try
             {
-                action.Invoke(publishEvent);
+                ((Action<T>)inv[i])(publishEvent);
             }
-
+            catch (Exception ex)
+            {
+                Debug.LogError($"[EventBus] Listener threw on {type.Name}: {ex}");
+            }
         }
-
     }
 
     public static void Unsubscribe<T>(Action<T> listener) where T : struct
     {
-        Type type = typeof(T);
+        if (listener == null) return;
 
-        if (listeners.ContainsKey(type))
-        {
-            Delegate current = listeners[type];
+        var type = typeof(T);
+        Delegate existing;
+        if (!listeners.TryGetValue(type, out existing) || existing == null) return;
 
-            Delegate updated = Delegate.Remove(current, listener);
+        var action = existing as Action<T>;
+        if (action == null) return;
 
-            if (updated == null)
-                listeners.Remove(type);
-            else
-                listeners[type] = updated;
-        }
+        action -= listener;
+        if (action == null)
+            listeners.Remove(type);
+        else
+            listeners[type] = action;
     }
 }
-
-
-
