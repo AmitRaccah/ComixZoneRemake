@@ -2,36 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class EventBus
+public static class ScopedEventBus<TScope>
 {
     private static readonly Dictionary<Type, Delegate> listeners = new Dictionary<Type, Delegate>();
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    private static void ResetOnPlayEnter()
-    {
-        listeners.Clear();
-    }
-
-    public static void ClearAll()
-    {
-        listeners.Clear();
-    }
+    public static void ClearAll() => listeners.Clear();
 
     public static int CountListeners<T>() where T : struct
     {
-        Delegate d;
-        if (!listeners.TryGetValue(typeof(T), out d) || d == null) return 0;
+        if (!listeners.TryGetValue(typeof(T), out var d) || d == null) return 0;
         return d.GetInvocationList().Length;
     }
 
     public static void Subscribe<T>(Action<T> listener) where T : struct
     {
         if (listener == null) return;
-
         var type = typeof(T);
-        Delegate existing;
-        listeners.TryGetValue(type, out existing);
-
+        listeners.TryGetValue(type, out var existing);
         var action = existing as Action<T>;
 
         if (action != null)
@@ -41,7 +28,7 @@ public static class EventBus
             {
                 var a = (Action<T>)inv[i];
                 if (a.Target == listener.Target && a.Method == listener.Method)
-                    return; 
+                    return;
             }
             action += listener;
         }
@@ -49,30 +36,23 @@ public static class EventBus
         {
             action = listener;
         }
-
         listeners[type] = action;
     }
 
-    public static void Publish<T>(T publishEvent) where T : struct
+    public static void Publish<T>(T e) where T : struct
     {
         var type = typeof(T);
-
-        Delegate d;
-        if (!listeners.TryGetValue(type, out d) || d == null) return;
-
+        if (!listeners.TryGetValue(type, out var d) || d == null) return;
         var action = d as Action<T>;
         if (action == null) return;
 
         var inv = action.GetInvocationList();
         for (int i = 0; i < inv.Length; i++)
         {
-            try
-            {
-                ((Action<T>)inv[i])(publishEvent);
-            }
+            try { ((Action<T>)inv[i])(e); }
             catch (Exception ex)
             {
-                Debug.LogError($"[EventBus] Listener threw on {type.Name}: {ex}");
+                Debug.LogError($"[ScopedEventBus<{typeof(TScope).Name}>] Listener threw on {type.Name}: {ex}");
             }
         }
     }
@@ -80,18 +60,14 @@ public static class EventBus
     public static void Unsubscribe<T>(Action<T> listener) where T : struct
     {
         if (listener == null) return;
-
         var type = typeof(T);
-        Delegate existing;
-        if (!listeners.TryGetValue(type, out existing) || existing == null) return;
+        if (!listeners.TryGetValue(type, out var existing) || existing == null) return;
 
         var action = existing as Action<T>;
         if (action == null) return;
 
         action -= listener;
-        if (action == null)
-            listeners.Remove(type);
-        else
-            listeners[type] = action;
+        if (action == null) listeners.Remove(type);
+        else listeners[type] = action;
     }
 }
