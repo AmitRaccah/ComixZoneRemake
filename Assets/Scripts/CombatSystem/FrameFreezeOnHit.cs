@@ -1,10 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// Attach this script to every character (player & enemies).
-/// It freezes only when:
-///   • this object is the target,  OR
-///   • the attackerId belongs to a component in this hierarchy.
+
 public class FrameFreezeOnHit : MonoBehaviour
 {
     private float storedFixedDelta;
@@ -18,7 +15,7 @@ public class FrameFreezeOnHit : MonoBehaviour
     void OnDamage(DamageEvent e)
     {
         if (!IsMe(e.attackerId) && !IsMe(e.targetId))
-            return;                                 // not related to me
+            return;                                 
 
         float dur = (e.attackData != null)
                   ? e.attackData.freezeFrameDuration
@@ -28,15 +25,13 @@ public class FrameFreezeOnHit : MonoBehaviour
         if (!isFreezing) StartCoroutine(Freeze(dur));
     }
 
-    /* -------------------------------------------------- */
 
     bool IsMe(int id)
     {
         if (id == gameObject.GetInstanceID()) return true;
 
-        // attackerId belongs to AttackActivator (stored in dictionary)
         if (AttackActivator.TransformsById.TryGetValue(id, out var t))
-            return t.root == transform;            // same hierarchy
+            return t.root == transform;            
 
         return false;
     }

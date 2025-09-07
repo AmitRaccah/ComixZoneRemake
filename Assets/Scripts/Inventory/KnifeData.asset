@@ -10,20 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6f4d41e03cc89241985a7697a9b6fe2, type: 3}
-  m_Name: HeavyPunch 1
+  m_Name: KnifeData
   m_EditorClassIdentifier: 
-  attackName: HeavyPunch
-  damageType: 1
-  damage: 10
-  knockback: 1
+  attackName: 
+  damageType: 2
+  damage: 500
+  knockback: 2
   activeTime: 0.15
   hitboxRadius: 0.25
   hitboxOffset: {x: 0, y: 0, z: 0}
-  side: 0
-  shakeAmplitude: 7
-  freezeFrameDuration: 0
+  side: 1
+  shakeAmplitude: 1
+  freezeFrameDuration: 0.1
   additionalHitEffects:
-  - prefab: {fileID: 107418, guid: ea6edc3a0a047a243a9ec62ca1655977, type: 3}
-    localOffset: {x: 0, y: 0, z: 0}
   - prefab: {fileID: 6265589298915445480, guid: 167d6aeb9c0abef4381e80ba5d40eceb, type: 3}
-    localOffset: {x: 0, y: 0, z: -3}
+    localOffset: {x: 0, y: 0, z: 0}

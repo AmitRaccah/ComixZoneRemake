@@ -1,6 +1,6 @@
-using UnityEngine;
+//using UnityEngine;
 
-public class BombItem : ItemController
-{
+//public class BombItem : ItemController
+//{
 
-}
+//}

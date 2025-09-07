@@ -8,12 +8,5 @@ public class AttackSequence : ScriptableObject
     [Header("Loop settings")]
     public bool loopableDuringAttack = false; 
 
-    [System.Serializable]
-    public struct Step
-    {
-        public InputType input;
-        public PlayerStance stance;
-        public string trigger;
-        public AttackData attack;
-    }
+
 }

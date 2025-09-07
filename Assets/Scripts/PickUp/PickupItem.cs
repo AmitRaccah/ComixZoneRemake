@@ -6,9 +6,15 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private PickupType pickupType;
     [SerializeField] private float pickupRange = 2f;
 
+
     //   [SerializeField] private LayerMask playerLayerMask;
 
+
     private Transform player;
+
+    private void Awake()
+    {
+    }
 
     private void OnEnable() =>
         CoreBus.Subscribe<PlayerPickUpEvent>(TryPickup);
@@ -24,9 +30,11 @@ public class PickupItem : MonoBehaviour
 
         if (accepted)
         {
+            AnimationHelper.Instance?.Trigger("Pickup");
             Debug.Log("Picked up! " + pickupType);
             Destroy(gameObject);
         }
+
     }
 
     bool IsPlayerInRange()
@@ -40,15 +48,15 @@ public class PickupItem : MonoBehaviour
 
 
 
-    private bool PlayerInRange()
-    {
-        if (player == null)
-            player = GameObject.FindGameObjectWithTag("Player")?.transform;
+    //private bool PlayerInRange()
+    //{
+    //    if (player == null)
+    //        player = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        if (player == null) return false;
+    //    if (player == null) return false;
 
-        return Vector3.Distance(transform.position, player.position) <= pickupRange;
-    }
+    //    return Vector3.Distance(transform.position, player.position) <= pickupRange;
+    //}
 
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
