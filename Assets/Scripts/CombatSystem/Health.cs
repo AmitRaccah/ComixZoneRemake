@@ -21,6 +21,11 @@ public class Health : MonoBehaviour
     private Animator anim;
     private int deathHash;
 
+    public int EntityId => myId;
+    public int CurrentHp => hp;
+    public int MaxHp => maxHp;
+
+
     void Awake()
     {
         myId = gameObject.GetInstanceID();
@@ -35,6 +40,8 @@ public class Health : MonoBehaviour
         hp = maxHp;
         CombatBus.Subscribe<DamageEvent>(OnDamage);
         CoreBus.Subscribe<PotionConsumedEvent>(OnPotionConsumed);
+
+        PublishHealthChanged();
     }
 
     void OnDisable()
@@ -69,8 +76,10 @@ public class Health : MonoBehaviour
         bool blocked = bc && bc.IsBlocking && IsFacingAttacker(e.attackerId);
         if (blocked) return;
         hp -= e.amount;
+        if (hp < 0) hp = 0;
         stunTimer = defaultHitStun;
         anim.SetBool("CanAttack", false);
+        PublishHealthChanged();
         if (e.knockback > 0f)
         {
             KnockbackEvent knockEvent = new KnockbackEvent();
@@ -99,6 +108,10 @@ public class Health : MonoBehaviour
     {
         if (isDead) return;
         isDead = true;
+
+        if (hp != 0) hp = 0;
+        PublishHealthChanged(true);
+
         if (CompareTag("Player"))
         {
             CombatBus.Publish(new PlayerDownEvent(myId, killerId));
@@ -132,11 +145,20 @@ public class Health : MonoBehaviour
 
     private void OnPotionConsumed(PotionConsumedEvent e)
     {
-        if (isDead || !CompareTag("Player")) return;  
+        if (isDead || !CompareTag("Player")) return;
+
         hp = Mathf.Min(hp + e.healAmount, maxHp);
-        AnimationHelper.Instance?.Trigger("Drink");  
+        AnimationHelper.Instance?.Trigger("Drink");
         Debug.Log($"Healed {e.healAmount} HP. Current HP: {hp}/{maxHp}");
+
+        PublishHealthChanged();
     }
+
+    private void PublishHealthChanged(bool dead = false)
+    {
+        CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, dead));
+        Debug.Log($"[HealthChanged] id={myId} hp={hp}/{maxHp} isPlayer={CompareTag("Player")} dead={dead}");
+
+    }
+
 }
-
-
