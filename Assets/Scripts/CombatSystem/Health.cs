@@ -8,12 +8,13 @@ public class Health : MonoBehaviour
     [Header("Stats")]
     [SerializeField] private int maxHp = 20;
     [SerializeField] private float defaultHitStun = 0.25f;
+
     [Header("Death")]
     [SerializeField] private string deathTriggerName = "Death";
     [SerializeField] private float removeDelay = 2f;
+
     private int hp;
     private float stunTimer;
-    public bool IsStunned => stunTimer > 0f;
     private int myId;
     private bool isDead;
     private Rigidbody rb;
@@ -21,12 +22,13 @@ public class Health : MonoBehaviour
     private Animator anim;
     private int deathHash;
 
-    public int EntityId => myId;  
-    public int CurrentHp => hp;     
-    public int MaxHp => maxHp;  
+    public int EntityId { get { return myId; } }
+    public int CurrentHp { get { return hp; } }
+    public int MaxHp { get { return maxHp; } }
+    public bool IsStunned { get { return stunTimer > 0f; } }
+    public bool IsDead { get { return isDead; } }
 
-
-    void Awake()
+    private void Awake()
     {
         myId = gameObject.GetInstanceID();
         rb = GetComponent<Rigidbody>();
@@ -35,22 +37,13 @@ public class Health : MonoBehaviour
         deathHash = Animator.StringToHash(deathTriggerName);
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         hp = maxHp;
-        CombatBus.Subscribe<DamageEvent>(OnDamage);
-        CoreBus.Subscribe<PotionConsumedEvent>(OnPotionConsumed);
-
-        PublishHealthChanged();
+        PublishHealthChanged(false);
     }
 
-    void OnDisable()
-    {
-        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
-        CoreBus.Unsubscribe<PotionConsumedEvent>(OnPotionConsumed);
-    }
-
-    void Update()
+    private void Update()
     {
         if (stunTimer > 0f)
         {
@@ -69,47 +62,58 @@ public class Health : MonoBehaviour
         }
     }
 
-    void OnDamage(DamageEvent e)
+    // --- API ציבורי ---
+    public void Heal(int amount)
     {
-        if (isDead || e.targetId != myId) return;
-        BlockController bc = GetComponent<BlockController>();
-        bool blocked = bc && bc.IsBlocking && IsFacingAttacker(e.attackerId);
-        if (blocked) return;
-        hp -= e.amount;
+        if (isDead) return;
+        if (amount <= 0) return;
+
+        int old = hp;
+        hp = Mathf.Min(hp + amount, maxHp);
+        if (hp != old)
+        {
+            PublishHealthChanged(false);
+        }
+    }
+
+    public void TakeDamage(int amount, int attackerId, float knockback)
+    {
+        if (isDead) return;
+        if (amount <= 0) return;
+
+        hp -= amount;
         if (hp < 0) hp = 0;
+
         stunTimer = defaultHitStun;
         anim.SetBool("CanAttack", false);
-        PublishHealthChanged();
-        if (e.knockback > 0f)
+
+        PublishHealthChanged(false);
+
+        if (knockback > 0f)
         {
-            KnockbackEvent knockEvent = new KnockbackEvent();
-            knockEvent.targetId = myId;
-            knockEvent.attackerId = e.attackerId;
-            knockEvent.force = e.knockback;
-            CombatBus.Publish(knockEvent);
+            KnockbackEvent k = new KnockbackEvent();
+            k.targetId = myId;
+            k.attackerId = attackerId;
+            k.force = knockback;
+            CombatBus.Publish(k);
         }
+
         if (hp <= 0)
         {
-            Die(e.attackerId);
+            Die(attackerId);
         }
     }
+    // -------------------
 
-    bool IsFacingAttacker(int attackerId)
-    {
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk))
-        {
-            return false;
-        }
-        Vector3 dir = (atk.position - transform.position).normalized;
-        return Vector3.Dot(transform.forward, dir) > 0.3f;
-    }
-
-    void Die(int killerId)
+    private void Die(int killerId)
     {
         if (isDead) return;
         isDead = true;
 
-        if (hp != 0) hp = 0;       
+        if (hp != 0)
+        {
+            hp = 0;
+        }
         PublishHealthChanged(true);
 
         if (CompareTag("Player"))
@@ -120,47 +124,36 @@ public class Health : MonoBehaviour
         {
             CombatBus.Publish(new EnemyDownEvent(myId, killerId));
         }
+
         anim.SetTrigger(deathHash);
         DisableCollisions();
-        var tpc = GetComponent<ThirdPersonController>();
-        if (tpc) tpc.enabled = false;
+
+        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
+        if (tpc != null) tpc.enabled = false;
+
         StartCoroutine(RemoveAfterDelay());
     }
 
-    IEnumerator RemoveAfterDelay()
+    private IEnumerator RemoveAfterDelay()
     {
-        yield return new WaitForSeconds(removeDelay);
+         yield return new WaitForSeconds(removeDelay);
         Destroy(gameObject);
     }
 
-    void DisableCollisions()
+    private void DisableCollisions()
     {
-        if (rb) rb.isKinematic = true;
-        if (cc) cc.enabled = false;
-        foreach (var col in GetComponentsInChildren<Collider>())
+        if (rb != null) rb.isKinematic = true;
+        if (cc != null) cc.enabled = false;
+
+        Collider[] cols = GetComponentsInChildren<Collider>();
+        for (int i = 0; i < cols.Length; i++)
         {
-            col.enabled = false;
+            cols[i].enabled = false;
         }
     }
 
-    private void OnPotionConsumed(PotionConsumedEvent e)
-    {
-        if (isDead || !CompareTag("Player")) return;
-
-        hp = Mathf.Min(hp + e.healAmount, maxHp);
-        AnimationHelper.Instance?.Trigger("Drink");
-        Debug.Log($"Healed {e.healAmount} HP. Current HP: {hp}/{maxHp}");
-
-        PublishHealthChanged();
-    }
-
-    private void PublishHealthChanged(bool dead = false)
+    private void PublishHealthChanged(bool dead)
     {
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, dead));
-         Debug.Log($"[HealthChanged] id={myId} hp={hp}/{maxHp} isPlayer={CompareTag("Player")} dead={dead}");
-
     }
-
 }
-
-
