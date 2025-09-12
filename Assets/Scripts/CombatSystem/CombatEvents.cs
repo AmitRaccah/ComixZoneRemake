@@ -61,3 +61,21 @@ public struct Step
     public string trigger;
     public AttackData attack;
 }
+
+public struct HealthChangedEvent
+{
+    public int entityId;
+    public int current;
+    public int max;
+    public bool isDead;
+
+    public HealthChangedEvent(int entityId, int current, int max, bool isDead = false)
+    {
+        this.entityId = entityId;
+        this.current = current;
+        this.max = max;
+        this.isDead = isDead;
+    }
+}
+
+
