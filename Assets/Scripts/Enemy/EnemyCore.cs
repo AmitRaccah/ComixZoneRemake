@@ -10,12 +10,14 @@ public class EnemyCore : MonoBehaviour
     public Animator Anim { get; private set; }
     public Rigidbody Body { get; private set; }
     public BehaviorGraphAgent AI { get; private set; }
+
     [Header("Lane-Lock")]
     [SerializeField] private float laneZ = 0f;
+
     private int myId;
     private EnemyCombatState combatState;
 
-    void Awake()
+    private void Awake()
     {
         Anim = GetComponent<Animator>();
         Body = GetComponent<Rigidbody>();
@@ -24,44 +26,54 @@ public class EnemyCore : MonoBehaviour
         combatState = GetComponent<EnemyCombatState>();
     }
 
-    void Start()
+    private void Start()
     {
+        // ����� ������ �� �����
         Vector3 p = transform.position;
         p.z = laneZ;
         transform.position = p;
-        Body.constraints |= RigidbodyConstraints.FreezePositionZ
-                          | RigidbodyConstraints.FreezeRotation;
+
+        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
-    void OnEnable()
+    private void OnEnable()
     {
         CombatBus.Subscribe<DamageEvent>(OnDamage);
+
+        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-    private void OnDamage(DamageEvent e)
+    private void FixedUpdate()
     {
-        if (e.targetId != myId) return;
-        combatState?.RegisterHit();
-        if (AI != null)
+        Vector3 v = Body.linearVelocity;
+        if (v.z != 0f)
         {
-            AI.SetVariableValue("IsStunned", true);
+            v.z = 0f;
+            Body.linearVelocity = v;
+        }
+
+        Vector3 pos = Body.position;
+        if (pos.z != laneZ)
+        {
+            pos.z = laneZ;
+            Body.position = pos; 
         }
     }
 
-    void Update()
+    private void Update()
     {
         if (AI != null && combatState != null)
         {
-            AI.SetVariableValue<bool>("GotHit",         combatState.GotHit);
-            AI.SetVariableValue<bool>("HitRecently",    combatState.HitRecently);
+            AI.SetVariableValue<bool>("GotHit", combatState.GotHit);
+            AI.SetVariableValue<bool>("HitRecently", combatState.HitRecently);
             AI.SetVariableValue<bool>("IsBeingSpammed", combatState.IsBeingSpammed);
         }
-        
+
         Health health = GetComponent<Health>();
         if (health != null && !health.IsStunned)
         {
@@ -71,5 +83,11 @@ public class EnemyCore : MonoBehaviour
             }
         }
     }
-    
+
+    private void OnDamage(DamageEvent e)
+    {
+        if (e.targetId != myId) return;
+        if (combatState != null) combatState.RegisterHit();
+        if (AI != null) AI.SetVariableValue("IsStunned", true);
+    }
 }
