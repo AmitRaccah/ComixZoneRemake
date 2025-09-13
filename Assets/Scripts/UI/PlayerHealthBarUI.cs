@@ -37,4 +37,14 @@ public class PlayerHealthBarUI : MonoBehaviour
         slider.maxValue = max;
         slider.value = current;
     }
+
+    public void SetTarget(Health h)
+    {
+        playerHealth = h;
+        if (playerHealth != null)
+        {
+            Apply(playerHealth.CurrentHp, playerHealth.MaxHp);
+        }
+    }
+
 }

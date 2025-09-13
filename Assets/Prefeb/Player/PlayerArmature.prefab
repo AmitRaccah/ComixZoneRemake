@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &386807799768547252
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 374290004313306899}
+  m_Layer: 8
+  m_Name: KnifeThrow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &374290004313306899
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 386807799768547252}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.091, y: 1.065, z: 0.817}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2893034696818528912}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6435533612568276109
 GameObject:
   m_ObjectHideFlags: 0
@@ -31,6 +62,10 @@ GameObject:
   - component: {fileID: 2413959843837484398}
   - component: {fileID: 961118692617251613}
   - component: {fileID: 8434318203744113306}
+  - component: {fileID: 2017042899015870048}
+  - component: {fileID: 3919719045596729867}
+  - component: {fileID: 2334889919496139720}
+  - component: {fileID: 5356559351638192402}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -53,6 +88,7 @@ Transform:
   m_Children:
   - {fileID: 3379010462401591013}
   - {fileID: 4548066077227366906}
+  - {fileID: 374290004313306899}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 96.362, z: 0}
 --- !u!95 &4001519933889548501
@@ -554,6 +590,57 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 92221edbac94d3a4c9c3a88d68df4515, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2017042899015870048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0433075d2dd56634fb57aa8e5be03b68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3919719045596729867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbe0696e086211040ba90b07325983b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
+  throwSocket: {fileID: 374290004313306899}
+  throwAnimationTrigger: Punch
+--- !u!114 &2334889919496139720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d52a6b32f1733c941b5145a20f7aa045, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5356559351638192402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8fbb418a6b76e04bb35607b15deaf7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8987688672489794844
