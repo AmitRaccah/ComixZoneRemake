@@ -36,7 +36,7 @@ public class InputBuffer : MonoBehaviour
         {
             FrameInput last = buffer[buffer.Count - 1];
             if (last.inputType == input && last.frame == frame)
-                return; 
+                return;
         }
 
         buffer.Add(new FrameInput(input, frame));
