@@ -24,6 +24,16 @@ public class PlayerHealthBarUI : MonoBehaviour
     //    Apply(playerHealth.CurrentHp, playerHealth.MaxHp);
     //}
 
+    public void SetTarget(Health h)
+    {
+        playerHealth = h;
+        if (playerHealth != null)
+        {
+            Apply(playerHealth.CurrentHp, playerHealth.MaxHp);
+        }
+    }
+
+
     private void OnHealthChanged(HealthChangedEvent e)
     {
         if (e.entityId != playerHealth.EntityId) return;
