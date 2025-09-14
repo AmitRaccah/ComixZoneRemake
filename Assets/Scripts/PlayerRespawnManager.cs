@@ -1,63 +1,80 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using StarterAssets;
 
 public class PlayerRespawnManager : MonoBehaviour
 {
-    [SerializeField] private GameObject playerPrefab;
-    [SerializeField] private Transform playerSpawnPoint;
-    [SerializeField] private TrackerFollowDeltaX tracker;
-    [SerializeField] private Transform trackerSpawnPoint;
+    [Header("Refs")]
+    public Transform player;
+    public Transform respawnPoint;
+    public TrackerFollowDeltaX tracker;
+    public Transform trackerRespawnPoint;
+    public string respawnRoomId;
 
-    private bool busy;
+    StarterAssetsInputs inputs;
+    ThirdPersonController controller;
+    MovementLock movementLock;
 
-    private void OnEnable()
+    void Awake()
+    {
+        CacheRefs();
+    }
+
+    void OnEnable()
     {
         CombatBus.Subscribe<PlayerDownEvent>(OnPlayerDown);
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         CombatBus.Unsubscribe<PlayerDownEvent>(OnPlayerDown);
     }
 
-    private void OnPlayerDown(PlayerDownEvent e)
+    void CacheRefs()
     {
-        if (busy) return;
-        busy = true;
-
-        tracker.player = null;
-        StartCoroutine(RespawnWhenDestroyed(e.playerId));
+        if (!player) return;
+        inputs = player.GetComponent<StarterAssetsInputs>();
+        controller = player.GetComponent<ThirdPersonController>();
+        movementLock = player.GetComponent<MovementLock>();
     }
 
-    private IEnumerator RespawnWhenDestroyed(int deadPlayerId)
+    void OnPlayerDown(PlayerDownEvent _)
     {
-        while (FindPlayerHealthById(deadPlayerId) != null)
+        StartCoroutine(DoRespawn());
+    }
+
+    IEnumerator DoRespawn()
+    {
+        if (!player || !respawnPoint || !tracker || !trackerRespawnPoint) yield break;
+
+        if (inputs) inputs.enabled = false;
+        if (movementLock) movementLock.SetExternalLock(true);
+
+        var h = player.GetComponent<Health>();
+        float wait = (h != null) ? h.DeathDelay : 0f;
+        if (wait > 0f) yield return new WaitForSeconds(wait);
+
+        var cc = player.GetComponent<CharacterController>();
+        if (cc) cc.enabled = false;
+        player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+        if (cc) cc.enabled = true;
+
+        var rb = player.GetComponent<Rigidbody>();
+        if (rb)
         {
-            yield return null;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
 
-        Vector3 tp = tracker.transform.position;
-        tp.x = trackerSpawnPoint.position.x;
-        tracker.transform.position = tp;
+        if (h) h.RespawnReset();
 
-        GameObject newPlayer = Instantiate(playerPrefab, playerSpawnPoint.position, playerSpawnPoint.rotation);
+        if (!string.IsNullOrEmpty(respawnRoomId))
+            tracker.ApplyRoom(respawnRoomId);
 
-        tracker.player = newPlayer.transform;
+        tracker.transform.position = trackerRespawnPoint.position;
         tracker.ResetSync();
 
-        busy = false;
-    }
-
-    private Health FindPlayerHealthById(int id)
-    {
-        Health[] all = FindObjectsOfType<Health>();
-        for (int i = 0; i < all.Length; i++)
-        {
-            if (all[i] != null && all[i].EntityId == id)
-            {
-                return all[i];
-            }
-        }
-        return null;
+        if (inputs) inputs.enabled = true;
+        if (movementLock) movementLock.SetExternalLock(false);
     }
 }

@@ -28,7 +28,6 @@ public class EnemyCore : MonoBehaviour
 
     private void Start()
     {
-        // ����� ������ �� �����
         Vector3 p = transform.position;
         p.z = laneZ;
         transform.position = p;
@@ -61,7 +60,7 @@ public class EnemyCore : MonoBehaviour
         if (pos.z != laneZ)
         {
             pos.z = laneZ;
-            Body.position = pos; 
+            Body.position = pos;
         }
     }
 
