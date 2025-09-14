@@ -27,6 +27,8 @@ public class Health : MonoBehaviour
     public int MaxHp { get { return maxHp; } }
     public bool IsStunned { get { return stunTimer > 0f; } }
     public bool IsDead { get { return isDead; } }
+    public float DeathDelay { get { return removeDelay; } }
+
 
     private void Awake()
     {
@@ -39,6 +41,7 @@ public class Health : MonoBehaviour
 
     private void OnEnable()
     {
+        isDead = false;
         hp = maxHp;
         PublishHealthChanged(false);
     }
@@ -48,17 +51,11 @@ public class Health : MonoBehaviour
         if (stunTimer > 0f)
         {
             stunTimer -= Time.deltaTime;
-            if (anim.GetBool("CanAttack"))
-            {
-                anim.SetBool("CanAttack", false);
-            }
+            if (anim.GetBool("CanAttack")) anim.SetBool("CanAttack", false);
         }
         else
         {
-            if (!anim.GetBool("CanAttack"))
-            {
-                anim.SetBool("CanAttack", true);
-            }
+            if (!anim.GetBool("CanAttack")) anim.SetBool("CanAttack", true);
         }
     }
 
@@ -69,10 +66,7 @@ public class Health : MonoBehaviour
 
         int old = hp;
         hp = Mathf.Min(hp + amount, maxHp);
-        if (hp != old)
-        {
-            PublishHealthChanged(false);
-        }
+        if (hp != old) PublishHealthChanged(false);
     }
 
     public void TakeDamage(int amount, int attackerId, float knockback)
@@ -97,10 +91,7 @@ public class Health : MonoBehaviour
             CombatBus.Publish(k);
         }
 
-        if (hp <= 0)
-        {
-            Die(attackerId);
-        }
+        if (hp <= 0) Die(attackerId);
     }
 
     private void Die(int killerId)
@@ -108,28 +99,29 @@ public class Health : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        if (hp != 0)
-        {
-            hp = 0;
-        }
+        if (hp != 0) hp = 0;
         PublishHealthChanged(true);
 
         if (CompareTag("Player"))
         {
             CombatBus.Publish(new PlayerDownEvent(myId, killerId));
+            anim.SetTrigger(deathHash);
+            DisableCollisions();
+
+            ThirdPersonController tpc = GetComponent<ThirdPersonController>();
+            if (tpc != null) tpc.enabled = false;
         }
         else
         {
             CombatBus.Publish(new EnemyDownEvent(myId, killerId));
+            anim.SetTrigger(deathHash);
+            DisableCollisions();
+
+            ThirdPersonController tpc = GetComponent<ThirdPersonController>();
+            if (tpc != null) tpc.enabled = false;
+
+            StartCoroutine(RemoveAfterDelay());
         }
-
-        anim.SetTrigger(deathHash);
-        DisableCollisions();
-
-        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
-        if (tpc != null) tpc.enabled = false;
-
-        StartCoroutine(RemoveAfterDelay());
     }
 
     private IEnumerator RemoveAfterDelay()
@@ -144,10 +136,40 @@ public class Health : MonoBehaviour
         if (cc != null) cc.enabled = false;
 
         Collider[] cols = GetComponentsInChildren<Collider>();
-        for (int i = 0; i < cols.Length; i++)
+        for (int i = 0; i < cols.Length; i++) cols[i].enabled = false;
+    }
+
+    private void EnableCollisions()
+    {
+        if (rb != null) rb.isKinematic = false;
+        if (cc != null) cc.enabled = true;
+
+        Collider[] cols = GetComponentsInChildren<Collider>();
+        for (int i = 0; i < cols.Length; i++) cols[i].enabled = true;
+    }
+
+    public void RespawnReset()
+    {
+        isDead = false;
+        hp = maxHp;
+        stunTimer = 0f;
+
+        EnableCollisions();
+
+        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
+        if (tpc != null) tpc.enabled = true;
+
+        if (rb != null)
         {
-            cols[i].enabled = false;
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
         }
+
+        anim.Rebind();
+        anim.Update(0f);
+        anim.SetBool("CanAttack", true);
+
+        PublishHealthChanged(false);
     }
 
     private void PublishHealthChanged(bool dead)

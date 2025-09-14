@@ -1,5 +1,4 @@
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using Unity.Behavior;
 using Unity.AppUI.Core;
@@ -23,7 +22,7 @@ public class EnemyRecognizePlayer : MonoBehaviour
     //private BlackboardVariable<bool> _canSeeVar;
     //private BlackboardVariable<bool> _inRangeVar;
 
-   // public float radius = 0.5f;
+    // public float radius = 0.5f;
 
     void Awake()
     {
