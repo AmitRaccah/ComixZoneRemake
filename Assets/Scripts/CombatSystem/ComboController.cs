@@ -51,7 +51,8 @@ public class ComboController : MonoBehaviour
 
     void Update()
     {
-        if (GetComponent<Health>()?.IsStunned == true)
+        if (GetComponent<HitStunController>()?.IsStunned == true)
+
         {
             step = -1;
             queuedInput = null;

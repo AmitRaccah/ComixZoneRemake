@@ -79,3 +79,10 @@ public struct HealthChangedEvent
 }
 
 
+public struct HealthDepletedEvent
+{
+    public int entityId;
+    public Faction faction;
+    public int killerId;
+    public HealthDepletedEvent(int id, Faction f, int killer) { entityId = id; faction = f; killerId = killer; }
+}

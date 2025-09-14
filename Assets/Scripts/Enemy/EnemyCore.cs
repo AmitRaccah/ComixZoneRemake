@@ -73,14 +73,8 @@ public class EnemyCore : MonoBehaviour
             AI.SetVariableValue<bool>("IsBeingSpammed", combatState.IsBeingSpammed);
         }
 
-        Health health = GetComponent<Health>();
-        if (health != null && !health.IsStunned)
-        {
-            if (AI != null)
-            {
-                AI.SetVariableValue("IsStunned", false);
-            }
-        }
+        var stun = GetComponent<HitStunController>();
+        if (stun != null && !stun.IsStunned) { AI?.SetVariableValue("IsStunned", false); }
     }
 
     private void OnDamage(DamageEvent e)

@@ -80,7 +80,7 @@ namespace StarterAssets
         public void OnPunch(InputValue v)
         {
             if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
+            if (GetComponent<HitStunController>()?.IsStunned == true) return;
 
             InputBuffer.Instance?.Add(InputType.Punch);
         }
@@ -89,7 +89,7 @@ namespace StarterAssets
         public void OnHeavyPunch(InputValue v)
         {
             if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
+            if (GetComponent<HitStunController>()?.IsStunned == true) return;
 
             InputBuffer.Instance?.Add(InputType.HeavyPunch);
         }
