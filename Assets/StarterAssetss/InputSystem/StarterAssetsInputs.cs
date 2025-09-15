@@ -80,19 +80,19 @@ namespace StarterAssets
         public void OnPunch(InputValue v)
         {
             if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
-
+            HitStunController s = GetComponent<HitStunController>();
+            if (s != null && s.IsStunned) return;
             InputBuffer.Instance?.Add(InputType.Punch);
         }
 
-        // ----- HEAVY PUNCH -----
         public void OnHeavyPunch(InputValue v)
         {
             if (!v.isPressed) return;
-            if (GetComponent<Health>()?.IsStunned == true) return;  
-
+            HitStunController s = GetComponent<HitStunController>();
+            if (s != null && s.IsStunned) return;
             InputBuffer.Instance?.Add(InputType.HeavyPunch);
         }
+
 
         public void OnSprint(InputValue value)
         {

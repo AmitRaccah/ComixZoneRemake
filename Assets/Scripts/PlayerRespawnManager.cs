@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using StarterAssets;
 
 public class PlayerRespawnManager : MonoBehaviour
 {
@@ -10,15 +9,6 @@ public class PlayerRespawnManager : MonoBehaviour
     public TrackerFollowDeltaX tracker;
     public Transform trackerRespawnPoint;
     public string respawnRoomId;
-
-    StarterAssetsInputs inputs;
-    ThirdPersonController controller;
-    MovementLock movementLock;
-
-    void Awake()
-    {
-        CacheRefs();
-    }
 
     void OnEnable()
     {
@@ -30,51 +20,51 @@ public class PlayerRespawnManager : MonoBehaviour
         CombatBus.Unsubscribe<PlayerDownEvent>(OnPlayerDown);
     }
 
-    void CacheRefs()
-    {
-        if (!player) return;
-        inputs = player.GetComponent<StarterAssetsInputs>();
-        controller = player.GetComponent<ThirdPersonController>();
-        movementLock = player.GetComponent<MovementLock>();
-    }
-
-    void OnPlayerDown(PlayerDownEvent _)
+    private void OnPlayerDown(PlayerDownEvent _)
     {
         StartCoroutine(DoRespawn());
     }
 
-    IEnumerator DoRespawn()
+    private IEnumerator DoRespawn()
     {
-        if (!player || !respawnPoint || !tracker || !trackerRespawnPoint) yield break;
+        if (player == null) yield break;
+        if (respawnPoint == null) yield break;
+        if (tracker == null) yield break;
+        if (trackerRespawnPoint == null) yield break;
 
-        if (inputs) inputs.enabled = false;
-        if (movementLock) movementLock.SetExternalLock(true);
-
-        var h = player.GetComponent<Health>();
-        float wait = (h != null) ? h.DeathDelay : 0f;
+        Health h = player.GetComponent<Health>();
+        float wait = h != null ? h.DeathDelay : 0f;
         if (wait > 0f) yield return new WaitForSeconds(wait);
 
-        var cc = player.GetComponent<CharacterController>();
-        if (cc) cc.enabled = false;
-        player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
-        if (cc) cc.enabled = true;
+        CharacterController cc = player.GetComponent<CharacterController>();
+        if (cc != null) cc.enabled = false;
 
-        var rb = player.GetComponent<Rigidbody>();
-        if (rb)
+        player.SetPositionAndRotation(respawnPoint.position, respawnPoint.rotation);
+
+        if (cc != null) cc.enabled = true;
+
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
 
-        if (h) h.RespawnReset();
+        Animator a = player.GetComponent<Animator>();
+        if (a != null)
+        {
+            a.Rebind();
+            a.Update(0f);
+        }
+
+        if (h != null) h.RespawnReset();
 
         if (!string.IsNullOrEmpty(respawnRoomId))
+        {
             tracker.ApplyRoom(respawnRoomId);
+        }
 
         tracker.transform.position = trackerRespawnPoint.position;
         tracker.ResetSync();
-
-        if (inputs) inputs.enabled = true;
-        if (movementLock) movementLock.SetExternalLock(false);
     }
 }

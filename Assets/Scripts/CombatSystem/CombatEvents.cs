@@ -79,3 +79,16 @@ public struct HealthChangedEvent
 }
 
 
+public struct HealthDepletedEvent
+{
+    public int entityId;
+    public Faction faction;
+    public int killerId;
+
+    public HealthDepletedEvent(int entityId, Faction faction, int killerId)
+    {
+        this.entityId = entityId;
+        this.faction = faction;
+        this.killerId = killerId;
+    }
+}
