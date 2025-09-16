@@ -47,13 +47,17 @@ namespace StarterAssets
 
         private void UseSlot(int idx)
         {
+            ThirdPersonController c = GetComponent<ThirdPersonController>();
+            if (c != null && c.IsTurning) return;
+
             var slots = InventoryManager.Instance.itemSlots;
             if (idx < 0 || idx >= slots.Count) return;
 
             var s = slots[idx];
-            if (s?.m_item != null)
+            if (s != null && s.m_item != null)
                 s.OnUseItem();
         }
+
 
 
 
@@ -80,18 +84,24 @@ namespace StarterAssets
         public void OnPunch(InputValue v)
         {
             if (!v.isPressed) return;
+            ThirdPersonController c = GetComponent<ThirdPersonController>();
+            if (c != null && c.IsTurning) return;
             HitStunController s = GetComponent<HitStunController>();
             if (s != null && s.IsStunned) return;
             InputBuffer.Instance?.Add(InputType.Punch);
         }
 
+
         public void OnHeavyPunch(InputValue v)
         {
             if (!v.isPressed) return;
+            ThirdPersonController c = GetComponent<ThirdPersonController>();
+            if (c != null && c.IsTurning) return;
             HitStunController s = GetComponent<HitStunController>();
             if (s != null && s.IsStunned) return;
             InputBuffer.Instance?.Add(InputType.HeavyPunch);
         }
+
 
 
         public void OnSprint(InputValue value)
@@ -104,13 +114,14 @@ namespace StarterAssets
         {
             bool pressed = value.isPressed;
             pickUp = pressed;
-
             if (pressed)
             {
-                Debug.Log("[INPUT] PickUp pressed");   
+                ThirdPersonController c = GetComponent<ThirdPersonController>();
+                if (c != null && c.IsTurning) return;
                 CoreBus.Publish(new PlayerPickUpEvent());
             }
         }
+
 
 
 #if ENABLE_INPUT_SYSTEM

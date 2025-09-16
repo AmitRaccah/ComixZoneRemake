@@ -5,9 +5,7 @@ public class ItemSlot : MonoBehaviour
 {
     public Item m_item = null;
 
-    // Assign in Inspector: this is the SAME Image that shows the yellow frame.
     [SerializeField] private Image image;
-    // Safety: assign the frame sprite (your yellow "NewSlot") here.
     [SerializeField] private Sprite frameSprite;
 
     private void Reset()
@@ -23,7 +21,6 @@ public class ItemSlot : MonoBehaviour
         if (frameSprite == null && image != null)
             frameSprite = image.sprite;
 
-        // Draw initial state (no item -> frame only)
         ApplyVisual(m_item);
     }
 
@@ -38,16 +35,13 @@ public class ItemSlot : MonoBehaviour
     {
         if (image == null) return;
 
-        // Always keep the frame as the base sprite
         image.sprite = frameSprite;
 
-        // If we have an item icon, draw it as an override on top of the frame
         if (item != null && item.icon != null)
             image.overrideSprite = item.icon;
         else
-            image.overrideSprite = null; // back to "just the frame"
+            image.overrideSprite = null; 
 
-        // Never hide the frame
         image.enabled = true;
     }
 
@@ -60,7 +54,7 @@ public class ItemSlot : MonoBehaviour
     public void Clear()
     {
         m_item = null;
-        ApplyVisual(null); // show only the frame
+        ApplyVisual(null); 
     }
 
     public void OnUseItem()
