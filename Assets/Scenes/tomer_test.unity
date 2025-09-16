@@ -1395,7 +1395,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 647636009}
   - {fileID: 538040234}
   - {fileID: 2025763619}
   - {fileID: 123272602}
@@ -2711,14 +2710,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 647636008}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -0.66722965, y: 0.18100023, z: 7.6460004}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1673820399}
   - {fileID: 2104060654}
-  m_Father: {fileID: 317615835}
+  m_Father: {fileID: 3073848525908110283}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &647636010
 MonoBehaviour:
@@ -10858,9 +10857,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8414754211213093556, guid: 5f57a276210c475449cadb26caeefd9c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 647636009}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f57a276210c475449cadb26caeefd9c, type: 3}
+--- !u!4 &3073848525908110283 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8414754211213093556, guid: 5f57a276210c475449cadb26caeefd9c, type: 3}
+  m_PrefabInstance: {fileID: 3073848525908110282}
+  m_PrefabAsset: {fileID: 0}
 --- !u!222 &3290810605804146453
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10896,9 +10903,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1997334363}
     m_Modifications:
+    - target: {fileID: 845763233975583453, guid: 623ae7192cc2ac84d83cd9c8b5943823, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.06
+      objectReference: {fileID: 0}
     - target: {fileID: 1018179742958028860, guid: 623ae7192cc2ac84d83cd9c8b5943823, type: 3}
       propertyPath: m_Name
       value: Gray_box_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1074329627935065486, guid: 623ae7192cc2ac84d83cd9c8b5943823, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2597057314629479249, guid: 623ae7192cc2ac84d83cd9c8b5943823, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.1
       objectReference: {fileID: 0}
     - target: {fileID: 3584242862831439348, guid: 623ae7192cc2ac84d83cd9c8b5943823, type: 3}
       propertyPath: m_LocalPosition.x
