@@ -85,6 +85,11 @@ namespace StarterAssets
         bool _punchHeld = false;
         bool _heavyHeld = false;
 
+        [Header("Combat Gating")]
+        public float TurnCompleteTolerance = 7f;
+        public bool IsTurning { get; private set; }
+
+
 
         private bool IsCurrentDeviceMouse
         {
@@ -165,6 +170,7 @@ namespace StarterAssets
             CameraRotation();
         }
 
+
         private void AssignAnimationIDs()
         {
             _animIDSpeed = Animator.StringToHash("Speed");
@@ -204,12 +210,9 @@ namespace StarterAssets
 
         private void Move()
         {
-
-
             if (GetComponent<MovementLock>().IsLocked) return;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
@@ -220,8 +223,7 @@ namespace StarterAssets
             if (currentHorizontalSpeed < targetSpeed - speedOffset ||
                 currentHorizontalSpeed > targetSpeed + speedOffset)
             {
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude,
-                    Time.deltaTime * SpeedChangeRate);
+                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
             }
             else
@@ -239,23 +241,26 @@ namespace StarterAssets
                 bool faceRight = _input.move.x > 0;
                 _desiredRotationY = faceRight ? 90f : -90f;
                 _shouldRotate = true;
-
                 _animator.SetBool("Mirror", !faceRight);
             }
 
+            float currentY = transform.eulerAngles.y;
+            if (currentY > 180f) currentY -= 360f;
+            float delta = Mathf.DeltaAngle(currentY, _desiredRotationY);
+            IsTurning = Mathf.Abs(delta) > TurnCompleteTolerance;
 
             if (_shouldRotate)
             {
-                float currentY = transform.eulerAngles.y;
-                if (currentY > 180f) currentY -= 360f;
-
-                float newY = Mathf.SmoothDampAngle(currentY, _desiredRotationY, ref _rotationVelocity, RotationSmoothTime);
+                float smooth = (Mathf.Abs(delta) > 45f) ? 0.05f : RotationSmoothTime;
+                float newY = Mathf.SmoothDampAngle(currentY, _desiredRotationY, ref _rotationVelocity, smooth);
                 transform.rotation = Quaternion.Euler(0, newY, 0);
 
-                if (Mathf.Abs(newY - _desiredRotationY) < 1f)
+                float afterDelta = Mathf.DeltaAngle(newY, _desiredRotationY);
+                if (Mathf.Abs(afterDelta) <= TurnCompleteTolerance)
                 {
                     transform.rotation = Quaternion.Euler(0, _desiredRotationY, 0);
                     _shouldRotate = false;
+                    IsTurning = false;
                 }
             }
 
@@ -276,8 +281,8 @@ namespace StarterAssets
                 fixedPos.z = 0f;
                 transform.position = fixedPos;
             }
-
         }
+
 
         private void JumpAndGravity()
         {

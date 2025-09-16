@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using StarterAssets;
 
 [RequireComponent(typeof(AnimationDriver))]
 public class ComboController : MonoBehaviour
@@ -51,16 +52,25 @@ public class ComboController : MonoBehaviour
 
     void Update()
     {
-        if (GetComponent<Health>()?.IsStunned == true)
+        ThirdPersonController c = GetComponent<ThirdPersonController>();
+        if (c != null && c.IsTurning)
         {
             step = -1;
             queuedInput = null;
-            InputBuffer.Instance?.GetBuffer().Clear();
-
-            activator.EndHitbox();      
+            if (InputBuffer.Instance != null) InputBuffer.Instance.GetBuffer().Clear();
+            activator.EndHitbox();
             return;
         }
 
+        HitStunController s = GetComponent<HitStunController>();
+        if (s != null && s.IsStunned)
+        {
+            step = -1;
+            queuedInput = null;
+            if (InputBuffer.Instance != null) InputBuffer.Instance.GetBuffer().Clear();
+            activator.EndHitbox();
+            return;
+        }
 
 
         if (InputBuffer.Instance == null)
@@ -94,8 +104,6 @@ public class ComboController : MonoBehaviour
             }
         }
 
-
-
         List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
 
         if (buf.Count > 0)
@@ -125,7 +133,6 @@ public class ComboController : MonoBehaviour
             }
             queuedInput = null;
         }
-
 
         if (step >= 0)
         {

@@ -1,179 +1,62 @@
 ﻿using UnityEngine;
-using System.Collections;
-using StarterAssets;
 
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(FactionId))]
 public class Health : MonoBehaviour
 {
-    [Header("Stats")]
     [SerializeField] private int maxHp = 20;
-    [SerializeField] private float defaultHitStun = 0.25f;
-
-    [Header("Death")]
-    [SerializeField] private string deathTriggerName = "Death";
-    [SerializeField] private float removeDelay = 2f;
-
     private int hp;
-    private float stunTimer;
     private int myId;
-    private bool isDead;
-    private Rigidbody rb;
-    private CharacterController cc;
-    private Animator anim;
-    private int deathHash;
+    private FactionId faction;
 
-    public int EntityId { get { return myId; } }
-    public int CurrentHp { get { return hp; } }
-    public int MaxHp { get { return maxHp; } }
-    public bool IsStunned { get { return stunTimer > 0f; } }
-    public bool IsDead { get { return isDead; } }
-    public float DeathDelay { get { return removeDelay; } }
+    public int CurrentHp => hp;
+    public int MaxHp => maxHp;
+    public bool IsDead => hp <= 0;
 
-
-    private void Awake()
+    void Awake()
     {
-        myId = gameObject.GetInstanceID();
-        rb = GetComponent<Rigidbody>();
-        cc = GetComponent<CharacterController>();
-        anim = GetComponent<Animator>();
-        deathHash = Animator.StringToHash(deathTriggerName);
+        faction = GetComponent<FactionId>();
+        myId = gameObject.GetInstanceID(); 
     }
 
-    private void OnEnable()
+
+    void OnEnable()
     {
-        isDead = false;
         hp = maxHp;
-        PublishHealthChanged(false);
+        CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
+        CombatBus.Subscribe<DamageEvent>(OnDamage);
     }
-
-    private void Update()
+    void OnDisable()
     {
-        if (stunTimer > 0f)
-        {
-            stunTimer -= Time.deltaTime;
-            if (anim.GetBool("CanAttack")) anim.SetBool("CanAttack", false);
-        }
-        else
-        {
-            if (!anim.GetBool("CanAttack")) anim.SetBool("CanAttack", true);
-        }
+        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
     public void Heal(int amount)
     {
-        if (isDead) return;
-        if (amount <= 0) return;
-
+        if (IsDead || amount <= 0) return;
         int old = hp;
-        hp = Mathf.Min(hp + amount, maxHp);
-        if (hp != old) PublishHealthChanged(false);
+        hp = Mathf.Min(maxHp, hp + amount);
+        if (hp != old) CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
     }
 
-    public void TakeDamage(int amount, int attackerId, float knockback)
+    private void OnDamage(DamageEvent e)
     {
-        if (isDead) return;
-        if (amount <= 0) return;
-
-        hp -= amount;
-        if (hp < 0) hp = 0;
-
-        stunTimer = defaultHitStun;
-        anim.SetBool("CanAttack", false);
-
-        PublishHealthChanged(false);
-
-        if (knockback > 0f)
-        {
-            KnockbackEvent k = new KnockbackEvent();
-            k.targetId = myId;
-            k.attackerId = attackerId;
-            k.force = knockback;
-            CombatBus.Publish(k);
-        }
-
-        if (hp <= 0) Die(attackerId);
+        if (e.targetId != myId || IsDead) return;
+        hp = Mathf.Max(0, hp - e.amount);
+        CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, hp == 0));
+        if (hp == 0) CoreBus.Publish(new HealthDepletedEvent(myId, faction ? faction.faction : Faction.Neutral, e.attackerId));
     }
 
-    private void Die(int killerId)
-    {
-        if (isDead) return;
-        isDead = true;
 
-        if (hp != 0) hp = 0;
-        PublishHealthChanged(true);
+    [SerializeField] private float deathDelay = 0f;
+    public float DeathDelay => deathDelay;
 
-        if (CompareTag("Player"))
-        {
-            CombatBus.Publish(new PlayerDownEvent(myId, killerId));
-            anim.SetTrigger(deathHash);
-            DisableCollisions();
 
-            ThirdPersonController tpc = GetComponent<ThirdPersonController>();
-            if (tpc != null) tpc.enabled = false;
-        }
-        else
-        {
-            CombatBus.Publish(new EnemyDownEvent(myId, killerId));
-            anim.SetTrigger(deathHash);
-            DisableCollisions();
-
-            ThirdPersonController tpc = GetComponent<ThirdPersonController>();
-            if (tpc != null) tpc.enabled = false;
-
-            StartCoroutine(RemoveAfterDelay());
-        }
-    }
-
-    private IEnumerator RemoveAfterDelay()
-    {
-        yield return new WaitForSeconds(removeDelay);
-        Destroy(gameObject);
-    }
-
-    private void DisableCollisions()
-    {
-        if (rb != null) rb.isKinematic = true;
-        if (cc != null) cc.enabled = false;
-
-        Collider[] cols = GetComponentsInChildren<Collider>();
-        for (int i = 0; i < cols.Length; i++) cols[i].enabled = false;
-    }
-
-    private void EnableCollisions()
-    {
-        if (rb != null) rb.isKinematic = false;
-        if (cc != null) cc.enabled = true;
-
-        Collider[] cols = GetComponentsInChildren<Collider>();
-        for (int i = 0; i < cols.Length; i++) cols[i].enabled = true;
-    }
+    public int EntityId => myId;
 
     public void RespawnReset()
     {
-        isDead = false;
         hp = maxHp;
-        stunTimer = 0f;
-
-        EnableCollisions();
-
-        ThirdPersonController tpc = GetComponent<ThirdPersonController>();
-        if (tpc != null) tpc.enabled = true;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-
-        anim.Rebind();
-        anim.Update(0f);
-        anim.SetBool("CanAttack", true);
-
-        PublishHealthChanged(false);
+        CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
     }
 
-    private void PublishHealthChanged(bool dead)
-    {
-        CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, dead));
-    }
 }
