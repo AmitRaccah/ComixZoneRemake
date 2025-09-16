@@ -6,9 +6,7 @@ public class ComboController : MonoBehaviour
 {
     [System.Serializable] public struct Entry { public AttackSequence sequence; }
     [SerializeField] private Entry[] combos;
-
     [SerializeField] private AttackActivator activator;
-
 
     AnimationDriver anim;
     AttackSequence curSeq;
@@ -20,6 +18,7 @@ public class ComboController : MonoBehaviour
     float resetT = 0.4f;
 
     InputType? queuedInput = null;
+    int queuedFrame = -1;
 
     Animator animator;
 
@@ -44,7 +43,7 @@ public class ComboController : MonoBehaviour
 
             curSeq = seq;
             StartStep(0);
-            return true;                   
+            return true;
         }
         return false;
     }
@@ -56,6 +55,7 @@ public class ComboController : MonoBehaviour
         {
             step = -1;
             queuedInput = null;
+            queuedFrame = -1;
             if (InputBuffer.Instance != null) InputBuffer.Instance.GetBuffer().Clear();
             activator.EndHitbox();
             return;
@@ -78,7 +78,7 @@ public class ComboController : MonoBehaviour
                 List<FrameInput> loopBuf = InputBuffer.Instance.GetBuffer();
                 if (loopBuf.Count > 0)
                 {
-                    FrameInput last = loopBuf[^1];
+                    FrameInput last = loopBuf[loopBuf.Count - 1];
                     if (TryBeginLoopable(last.inputType))
                     {
                         loopBuf.RemoveAt(loopBuf.Count - 1);
@@ -88,6 +88,7 @@ public class ComboController : MonoBehaviour
 
                 InputBuffer.Instance.GetBuffer().Clear();
                 queuedInput = null;
+                queuedFrame = -1;
                 return;
             }
         }
@@ -98,7 +99,7 @@ public class ComboController : MonoBehaviour
         {
             FrameInput last = buf[buf.Count - 1];
             queuedInput = last.inputType;
-            buf.RemoveAt(buf.Count - 1);
+            queuedFrame = last.frame;
         }
 
         bool chained = false;
@@ -109,17 +110,16 @@ public class ComboController : MonoBehaviour
             curSeq.steps[step + 1].input == queuedInput.Value)
         {
             StartStep(step + 1);
-            queuedInput = null;
+            ConsumeQueuedInput();
             chained = true;
         }
         if (!chained && queuedInput.HasValue)
         {
             if (step < 0 && TryBegin(queuedInput.Value))
             {
-                queuedInput = null;
+                ConsumeQueuedInput();
                 return;
             }
-            queuedInput = null;
         }
 
         if (step >= 0)
@@ -127,8 +127,26 @@ public class ComboController : MonoBehaviour
             resetT -= Time.deltaTime;
             if (resetT <= 0f) step = -1;
         }
-    }
 
+        if (queuedInput.HasValue)
+        {
+            List<FrameInput> b2 = InputBuffer.Instance.GetBuffer();
+            bool stillExists = false;
+            for (int i = b2.Count - 1; i >= 0; i--)
+            {
+                if (b2[i].frame == queuedFrame && b2[i].inputType == queuedInput.Value)
+                {
+                    stillExists = true;
+                    break;
+                }
+            }
+            if (!stillExists)
+            {
+                queuedInput = null;
+                queuedFrame = -1;
+            }
+        }
+    }
 
     bool TryBegin(InputType firstInput)
     {
@@ -148,7 +166,7 @@ public class ComboController : MonoBehaviour
             int score = seq.steps.Length;
             if (seq.steps.Length > 1 && queuedInput.HasValue &&
                 seq.steps[1].input == queuedInput.Value)
-                score += 100;         
+                score += 100;
 
             if (score > bestScore)
             {
@@ -166,7 +184,6 @@ public class ComboController : MonoBehaviour
         return false;
     }
 
-
     void StartStep(int idx)
     {
         step = idx;
@@ -174,10 +191,8 @@ public class ComboController : MonoBehaviour
         resetT = 0.4f;
 
         var stepData = curSeq.steps[idx].attack;
-        Debug.Log($"[Combo] Step {idx}: attack = {stepData.attackName}");
+        Debug.Log("[Combo] Step " + idx + ": attack = " + stepData.attackName);
         activator.SetCurrentAttack(stepData);
-
-
         anim.Trigger(curSeq.steps[idx].trigger);
     }
 
@@ -198,6 +213,20 @@ public class ComboController : MonoBehaviour
         if (step == curSeq.steps.Length - 1)
             step = -1;
     }
+
+    void ConsumeQueuedInput()
+    {
+        if (!queuedInput.HasValue) return;
+        List<FrameInput> buf = InputBuffer.Instance.GetBuffer();
+        for (int i = buf.Count - 1; i >= 0; i--)
+        {
+            if (buf[i].frame == queuedFrame && buf[i].inputType == queuedInput.Value)
+            {
+                buf.RemoveAt(i);
+                break;
+            }
+        }
+        queuedInput = null;
+        queuedFrame = -1;
+    }
 }
-
-
