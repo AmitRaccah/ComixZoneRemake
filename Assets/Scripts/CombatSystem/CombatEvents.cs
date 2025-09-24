@@ -92,3 +92,10 @@ public struct HealthDepletedEvent
         this.killerId = killerId;
     }
 }
+
+public struct StunChangedEvent
+{
+    public int entityId;
+    public bool isStunned;
+    public StunChangedEvent(int id, bool s) { entityId = id; isStunned = s; }
+}

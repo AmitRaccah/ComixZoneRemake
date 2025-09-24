@@ -41,9 +41,28 @@ public class Health : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId || IsDead) return;
+
+        if (IsBlockedAgainst(e.attackerId))
+            return;
+
         hp = Mathf.Max(0, hp - e.amount);
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, hp == 0));
-        if (hp == 0) CoreBus.Publish(new HealthDepletedEvent(myId, faction ? faction.faction : Faction.Neutral, e.attackerId));
+
+        if (hp == 0)
+            CoreBus.Publish(new HealthDepletedEvent(myId, faction ? faction.faction : Faction.Neutral, e.attackerId));
+    }
+
+    private bool IsBlockedAgainst(int attackerId)
+    {
+        var bc = GetComponent<BlockController>();
+        if (bc == null || !bc.IsBlocking) return false;
+
+        Transform atk;
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk)) return false;
+
+        Vector3 dir = (atk.position - transform.position).normalized;
+        dir.y = 0f;
+        return Vector3.Dot(transform.forward, dir) > 0.3f;
     }
 
 
