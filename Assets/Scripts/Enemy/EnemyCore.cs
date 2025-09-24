@@ -85,17 +85,16 @@ public class EnemyCore : MonoBehaviour
         if (e.targetId != myId) return;
 
         if (combatState != null) combatState.RegisterHit();
-
         if (AI != null) AI.SetVariableValue("IsStunned", true);
 
         if (AttackActivator.TransformsById.TryGetValue(e.attackerId, out var atk))
         {
-            Vector3 toAtk = (atk.position - transform.position).normalized;
-            bool behind = Vector3.Dot(transform.forward, toAtk) < 0f;
-            bool right = atk.position.x > transform.position.x;
+            Vector3 toAtt = (atk.position - transform.position).normalized;
+            bool fromBehind = Vector3.Dot(transform.forward, toAtt) < 0f;   
+            bool attackerOnRight = (atk.position.x - transform.position.x) > 0f; 
 
-            AI?.SetVariableValue("HitFromBehind", behind);
-            AI?.SetVariableValue("AttackerOnRight", right);
+            AI?.SetVariableValue("HitFromBehind", fromBehind);
+            AI?.SetVariableValue("AttackerOnRight", attackerOnRight);
         }
     }
 }
