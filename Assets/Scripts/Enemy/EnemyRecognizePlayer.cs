@@ -72,6 +72,9 @@ public class EnemyRecognizePlayer : MonoBehaviour
 
         Debug.DrawLine(eye, eye + dir * viewDistance,
                        seeingPlayer ? Color.green : Color.red);
+
+        _agent.SetVariableValue<float>("Distance", dist);
+
     }
 
     void OnDrawGizmosSelected()

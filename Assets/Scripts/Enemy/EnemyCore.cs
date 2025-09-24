@@ -83,8 +83,20 @@ public class EnemyCore : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId) return;
+
         if (combatState != null) combatState.RegisterHit();
+
         if (AI != null) AI.SetVariableValue("IsStunned", true);
+
+        if (AttackActivator.TransformsById.TryGetValue(e.attackerId, out var atk))
+        {
+            Vector3 toAtk = (atk.position - transform.position).normalized;
+            bool behind = Vector3.Dot(transform.forward, toAtk) < 0f;
+            bool right = atk.position.x > transform.position.x;
+
+            AI?.SetVariableValue("HitFromBehind", behind);
+            AI?.SetVariableValue("AttackerOnRight", right);
+        }
     }
 }
 
