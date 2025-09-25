@@ -15,9 +15,8 @@ public class Health : MonoBehaviour
     void Awake()
     {
         faction = GetComponent<FactionId>();
-        myId = gameObject.GetInstanceID(); 
+        myId = gameObject.GetInstanceID();
     }
-
 
     void OnEnable()
     {
@@ -42,33 +41,17 @@ public class Health : MonoBehaviour
     {
         if (e.targetId != myId || IsDead) return;
 
-        if (IsBlockedAgainst(e.attackerId))
-            return;
+        if (BlockUtil.IsBlocked(this, e.attackerId)) return;
 
         hp = Mathf.Max(0, hp - e.amount);
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, hp == 0));
 
         if (hp == 0)
-            CoreBus.Publish(new HealthDepletedEvent(myId, faction ? faction.faction : Faction.Neutral, e.attackerId));
+            CoreBus.Publish(new HealthDepletedEvent(myId, faction != null ? faction.faction : Faction.Neutral, e.attackerId));
     }
-
-    private bool IsBlockedAgainst(int attackerId)
-    {
-        var bc = GetComponent<BlockController>();
-        if (bc == null || !bc.IsBlocking) return false;
-
-        Transform atk;
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk)) return false;
-
-        Vector3 dir = (atk.position - transform.position).normalized;
-        dir.y = 0f;
-        return Vector3.Dot(transform.forward, dir) > 0.3f;
-    }
-
 
     [SerializeField] private float deathDelay = 0f;
     public float DeathDelay => deathDelay;
-
 
     public int EntityId => myId;
 
@@ -77,5 +60,4 @@ public class Health : MonoBehaviour
         hp = maxHp;
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
     }
-
 }

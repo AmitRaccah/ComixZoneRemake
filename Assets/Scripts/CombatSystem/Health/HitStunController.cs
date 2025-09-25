@@ -15,7 +15,7 @@ public class HitStunController : MonoBehaviour
     {
         if (e.targetId != myId) return;
 
-        if (IsBlockedAgainst(e.attackerId)) return;
+        if (BlockUtil.IsBlocked(this, e.attackerId)) return;
 
         float dur = (e.freezeFrameDuration > 0f)
             ? Mathf.Max(defaultHitStun, e.freezeFrameDuration)
@@ -32,19 +32,5 @@ public class HitStunController : MonoBehaviour
         yield return new WaitForSeconds(dur);
         IsStunned = false;
         CombatBus.Publish(new StunChangedEvent(myId, false));
-    }
-
-    private bool IsBlockedAgainst(int attackerId)
-    {
-        BlockController bc = GetComponent<BlockController>();
-        if (bc == null || !bc.IsBlocking) return false;
-
-        Transform atk;
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out atk)) return false;
-
-        Vector3 dir = (atk.position - transform.position).normalized;
-        dir.y = 0f;
-        // positive dot ⇒ target is facing attacker
-        return Vector3.Dot(transform.forward, dir) > 0.3f;
     }
 }
