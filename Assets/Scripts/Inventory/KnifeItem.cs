@@ -8,6 +8,9 @@ public class KnifeItem : Item
     public float speed = 10f;
     public float distance = 15f;
     public float rotationSpeed = 720f;
+
+    public AttackData Data => attackData;
+
     public override bool Use()
     {
         if (attackData == null) return false;
