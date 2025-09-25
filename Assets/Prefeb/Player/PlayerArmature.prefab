@@ -16,7 +16,6 @@ GameObject:
   - component: {fileID: 2171035907506631649}
   - component: {fileID: 199340099737440762}
   - component: {fileID: 3237458380186730169}
-  - component: {fileID: 6184929467330005845}
   - component: {fileID: 1674168052519662417}
   - component: {fileID: 4563134035269349670}
   - component: {fileID: 5475519076379174595}
@@ -31,12 +30,14 @@ GameObject:
   - component: {fileID: 2413959843837484398}
   - component: {fileID: 961118692617251613}
   - component: {fileID: 8434318203744113306}
-  - component: {fileID: 1930494891389333817}
-  - component: {fileID: 8159612601704472943}
   - component: {fileID: 9108244256341838026}
   - component: {fileID: 9050132550859841927}
   - component: {fileID: 3585741332985080660}
-  - component: {fileID: 3467500929669097828}
+  - component: {fileID: 1174351756265962848}
+  - component: {fileID: 3450383931648856720}
+  - component: {fileID: 1908023126520637397}
+  - component: {fileID: 1868184452788584355}
+  - component: {fileID: 6065251301749083187}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -123,7 +124,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 2
   SprintSpeed: 5.335
-  RotationSmoothTime: 0.12
+  RotationSmoothTime: 0.04
   SpeedChangeRate: 10
   LandingAudioClip: {fileID: 8300000, guid: ff697d3070687ce4583faa0561a145a2, type: 3}
   FootstepAudioClips:
@@ -154,6 +155,7 @@ MonoBehaviour:
   CameraAngleOverride: 0
   LockCameraPosition: 0
   allowZMovementTemporarily: 0
+  TurnCompleteTolerance: 50
 --- !u!114 &5692041071071989945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -307,18 +309,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 4001519933889548501}
---- !u!114 &6184929467330005845
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6435533612568276109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4406e3ec530d227409fd047bababd4e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1674168052519662417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -522,10 +512,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fea9b7ce0d2afe4c83808bbdfb7a375, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 200
-  defaultHitStun: 0.75
-  deathTriggerName: Death
-  removeDelay: 2
+  maxHp: 80
+  deathDelay: 2.5
 --- !u!114 &2413959843837484398
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -564,30 +552,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92221edbac94d3a4c9c3a88d68df4515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1930494891389333817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6435533612568276109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8fbb418a6b76e04bb35607b15deaf7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &8159612601704472943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6435533612568276109}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d52a6b32f1733c941b5145a20f7aa045, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &9108244256341838026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,7 +578,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
   throwSocket: {fileID: 3211131276196081246}
-  throwAnimationTrigger: Punch
+  throwAnimationTrigger: Throw
 --- !u!114 &3585741332985080660
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -627,7 +591,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d52a6b32f1733c941b5145a20f7aa045, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3467500929669097828
+--- !u!114 &1174351756265962848
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -636,9 +600,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 6435533612568276109}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d8fbb418a6b76e04bb35607b15deaf7f, type: 3}
+  m_Script: {fileID: 11500000, guid: ef7c8a11cad021649856560fd31c1811, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  faction: 0
+--- !u!114 &3450383931648856720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c35d42d4996253428fd034e8f351360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1908023126520637397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17be1698f70692f4a88616de1cf47b47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultHitStun: 0.25
+--- !u!114 &1868184452788584355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f7909c0ab1ef194a98eeed7117979d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deathTriggerName: Death
+--- !u!114 &6065251301749083187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6435533612568276109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06da634c84063aa49a5d5835335f0cd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canAttackBool: CanAttack
 --- !u!1 &8848633590746621208
 GameObject:
   m_ObjectHideFlags: 0
@@ -664,7 +680,7 @@ Transform:
   m_GameObject: {fileID: 8848633590746621208}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.091, y: 1.065, z: 0.817}
+  m_LocalPosition: {x: -0.09, y: 0.96, z: 0.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
