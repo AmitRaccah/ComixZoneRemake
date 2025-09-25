@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using Unity.Behavior;
 
@@ -5,77 +6,104 @@ using Unity.Behavior;
 [RequireComponent(typeof(BehaviorGraphAgent))]
 public class EnemyRetreatNav : MonoBehaviour
 {
-    [SerializeField] private string stepsIntParam = "AI_RetreatSteps"; // Animator int
-    [SerializeField] private string targetVar = "RetreatTarget";   // Blackboard GameObject
-    [SerializeField] private string retreatFlagVar = "IsRetreating";    // Blackboard bool
-    [SerializeField] private float stepDistance = 0.8f;              // מרחק צעד
-    [SerializeField] private float arrivalThreshold = 0.2f;             // תואם ל-Navigate Distance Threshold
+    [Header("Blackboard / Animator names")]
+    [SerializeField] string stepsIntParam = "AI_RetreatSteps"; 
+    [SerializeField] string targetVar = "RetreatTarget";   
+    [SerializeField] string retreatFlagVar = "IsRetreating";    
+    [SerializeField] string speedFloatParam = "Speed";          
 
-    private Animator anim;
-    private BehaviorGraphAgent agent;
-    private int stepsId;
-    private Transform retreatTarget;
-    private Transform player;
-    private bool isRetreating;
+    [Header("Retreat step")]
+    [SerializeField] float stepDistance = 0.8f; 
+    [SerializeField] float arrivalThreshold = 0.2f;
 
-    private void Awake()
+    [Header("Tuning")]
+    [SerializeField] float speedDampTime = 0.1f;
+
+    Animator anim;
+    BehaviorGraphAgent agent;
+    Transform retreatTarget, player;
+
+    int stepsId, speedId;
+    bool isRetreating;
+    float arrivalSqr;
+    Vector3 lastPos;
+
+    void Awake()
     {
         anim = GetComponent<Animator>();
         agent = GetComponent<BehaviorGraphAgent>();
         stepsId = Animator.StringToHash(stepsIntParam);
+        speedId = Animator.StringToHash(speedFloatParam);
+
+        arrivalSqr = arrivalThreshold * arrivalThreshold;
 
         var go = new GameObject("RetreatTarget");
         go.hideFlags = HideFlags.HideInHierarchy;
         retreatTarget = go.transform;
 
         var p = GameObject.FindGameObjectWithTag("Player");
-        if (p != null) player = p.transform;
+        if (p) player = p.transform;
+
+        lastPos = transform.position;
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
-        if (retreatTarget != null) Destroy(retreatTarget.gameObject);
+        if (retreatTarget) Destroy(retreatTarget.gameObject);
     }
 
-    private void Update()
+    void Update()
     {
         int steps = anim.GetInteger(stepsId);
         if (steps > 0)
         {
             anim.SetInteger(stepsId, 0);
 
-            Vector3 fwd = transform.forward;
-            fwd.y = 0f;
+            Vector3 fwd = transform.forward; fwd.y = 0f;
             if (fwd.sqrMagnitude > 0f) fwd.Normalize(); else fwd = Vector3.right;
 
             Vector3 pos = transform.position - fwd * (steps * stepDistance);
             pos.z = transform.position.z;
             retreatTarget.position = pos;
 
-            agent.SetVariableValue<GameObject>(targetVar, retreatTarget.gameObject);
-            isRetreating = true;
-            agent.SetVariableValue<bool>(retreatFlagVar, true);
+            agent.SetVariableValue(targetVar, retreatTarget.gameObject);
+
+            if (!isRetreating)
+            {
+                isRetreating = true;
+                agent.SetVariableValue(retreatFlagVar, true);
+            }
         }
 
         if (isRetreating)
         {
             Vector3 a = transform.position; a.y = 0f;
             Vector3 b = retreatTarget.position; b.y = 0f;
-            if ((a - b).sqrMagnitude <= (arrivalThreshold * arrivalThreshold))
+            if ((a - b).sqrMagnitude <= arrivalSqr)
             {
                 isRetreating = false;
-                agent.SetVariableValue<bool>(retreatFlagVar, false);
+                agent.SetVariableValue(retreatFlagVar, false);
             }
         }
     }
 
-    private void LateUpdate()
+    void LateUpdate()
     {
-        if (!isRetreating || player == null) return;
+        if (isRetreating && player)
+        {
+            Vector3 toPlayer = player.position - transform.position; toPlayer.y = 0f;
+            if (toPlayer.sqrMagnitude > 1e-4f)
+                transform.rotation = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
+        }
 
-        Vector3 toPlayer = player.position - transform.position;
-        toPlayer.y = 0f;
-        if (toPlayer.sqrMagnitude > 0.0001f)
-            transform.rotation = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
+        Vector3 delta = transform.position - lastPos; delta.y = 0f;
+        float signedSpeed = (Time.deltaTime > 0f)
+            ? Vector3.Dot(transform.forward, delta) / Time.deltaTime
+            : 0f;
+
+        anim.SetFloat(speedId, signedSpeed, speedDampTime, Time.deltaTime);
+        lastPos = transform.position;
     }
 }
+
+
