@@ -177,7 +177,7 @@ AnimatorStateMachine:
     m_Position: {x: -840, y: 480, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 2387369482359863417}
-    m_Position: {x: -440, y: 450, z: 0}
+    m_Position: {x: -500, y: 310, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -686,6 +686,12 @@ AnimatorController:
     m_Controller: {fileID: 9100000}
   - m_Name: AI_RequestRetreat
     m_Type: 4
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: AI_RetreatSteps
+    m_Type: 3
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
