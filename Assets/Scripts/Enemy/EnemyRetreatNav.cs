@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using Unity.Behavior;
 
@@ -7,13 +6,13 @@ using Unity.Behavior;
 public class EnemyRetreatNav : MonoBehaviour
 {
     [Header("Blackboard / Animator names")]
-    [SerializeField] string stepsIntParam = "AI_RetreatSteps"; 
-    [SerializeField] string targetVar = "RetreatTarget";   
-    [SerializeField] string retreatFlagVar = "IsRetreating";    
-    [SerializeField] string speedFloatParam = "Speed";          
+    [SerializeField] string stepsIntParam = "AI_RetreatSteps";
+    [SerializeField] string targetVar = "RetreatTarget";
+    [SerializeField] string retreatFlagVar = "IsRetreating";
+    [SerializeField] string speedFloatParam = "Speed";
 
     [Header("Retreat step")]
-    [SerializeField] float stepDistance = 0.8f; 
+    [SerializeField] float stepDistance = 0.8f;
     [SerializeField] float arrivalThreshold = 0.2f;
 
     [Header("Tuning")]
@@ -21,7 +20,7 @@ public class EnemyRetreatNav : MonoBehaviour
 
     Animator anim;
     BehaviorGraphAgent agent;
-    Transform retreatTarget, player;
+    Transform retreatTarget;
 
     int stepsId, speedId;
     bool isRetreating;
@@ -40,9 +39,6 @@ public class EnemyRetreatNav : MonoBehaviour
         var go = new GameObject("RetreatTarget");
         go.hideFlags = HideFlags.HideInHierarchy;
         retreatTarget = go.transform;
-
-        var p = GameObject.FindGameObjectWithTag("Player");
-        if (p) player = p.transform;
 
         lastPos = transform.position;
     }
@@ -89,13 +85,6 @@ public class EnemyRetreatNav : MonoBehaviour
 
     void LateUpdate()
     {
-        if (isRetreating && player)
-        {
-            Vector3 toPlayer = player.position - transform.position; toPlayer.y = 0f;
-            if (toPlayer.sqrMagnitude > 1e-4f)
-                transform.rotation = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
-        }
-
         Vector3 delta = transform.position - lastPos; delta.y = 0f;
         float signedSpeed = (Time.deltaTime > 0f)
             ? Vector3.Dot(transform.forward, delta) / Time.deltaTime
@@ -105,5 +94,3 @@ public class EnemyRetreatNav : MonoBehaviour
         lastPos = transform.position;
     }
 }
-
-

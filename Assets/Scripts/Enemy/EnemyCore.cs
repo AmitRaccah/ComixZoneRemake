@@ -1,13 +1,7 @@
-
-
-
 using UnityEngine;
 using Unity.Behavior;
 
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(BehaviorGraphAgent))]
-[RequireComponent(typeof(EnemyCombatState))]
+
 public class EnemyCore : MonoBehaviour
 {
     public Animator Anim { get; private set; }
@@ -41,7 +35,6 @@ public class EnemyCore : MonoBehaviour
     private void OnEnable()
     {
         CombatBus.Subscribe<DamageEvent>(OnDamage);
-
         Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
@@ -67,6 +60,15 @@ public class EnemyCore : MonoBehaviour
         }
     }
 
+    private void LateUpdate()
+    {
+        float y = transform.eulerAngles.y;
+        float d90 = Mathf.Abs(Mathf.DeltaAngle(y, 90f));
+        float dm90 = Mathf.Abs(Mathf.DeltaAngle(y, -90f));
+        float target = (d90 <= dm90) ? 90f : -90f;
+        transform.rotation = Quaternion.Euler(0f, target, 0f);
+    }
+
     private void Update()
     {
         if (AI != null && combatState != null)
@@ -90,12 +92,11 @@ public class EnemyCore : MonoBehaviour
         if (AttackActivator.TransformsById.TryGetValue(e.attackerId, out var atk))
         {
             Vector3 toAtt = (atk.position - transform.position).normalized;
-            bool fromBehind = Vector3.Dot(transform.forward, toAtt) < 0f;   
-            bool attackerOnRight = (atk.position.x - transform.position.x) > 0f; 
+            bool fromBehind = Vector3.Dot(transform.forward, toAtt) < 0f;
+            bool attackerOnRight = (atk.position.x - transform.position.x) > 0f;
 
             AI?.SetVariableValue("HitFromBehind", fromBehind);
             AI?.SetVariableValue("AttackerOnRight", attackerOnRight);
         }
     }
 }
-
