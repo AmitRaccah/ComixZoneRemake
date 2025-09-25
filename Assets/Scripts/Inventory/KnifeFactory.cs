@@ -11,7 +11,16 @@ public static class KnifeFactory
             ? socket.position
             : owner.transform.position + owner.transform.forward * 0.5f + Vector3.up * 1f;
 
-        Quaternion rot = Quaternion.LookRotation(owner.transform.forward);
+        startPos.z = owner.transform.position.z;
+
+        float sign = Mathf.Sign(Vector3.Dot(
+            socket ? socket.forward : owner.transform.forward,
+            Vector3.right
+        ));
+        if (sign == 0f) sign = 1f;
+
+        Vector3 dir = new Vector3(sign, 0f, 0f);
+        Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
 
         var go = Object.Instantiate(prefab, startPos, rot);
         go.GetComponent<KnifeProjectile>()?.Initialize(
