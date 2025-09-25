@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using Unity.Behavior;
 
@@ -7,28 +6,28 @@ using Unity.Behavior;
 public class EnemyRetreatNav : MonoBehaviour
 {
     [Header("Blackboard / Animator names")]
-    [SerializeField] string stepsIntParam = "AI_RetreatSteps"; 
-    [SerializeField] string targetVar = "RetreatTarget";   
-    [SerializeField] string retreatFlagVar = "IsRetreating";    
-    [SerializeField] string speedFloatParam = "Speed";          
+    [SerializeField] private string stepsIntParam = "AI_RetreatSteps";
+    [SerializeField] private string targetVar = "RetreatTarget";
+    [SerializeField] private string retreatFlagVar = "IsRetreating";
+    [SerializeField] private string speedFloatParam = "Speed";
 
     [Header("Retreat step")]
-    [SerializeField] float stepDistance = 0.8f; 
-    [SerializeField] float arrivalThreshold = 0.2f;
+    [SerializeField] private float stepDistance = 0.8f;
+    [SerializeField] private float arrivalThreshold = 0.2f;
 
     [Header("Tuning")]
-    [SerializeField] float speedDampTime = 0.1f;
+    [SerializeField] private float speedDampTime = 0.1f;
 
-    Animator anim;
-    BehaviorGraphAgent agent;
-    Transform retreatTarget, player;
+    private Animator anim;
+    private BehaviorGraphAgent agent;
+    private Transform retreatTarget;
 
-    int stepsId, speedId;
-    bool isRetreating;
-    float arrivalSqr;
-    Vector3 lastPos;
+    private int stepsId, speedId;
+    private bool isRetreating;
+    private float arrivalSqr;
+    private Vector3 lastPos;
 
-    void Awake()
+    private void Awake()
     {
         anim = GetComponent<Animator>();
         agent = GetComponent<BehaviorGraphAgent>();
@@ -37,29 +36,27 @@ public class EnemyRetreatNav : MonoBehaviour
 
         arrivalSqr = arrivalThreshold * arrivalThreshold;
 
-        var go = new GameObject("RetreatTarget");
+        GameObject go = new GameObject("RetreatTarget");
         go.hideFlags = HideFlags.HideInHierarchy;
         retreatTarget = go.transform;
-
-        var p = GameObject.FindGameObjectWithTag("Player");
-        if (p) player = p.transform;
 
         lastPos = transform.position;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
-        if (retreatTarget) Destroy(retreatTarget.gameObject);
+        if (retreatTarget != null) Destroy(retreatTarget.gameObject);
     }
 
-    void Update()
+    private void Update()
     {
         int steps = anim.GetInteger(stepsId);
         if (steps > 0)
         {
             anim.SetInteger(stepsId, 0);
 
-            Vector3 fwd = transform.forward; fwd.y = 0f;
+            Vector3 fwd = transform.forward;
+            fwd.y = 0f;
             if (fwd.sqrMagnitude > 0f) fwd.Normalize(); else fwd = Vector3.right;
 
             Vector3 pos = transform.position - fwd * (steps * stepDistance);
@@ -87,23 +84,16 @@ public class EnemyRetreatNav : MonoBehaviour
         }
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
-        if (isRetreating && player)
-        {
-            Vector3 toPlayer = player.position - transform.position; toPlayer.y = 0f;
-            if (toPlayer.sqrMagnitude > 1e-4f)
-                transform.rotation = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
-        }
+        Vector3 delta = transform.position - lastPos;
+        delta.y = 0f;
 
-        Vector3 delta = transform.position - lastPos; delta.y = 0f;
-        float signedSpeed = (Time.deltaTime > 0f)
-            ? Vector3.Dot(transform.forward, delta) / Time.deltaTime
-            : 0f;
+        float signedSpeed = 0f;
+        if (Time.deltaTime > 0f)
+            signedSpeed = Vector3.Dot(transform.forward, delta) / Time.deltaTime;
 
         anim.SetFloat(speedId, signedSpeed, speedDampTime, Time.deltaTime);
         lastPos = transform.position;
     }
 }
-
-
