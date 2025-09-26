@@ -275,12 +275,12 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
 
-            if (!allowZMovementTemporarily)
-            {
-                Vector3 fixedPos = transform.position;
-                fixedPos.z = 0f;
-                transform.position = fixedPos;
-            }
+            //if (!allowZMovementTemporarily)
+            //{
+            //    Vector3 fixedPos = transform.position;
+            //    fixedPos.z = 0f;
+            //    transform.position = fixedPos;
+            //}
         }
 
 

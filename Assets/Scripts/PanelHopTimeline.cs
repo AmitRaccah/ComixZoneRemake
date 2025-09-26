@@ -5,17 +5,25 @@ using StarterAssets;
 [RequireComponent(typeof(Collider))]
 public class PanelHopTimeline : MonoBehaviour
 {
+    [Header("Timeline")]
     public PlayableDirector director;
+
+    [Header("Gate")]
     public bool requireCrouch = false;
     public string playerTag = "Player";
+
+    [Header("Player Refs")]
     public Transform player;
     public Animator playerAnimator;
     public ThirdPersonController controller;
     public StarterAssetsInputs inputs;
     public MovementLock movementLock;
+
+    [Header("World / Tracker")]
     public Transform worldLanding;
     public TrackerFollowDeltaX trackerFollow;
     public string enterRoomId;
+
     private bool triggered = false;
     private bool playerInsideGate = false;
     private static PanelHopTimeline waitingCrouchGate = null;
@@ -25,12 +33,17 @@ public class PanelHopTimeline : MonoBehaviour
         if (director != null) director.extrapolationMode = DirectorWrapMode.None;
     }
 
+    void OnDisable()
+    {
+        if (director != null) director.stopped -= OnDirectorStopped;
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (triggered) return;
         if (!other.CompareTag(playerTag)) return;
 
-        var inp = other.GetComponent<StarterAssetsInputs>();
+        StarterAssetsInputs inp = other.GetComponent<StarterAssetsInputs>();
         if (inp == null) return;
         inputs = inp;
 
@@ -73,8 +86,13 @@ public class PanelHopTimeline : MonoBehaviour
     {
         if (director == null) return;
         triggered = true;
+
+        ResetAllInputs();
+        ClearCombatBuffer();
+
         if (playerAnimator != null) playerAnimator.applyRootMotion = true;
-        director.time = 0.0f;
+
+        director.time = 0f;
         director.stopped += OnDirectorStopped;
         director.Play();
     }
@@ -83,8 +101,12 @@ public class PanelHopTimeline : MonoBehaviour
     {
         if (d != null) d.stopped -= OnDirectorStopped;
         triggered = false;
+
+        DisableRootMotion();
         SafeReleaseControl();
-        // rep tracker
+        ResetAllInputs();
+        ClearCombatBuffer();
+
         if (trackerFollow != null)
         {
             if (!string.IsNullOrEmpty(enterRoomId)) trackerFollow.ApplyRoom(enterRoomId);
@@ -107,17 +129,23 @@ public class PanelHopTimeline : MonoBehaviour
         if (movementLock != null) movementLock.SetExternalLock(true);
         if (inputs != null) inputs.enabled = false;
         if (controller != null) controller.allowZMovementTemporarily = true;
+
+        ResetAllInputs();
+        ClearCombatBuffer();
     }
 
     public void TeleportToWorld()
     {
         if (player == null || worldLanding == null) return;
+
         CharacterController cc = null;
         if (controller != null) cc = controller.GetComponent<CharacterController>();
         if (cc != null) cc.enabled = false;
+
         player.position = worldLanding.position;
+
         if (cc != null) cc.enabled = true;
-        // optional safety: resync tracker after position jump
+
         if (trackerFollow != null) trackerFollow.ResetSync();
     }
 
@@ -137,5 +165,23 @@ public class PanelHopTimeline : MonoBehaviour
         if (movementLock != null) movementLock.SetExternalLock(false);
         if (inputs != null) inputs.enabled = true;
         if (controller != null) controller.allowZMovementTemporarily = false;
+    }
+
+    void ResetAllInputs()
+    {
+        if (inputs == null) return;
+        inputs.move = Vector2.zero;
+        inputs.look = Vector2.zero;
+        inputs.jump = false;
+        inputs.sprint = false;
+        inputs.crouch = false;
+    }
+
+    void ClearCombatBuffer()
+    {
+        if (InputBuffer.Instance != null)
+        {
+            InputBuffer.Instance.Clear();
+        }
     }
 }

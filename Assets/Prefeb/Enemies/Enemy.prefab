@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 4065923666449503550}
   - component: {fileID: 747308398821444354}
   - component: {fileID: 5897083792174015254}
+  - component: {fileID: 6681461272722536898}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -466,6 +467,10 @@ MonoBehaviour:
   stepDistance: 0.8
   arrivalThreshold: 0.2
   speedDampTime: 0.1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  skin: 0.05
 --- !u!114 &7139903764344225786
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -606,6 +611,10 @@ MonoBehaviour:
   stepDistance: 0.8
   arrivalThreshold: 0.05
   speedDampTime: 0.1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  skin: 0.05
 --- !u!114 &5897083792174015254
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -621,6 +630,23 @@ MonoBehaviour:
   knifeConfig: {fileID: 11400000, guid: b1a530338899f8a4abf50d17acc3db60, type: 2}
   knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
   throwSocket: {fileID: 8638533217942301412}
+--- !u!114 &6681461272722536898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: efa864ec619adad4da53d2283f2eb5ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  laneZ: 0
+  leftYaw: -90
+  rightYaw: 90
+  snapYawForCharacterController: 0
+  snapYawForRigidbody: 1
 --- !u!1 &603024565703877214
 GameObject:
   m_ObjectHideFlags: 0

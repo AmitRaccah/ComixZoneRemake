@@ -18,6 +18,10 @@ public class EnemyRetreatNav : MonoBehaviour
     [Header("Tuning")]
     [SerializeField] float speedDampTime = 0.1f;
 
+    [Header("Obstacle")]
+    [SerializeField] LayerMask obstacleMask = ~0;
+    [SerializeField] float skin = 0.05f;
+
     Animator anim;
     BehaviorGraphAgent agent;
     Transform retreatTarget;
@@ -33,7 +37,6 @@ public class EnemyRetreatNav : MonoBehaviour
         agent = GetComponent<BehaviorGraphAgent>();
         stepsId = Animator.StringToHash(stepsIntParam);
         speedId = Animator.StringToHash(speedFloatParam);
-
         arrivalSqr = arrivalThreshold * arrivalThreshold;
 
         var go = new GameObject("RetreatTarget");
@@ -48,6 +51,44 @@ public class EnemyRetreatNav : MonoBehaviour
         if (retreatTarget) Destroy(retreatTarget.gameObject);
     }
 
+    float AllowedBack(float want)
+    {
+        int sign = (transform.right.x >= 0f) ? +1 : -1;
+        Vector3 dir = new Vector3(-sign, 0f, 0f);
+
+        var cc = GetComponent<CharacterController>();
+        if (cc)
+        {
+            float r = cc.radius;
+            float h = Mathf.Max(cc.height - 2f * r, 0.01f);
+            Vector3 p1 = transform.position + Vector3.up * r;
+            Vector3 p2 = transform.position + Vector3.up * (r + h);
+            if (Physics.CapsuleCast(p1, p2, r, dir, out var hit, want, obstacleMask, QueryTriggerInteraction.Ignore))
+                return Mathf.Max(0f, hit.distance - skin);
+            return want;
+        }
+
+        var cap = GetComponent<CapsuleCollider>();
+        if (cap)
+        {
+            float r = cap.radius * Mathf.Max(transform.lossyScale.x, transform.lossyScale.z);
+            Vector3 c = transform.TransformPoint(cap.center);
+            float half = Mathf.Max(cap.height * 0.5f - cap.radius, 0f);
+            Vector3 up = transform.up * half;
+            Vector3 p1 = c + up;
+            Vector3 p2 = c - up;
+            if (Physics.CapsuleCast(p1, p2, r, dir, out var hit2, want, obstacleMask, QueryTriggerInteraction.Ignore))
+                return Mathf.Max(0f, hit2.distance - skin);
+            return want;
+        }
+
+        Vector3 origin = transform.position + Vector3.up * 1f;
+        if (Physics.Raycast(origin, dir, out var rh, want, obstacleMask, QueryTriggerInteraction.Ignore))
+            return Mathf.Max(0f, rh.distance - skin);
+
+        return want;
+    }
+
     void Update()
     {
         int steps = anim.GetInteger(stepsId);
@@ -55,10 +96,13 @@ public class EnemyRetreatNav : MonoBehaviour
         {
             anim.SetInteger(stepsId, 0);
 
-            Vector3 fwd = transform.forward; fwd.y = 0f;
-            if (fwd.sqrMagnitude > 0f) fwd.Normalize(); else fwd = Vector3.right;
+            int sign = (transform.right.x >= 0f) ? +1 : -1;
+            Vector3 backDir = new Vector3(-sign, 0f, 0f);
 
-            Vector3 pos = transform.position - fwd * (steps * stepDistance);
+            float want = steps * stepDistance;
+            float allowed = AllowedBack(want);
+
+            Vector3 pos = transform.position + backDir * allowed;
             pos.z = transform.position.z;
             retreatTarget.position = pos;
 

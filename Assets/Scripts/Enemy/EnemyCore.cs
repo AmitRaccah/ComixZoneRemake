@@ -29,13 +29,13 @@ public class EnemyCore : MonoBehaviour
         p.z = laneZ;
         transform.position = p;
 
-        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        //Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
     private void OnEnable()
     {
         CombatBus.Subscribe<DamageEvent>(OnDamage);
-        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        //Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
     private void OnDisable()
@@ -43,31 +43,31 @@ public class EnemyCore : MonoBehaviour
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-    private void FixedUpdate()
-    {
-        Vector3 v = Body.linearVelocity;
-        if (v.z != 0f)
-        {
-            v.z = 0f;
-            Body.linearVelocity = v;
-        }
+    //private void FixedUpdate()
+    //{
+    //    Vector3 v = Body.linearVelocity;
+    //    if (v.z != 0f)
+    //    {
+    //        v.z = 0f;
+    //        Body.linearVelocity = v;
+    //    }
 
-        Vector3 pos = Body.position;
-        if (pos.z != laneZ)
-        {
-            pos.z = laneZ;
-            Body.position = pos;
-        }
-    }
+    //    Vector3 pos = Body.position;
+    //    if (pos.z != laneZ)
+    //    {
+    //        pos.z = laneZ;
+    //        Body.position = pos;
+    //    }
+    //}
 
-    private void LateUpdate()
-    {
-        float y = transform.eulerAngles.y;
-        float d90 = Mathf.Abs(Mathf.DeltaAngle(y, 90f));
-        float dm90 = Mathf.Abs(Mathf.DeltaAngle(y, -90f));
-        float target = (d90 <= dm90) ? 90f : -90f;
-        transform.rotation = Quaternion.Euler(0f, target, 0f);
-    }
+    //private void LateUpdate()
+    //{
+    //    float y = transform.eulerAngles.y;
+    //    float d90 = Mathf.Abs(Mathf.DeltaAngle(y, 90f));
+    //    float dm90 = Mathf.Abs(Mathf.DeltaAngle(y, -90f));
+    //    float target = (d90 <= dm90) ? 90f : -90f;
+    //    transform.rotation = Quaternion.Euler(0f, target, 0f);
+    //}
 
     private void Update()
     {
