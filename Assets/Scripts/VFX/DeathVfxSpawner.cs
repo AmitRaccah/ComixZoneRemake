@@ -1,38 +1,45 @@
 using UnityEngine;
 
-[AddComponentMenu("Combat/Health/Death VFX Spawner")]
+[AddComponentMenu("VFX/Death VFX Spawner")]
 public class DeathVfxSpawner : MonoBehaviour
 {
-    [Header("VFX Settings")]
+    [Header("Setup")]
     [SerializeField] private GameObject deathVfxPrefab;
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private Vector3 localOffset = Vector3.zero;
-    [SerializeField] private bool inheritSpawnRotation = true;
 
     [Header("Lifetime")]
-    [Tooltip("Fallback lifetime used when the spawned VFX has no finite particle duration.")]
+    [Tooltip("Used when the spawned VFX has no finite duration to determine when to destroy it.")]
     [Min(0f)]
     [SerializeField] private float fallbackLifetimeSeconds = 5f;
 
     private int entityId;
-
-    private void Awake()
-    {
-        entityId = gameObject.GetInstanceID();
-    }
 
     private void Reset()
     {
         spawnPoint = transform;
     }
 
+    private void Awake()
+    {
+        entityId = gameObject.GetInstanceID();
+
+        if (spawnPoint == null)
+        {
+            spawnPoint = transform;
+        }
+    }
+
     private void OnValidate()
     {
         if (fallbackLifetimeSeconds < 0f)
+        {
             fallbackLifetimeSeconds = 0f;
+        }
 
         if (spawnPoint == null)
+        {
             spawnPoint = transform;
+        }
     }
 
     private void OnEnable()
@@ -45,83 +52,49 @@ public class DeathVfxSpawner : MonoBehaviour
         CoreBus.Unsubscribe<HealthDepletedEvent>(OnDeath);
     }
 
-    private void OnDeath(HealthDepletedEvent e)
+    private void OnDeath(HealthDepletedEvent evt)
     {
-        if (e.entityId != entityId)
+        if (evt.entityId != entityId)
             return;
 
-        if (deathVfxPrefab == null)
+        if (deathVfxPrefab == null || spawnPoint == null)
             return;
 
-        Transform basis = spawnPoint != null ? spawnPoint : transform;
-        Vector3 basePosition = basis.position;
-
-        ParticleEffectUtility.Spawn(
+        Transform origin = spawnPoint;
+        GameObject instance = Instantiate(
             deathVfxPrefab,
-            basePosition,
-            basis,
-            localOffset,
-            inheritSpawnRotation,
-            parentToBasis: true,
-            autoDestroy: true,
-            fallbackLifetimeSeconds: fallbackLifetimeSeconds);
-    }
-}
-Assets / Scripts / CombatSystem / VFX / ParticleEffectAutoDestroy.cs
-New
-+ 88 - 0
-using System.Collections;
-using UnityEngine;
+            origin.position,
+            origin.rotation,
+            origin);
 
-public class ParticleEffectAutoDestroy : MonoBehaviour
-{
-    [SerializeField]
-    [Min(0f)]
-    private float fallbackLifetimeSeconds = 0f;
-
-    private bool coroutineStarted;
-
-    public void Begin(float fallbackSeconds)
-    {
-        fallbackLifetimeSeconds = Mathf.Max(0f, fallbackSeconds);
-
-        if (coroutineStarted)
-            return;
-
-        StartCoroutine(DestroyWhenFinished());
-        coroutineStarted = true;
-    }
-
-    private IEnumerator DestroyWhenFinished()
-    {
-        float waitTime = CalculateLifetime();
-
-        if (waitTime <= 0f)
+        float lifetime = CalculateLifetime(instance);
+        if (lifetime <= 0f)
         {
-            waitTime = fallbackLifetimeSeconds;
+            lifetime = fallbackLifetimeSeconds;
         }
 
-        if (waitTime > 0f)
+        if (lifetime > 0f)
         {
-            yield return new WaitForSeconds(waitTime);
+            Destroy(instance, lifetime);
         }
         else
         {
-            yield return null;
-        }
-
-        if (this != null && gameObject != null)
-        {
-            Destroy(gameObject);
+            Destroy(instance);
         }
     }
 
-    private float CalculateLifetime()
+    private static float CalculateLifetime(GameObject instance)
     {
-        float maxLifetime = 0f;
-        bool foundFiniteSystem = false;
+        if (instance == null)
+            return 0f;
 
-        ParticleSystem[] particleSystems = GetComponentsInChildren<ParticleSystem>();
+        ParticleSystem[] particleSystems = instance.GetComponentsInChildren<ParticleSystem>();
+        if (particleSystems == null || particleSystems.Length == 0)
+            return 0f;
+
+        float maxLifetime = 0f;
+        bool hasFiniteSystem = false;
+
         for (int i = 0; i < particleSystems.Length; i++)
         {
             ParticleSystem system = particleSystems[i];
@@ -132,10 +105,11 @@ public class ParticleEffectAutoDestroy : MonoBehaviour
                 return 0f;
             }
 
-            foundFiniteSystem = true;
+            hasFiniteSystem = true;
 
             float systemLifetime = main.duration;
             ParticleSystem.MinMaxCurve startLifetime = main.startLifetime;
+
             switch (startLifetime.mode)
             {
                 case ParticleSystemCurveMode.Constant:
@@ -155,6 +129,6 @@ public class ParticleEffectAutoDestroy : MonoBehaviour
             }
         }
 
-        return foundFiniteSystem ? maxLifetime : 0f;
+        return hasFiniteSystem ? maxLifetime : 0f;
     }
 }
