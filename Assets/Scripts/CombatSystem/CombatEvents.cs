@@ -12,6 +12,8 @@ public struct DamageEvent
     //VFX
     public AttackData attackData;
 
+    public bool isBlocked;
+
 }
 
 public struct AttackPerformedEvent

@@ -39,6 +39,13 @@ public class HitReaction : MonoBehaviour
     {
         if (e.targetId != myId) return;
 
+        if (e.isBlocked)
+        {
+            queuedHit = false;
+            anim.ResetTrigger(hitHash);
+            return;
+        }
+
         if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId))
         {
             queuedHit = false;

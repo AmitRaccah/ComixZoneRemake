@@ -19,10 +19,10 @@ public class CameraShakeOnHit : MonoBehaviour
     }
     private void OnDamage(DamageEvent e)
     {
-        float amplitude = e.shakeAmplitude; 
+        float amplitude = e.shakeAmplitude;
         if (e.attackData != null)
         {
-            amplitude = e.attackData.shakeAmplitude; 
+            amplitude = e.attackData.GetShakeAmplitude(e.isBlocked);
         }
         if (amplitude > 0f)
             _impulseSource.GenerateImpulse(Vector3.up * amplitude);

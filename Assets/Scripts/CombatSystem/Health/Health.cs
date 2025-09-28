@@ -41,7 +41,7 @@ public class Health : MonoBehaviour
     {
         if (e.targetId != myId || IsDead) return;
 
-        if (BlockUtil.IsBlocked(this, e.attackerId)) return;
+        if (e.isBlocked || BlockUtil.IsBlocked(this, e.attackerId)) return;
 
         hp = Mathf.Max(0, hp - e.amount);
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, hp == 0));

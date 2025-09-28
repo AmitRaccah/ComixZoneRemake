@@ -18,7 +18,7 @@ public class FrameFreezeOnHit : MonoBehaviour
             return;                                 
 
         float dur = (e.attackData != null)
-                  ? e.attackData.freezeFrameDuration
+                  ? e.attackData.GetFreezeFrameDuration(e.isBlocked)
                   : e.freezeFrameDuration;
 
         if (dur <= 0f) return;

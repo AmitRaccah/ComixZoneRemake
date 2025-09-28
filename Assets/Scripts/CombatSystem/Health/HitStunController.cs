@@ -15,8 +15,7 @@ public class HitStunController : MonoBehaviour
     {
         if (e.targetId != myId) return;
 
-        if (BlockUtil.IsBlocked(this, e.attackerId)) return;
-
+        if (e.isBlocked || BlockUtil.IsBlocked(this, e.attackerId)) return;
         float dur = (e.freezeFrameDuration > 0f)
             ? Mathf.Max(defaultHitStun, e.freezeFrameDuration)
             : defaultHitStun;

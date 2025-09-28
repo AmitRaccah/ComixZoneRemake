@@ -86,6 +86,8 @@ public class EnemyCore : MonoBehaviour
     {
         if (e.targetId != myId) return;
 
+        if (e.isBlocked) return;
+
         if (combatState != null) combatState.RegisterHit();
         if (AI != null) AI.SetVariableValue("IsStunned", true);
 

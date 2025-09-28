@@ -6,11 +6,12 @@ public static class HitResolve
         int attackerId, AttackData data, Collider other,
         Vector3 basePos, Transform basis)
     {
-        Transform targetRoot = other.attachedRigidbody ? other.attachedRigidbody.transform : other.transform.root;
+        Transform root = other.attachedRigidbody ? other.attachedRigidbody.transform : other.transform.root;
+        bool blocked = BlockUtil.IsBlocked(root, attackerId);
 
-        DoDamage(attackerId, data, targetRoot);
+        DoDamage(attackerId, data, root, blocked);
 
-        var list = data.additionalHitEffects;
+        var list = data.GetHitEffects(blocked);
         if (list == null || list.Count == 0) return;
 
         foreach (var fx in list)
@@ -23,6 +24,7 @@ public static class HitResolve
         }
     }
 
+
     static void DoDamage(int attackerId, AttackData data, Transform targetRoot)
     {
         if (!targetRoot) return;
@@ -34,9 +36,10 @@ public static class HitResolve
             amount = data.damage,
             knockback = data.knockback,
             type = data.damageType,
-            shakeAmplitude = data.shakeAmplitude,
-            freezeFrameDuration = data.freezeFrameDuration,
-            attackData = data
+            shakeAmplitude = data.GetShakeAmplitude(isBlocked),
+            freezeFrameDuration = data.GetFreezeFrameDuration(isBlocked),
+            attackData = data,
+            isBlocked = isBlocked
         });
     }
 }
