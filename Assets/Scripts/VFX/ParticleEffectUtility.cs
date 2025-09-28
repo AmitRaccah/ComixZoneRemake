@@ -2,56 +2,41 @@ using UnityEngine;
 
 public static class ParticleEffectUtility
 {
-    public static GameObject Spawn(
-        GameObject prefab,
-        Vector3 basePosition,
-        Transform basis,
-        Vector3 localOffset,
-        bool inheritRotation,
-        bool parentToBasis,
-        bool autoDestroy,
-        float fallbackLifetimeSeconds)
+    public static GameObject Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null, Transform parent = null)
     {
-        if (prefab == null)
+        if (!prefab)
+        {
+            Debug.LogWarning("Tried to spawn a particle effect with a null prefab.");
             return null;
-
-        Vector3 worldPosition = basePosition + GetOffset(localOffset, basis);
-        Quaternion worldRotation = GetRotation(inheritRotation, basis);
-
-        GameObject instance = Object.Instantiate(prefab, worldPosition, worldRotation);
-
-        if (parentToBasis && basis != null)
-        {
-            instance.transform.SetParent(basis, worldPositionStays: true);
         }
 
-        if (autoDestroy)
-        {
-            var autoDestroyComponent = instance.GetComponent<ParticleEffectAutoDestroy>();
-            if (autoDestroyComponent == null)
-            {
-                autoDestroyComponent = instance.AddComponent<ParticleEffectAutoDestroy>();
-            }
+        var effectRotation = rotation ?? Quaternion.identity;
+        var instance = Object.Instantiate(prefab, position, effectRotation, parent);
 
-            autoDestroyComponent.Begin(fallbackLifetimeSeconds);
-        }
-
+        EnsureAutoDestroy(instance);
         return instance;
     }
 
-    private static Vector3 GetOffset(Vector3 localOffset, Transform basis)
-    {
-        if (basis == null)
-            return localOffset;
 
-        return basis.TransformDirection(localOffset);
+    public static Vector3 CalculateWorldPosition(Vector3 basePosition, Transform basis, Vector3 localOffset)
+    {
+        if (!basis)
+        {
+            return basePosition + localOffset;
+        }
+
+        return basePosition + basis.TransformDirection(localOffset);
     }
 
-    private static Quaternion GetRotation(bool inheritRotation, Transform basis)
+    static void EnsureAutoDestroy(GameObject instance)
     {
-        if (!inheritRotation || basis == null)
-            return Quaternion.identity;
+        if (!instance) return;
 
-        return basis.rotation;
+        if (!instance.TryGetComponent(out ParticleEffectAutoDestroy autoDestroy))
+        {
+            autoDestroy = instance.AddComponent<ParticleEffectAutoDestroy>();
+        }
+
+        autoDestroy.InitializeFromHierarchy(instance.transform);
     }
 }
