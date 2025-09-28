@@ -15,9 +15,20 @@ public static class HitResolve
         {
             if (!fx.prefab) continue;
 
-            Vector3 pos = basePos + basis.TransformDirection(fx.localOffset);
-            Object.Instantiate(fx.prefab, pos, Quaternion.identity);
+            // Vector3 pos = basePos + basis.TransformDirection(fx.localOffset);
+            // Object.Instantiate(fx.prefab, pos, Quaternion.identity);
+            Vector3 offset = basis != null ? basis.TransformDirection(fx.localOffset) : fx.localOffset;
+            Vector3 worldPosition = basePos + offset;
 
+            ParticleEffectUtility.Spawn(
+    fx.prefab,
+    basePos,
+    basis,
+    fx.localOffset,
+    inheritRotation: false,
+    parentToBasis: false,
+    autoDestroy: false,
+    fallbackLifetimeSeconds: 0f);
             Debug.Log($"[FX] '{fx.prefab.name}' basePos={basePos:F2} pos={pos:F2} offset={fx.localOffset:F2}");
         }
     }
