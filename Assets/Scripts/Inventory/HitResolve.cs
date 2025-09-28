@@ -6,7 +6,9 @@ public static class HitResolve
         int attackerId, AttackData data, Collider other,
         Vector3 basePos, Transform basis)
     {
-        DoDamage(attackerId, data, other);
+        Transform targetRoot = other.attachedRigidbody ? other.attachedRigidbody.transform : other.transform.root;
+
+        DoDamage(attackerId, data, targetRoot);
 
         var list = data.additionalHitEffects;
         if (list == null || list.Count == 0) return;
@@ -15,21 +17,20 @@ public static class HitResolve
         {
             if (!fx.prefab) continue;
 
-            Vector3 pos = basePos + basis.TransformDirection(fx.localOffset);
-            Object.Instantiate(fx.prefab, pos, Quaternion.identity);
+            Vector3 spawnPosition = ParticleEffectUtility.CalculateSpawnPosition(basePos, basis, fx.localOffset);
 
-            Debug.Log($"[FX] '{fx.prefab.name}' basePos={basePos:F2} pos={pos:F2} offset={fx.localOffset:F2}");
+            Object.Instantiate(fx.prefab, spawnPosition, Quaternion.identity);
         }
     }
 
-    static void DoDamage(int attackerId, AttackData data, Collider other)
+    static void DoDamage(int attackerId, AttackData data, Transform targetRoot)
     {
-        Transform root = other.attachedRigidbody ? other.attachedRigidbody.transform : other.transform.root;
+        if (!targetRoot) return;
 
         CombatBus.Publish(new DamageEvent
         {
             attackerId = attackerId,
-            targetId = root.gameObject.GetInstanceID(),
+            targetId = targetRoot.gameObject.GetInstanceID(),
             amount = data.damage,
             knockback = data.knockback,
             type = data.damageType,
