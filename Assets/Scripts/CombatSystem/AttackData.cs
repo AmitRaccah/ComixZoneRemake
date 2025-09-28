@@ -35,8 +35,18 @@ public class AttackData : ScriptableObject
 
     public IReadOnlyList<ParticleEffectData> GetHitEffects(bool blocked)
     {
-        if (!blocked) return additionalHitEffects;
-        return (blockHitEffects != null && blockHitEffects.Count > 0) ? blockHitEffects : additionalHitEffects;
+        if (blocked)
+        {
+            if (blockHitEffects != null && blockHitEffects.Count > 0)
+                return blockHitEffects;
+
+            return null;
+        }
+
+        if (additionalHitEffects != null && additionalHitEffects.Count > 0)
+            return additionalHitEffects;
+
+        return null;
     }
 }
 

@@ -25,23 +25,22 @@ public static class HitResolve
     }
 
 
-    static void DoDamage(int attackerId, AttackData data, Transform targetRoot)
+    static void DoDamage(int attackerId, AttackData data, Transform targetRoot, bool isBlocked)
     {
-        if (!targetRoot) return;
-        static void DoDamage(int attackerId, AttackData data, Transform targetRoot, bool isBlocked)
+        if (!targetRoot)
+            return;
+
+        CombatBus.Publish(new DamageEvent
         {
-            CombatBus.Publish(new DamageEvent
-            {
-                attackerId = attackerId,
-                targetId = targetRoot.gameObject.GetInstanceID(),
-                amount = data.damage,
-                knockback = data.knockback,
-                type = data.damageType,
-                shakeAmplitude = data.GetShakeAmplitude(isBlocked),
-                freezeFrameDuration = data.GetFreezeFrameDuration(isBlocked),
-                attackData = data,
-                isBlocked = isBlocked
-            });
-        }
+            attackerId = attackerId,
+            targetId = targetRoot.gameObject.GetInstanceID(),
+            amount = data.damage,
+            knockback = data.knockback,
+            type = data.damageType,
+            shakeAmplitude = data.GetShakeAmplitude(isBlocked),
+            freezeFrameDuration = data.GetFreezeFrameDuration(isBlocked),
+            attackData = data,
+            isBlocked = isBlocked
+        });
     }
 }
