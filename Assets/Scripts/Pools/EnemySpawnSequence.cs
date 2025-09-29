@@ -36,7 +36,8 @@ public class EnemySpawnSequence : MonoBehaviour
         poolMember = GetComponent<EnemyPoolMember>();
         if (poolMember == null)
         {
-            Debug.LogWarning($"{nameof(EnemySpawnSequence)} requires an {nameof(EnemyPoolMember)} component on {name}.");
+            Debug.LogWarning(string.Format("{0} requires an {1} component on {2}.",
+                nameof(EnemySpawnSequence), nameof(EnemyPoolMember), name));
         }
     }
 
@@ -54,7 +55,8 @@ public class EnemySpawnSequence : MonoBehaviour
         {
             if (!sequenceInitialized)
             {
-                Debug.LogWarning($"{nameof(EnemySpawnSequence)} on {name} could not match assignment '{assignmentId}'.");
+                Debug.LogWarning(string.Format("{0} on {1} could not match assignment '{2}'.",
+                    nameof(EnemySpawnSequence), name, assignmentId));
             }
             return;
         }
@@ -99,6 +101,7 @@ public class EnemySpawnSequence : MonoBehaviour
             currentStageIndex = nextIndex;
             Stage nextStage = stages[currentStageIndex];
             remainingLivesInStage = Mathf.Max(0, nextStage.spawnCount - 1);
+
             float delay = nextStage.transitionDelay > 0f ? nextStage.transitionDelay : nextStage.respawnDelay;
             ScheduleSpawn(nextStage.assignmentId, delay);
         }
@@ -108,7 +111,8 @@ public class EnemySpawnSequence : MonoBehaviour
     {
         if (string.IsNullOrEmpty(assignmentId))
         {
-            Debug.LogWarning($"{nameof(EnemySpawnSequence)} on {name} attempted to schedule a spawn without an assignment id.");
+            Debug.LogWarning(string.Format("{0} on {1} attempted to schedule a spawn without an assignment id.",
+                nameof(EnemySpawnSequence), name));
             return;
         }
 
@@ -121,30 +125,12 @@ public class EnemySpawnSequence : MonoBehaviour
 
         if (EnemyPool.Instance == null)
         {
-            Debug.LogWarning($"{nameof(EnemySpawnSequence)} on {name} could not find an active {nameof(EnemyPool)} instance.");
+            Debug.LogWarning(string.Format("{0} on {1} could not find an active {2} instance.",
+                nameof(EnemySpawnSequence), name, nameof(EnemyPool)));
             return;
         }
 
-        scheduledSpawn = EnemyPool.Instance.StartCoroutine(SpawnAfterDelay(assignmentId, Mathf.Max(0f, delay)));
-    }
-
-    private IEnumerator SpawnAfterDelay(string assignmentId, float delay)
-    {
-        if (delay > 0f)
-        {
-            yield return new WaitForSeconds(delay);
-        }
-
-        if (EnemyPool.Instance != null)
-        {
-            EnemyPool.Instance.SpawnFromAssignment(assignmentId);
-        }
-        else
-        {
-            Debug.LogWarning($"{nameof(EnemySpawnSequence)} on {name} could not execute spawn because the {nameof(EnemyPool)} instance was missing.");
-        }
-
-        scheduledSpawn = null;
+        scheduledSpawn = EnemyPool.Instance.ScheduleRespawnSpecific(poolMember, assignmentId, Mathf.Max(0f, delay));
     }
 
     private int FindStageIndex(string assignmentId)
@@ -161,7 +147,6 @@ public class EnemySpawnSequence : MonoBehaviour
                 return i;
             }
         }
-
         return -1;
     }
 
@@ -171,7 +156,6 @@ public class EnemySpawnSequence : MonoBehaviour
         {
             return null;
         }
-
         return stages[currentStageIndex];
     }
 
@@ -183,7 +167,6 @@ public class EnemySpawnSequence : MonoBehaviour
             {
                 EnemyPool.Instance.StopCoroutine(scheduledSpawn);
             }
-
             scheduledSpawn = null;
         }
     }

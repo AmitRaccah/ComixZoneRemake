@@ -4,50 +4,36 @@ using UnityEngine;
 public class EnemyPoolMember : MonoBehaviour
 {
     private EnemyPool owner;
-    private GameObject sourcePrefab;
     private bool isInitialized;
     private bool isActive;
     private Vector3 initialLocalScale;
     private Quaternion initialLocalRotation;
     private string currentAssignmentId;
-    private bool isQueued;
 
-    internal GameObject SourcePrefab => sourcePrefab;
-    internal bool IsActive => isActive;
-    internal bool IsPooled => owner != null;
-    internal string LastAssignmentId => currentAssignmentId;
-    internal bool IsQueued => isQueued;
+    internal bool IsActive { get { return isActive; } }
+    internal bool IsPooled { get { return owner != null; } }
+    internal string LastAssignmentId { get { return currentAssignmentId; } }
 
-    internal void Initialize(EnemyPool pool, GameObject prefab)
+    private void Awake()
     {
-        owner = pool;
-        sourcePrefab = prefab;
+        owner = EnemyPool.Instance;
         isInitialized = true;
         initialLocalScale = transform.localScale;
         initialLocalRotation = transform.localRotation;
-        isActive = false;
+        isActive = gameObject.activeSelf;
         currentAssignmentId = null;
-        isQueued = true;
     }
 
-    internal void PrepareForSpawn(Transform parentOverride, Transform spawnPoint, string assignmentId)
+    internal void PrepareForSpawn(Transform spawnPoint, string assignmentId)
     {
         if (!isInitialized)
         {
-            Debug.LogWarning($"EnemyPoolMember on {name} was not initialized before spawn.");
+            Debug.LogWarning($"{nameof(EnemyPoolMember)} on {name} was not initialized before spawn.");
         }
-
-        Transform targetParent = parentOverride != null
-            ? parentOverride
-            : spawnPoint != null ? spawnPoint.parent : null;
-
-        if (targetParent != null)
+        if (isActive)
         {
-            transform.SetParent(targetParent, true);
-        }
-        else
-        {
-            transform.SetParent(null, true);
+            Debug.LogWarning($"{nameof(EnemyPoolMember)} on {name} requested to spawn while already active.");
+            return;
         }
 
         if (spawnPoint != null)
@@ -59,57 +45,59 @@ public class EnemyPoolMember : MonoBehaviour
 
         ResetDynamicState();
         gameObject.SetActive(true);
+
         isActive = true;
         currentAssignmentId = assignmentId;
-        isQueued = false;
+
         BroadcastMessage("OnSpawnedFromPool", SendMessageOptions.DontRequireReceiver);
     }
 
-    internal bool ReturnToPool(Transform poolParent)
+    internal bool ReturnToPool()
     {
         if (!isInitialized) return false;
         if (!isActive) return false;
 
         BroadcastMessage("OnReturnedToPool", SendMessageOptions.DontRequireReceiver);
+
         ResetDynamicState();
         gameObject.SetActive(false);
-        transform.SetParent(poolParent, false);
-        transform.localPosition = Vector3.zero;
+
         transform.localRotation = initialLocalRotation;
         transform.localScale = initialLocalScale;
+
         isActive = false;
         currentAssignmentId = null;
-        isQueued = true;
         return true;
     }
 
     private void ResetDynamicState()
     {
-        var rb = GetComponent<Rigidbody>();
+        Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            rb.linearVelocity = Vector3.zero;
+            rb.linearVelocity = Vector3.zero;      
             rb.angularVelocity = Vector3.zero;
         }
 
-        var rb2d = GetComponent<Rigidbody2D>();
+        Rigidbody2D rb2d = GetComponent<Rigidbody2D>();
         if (rb2d != null)
         {
-            rb2d.linearVelocity = Vector2.zero;
+            rb2d.linearVelocity = Vector2.zero;     
             rb2d.angularVelocity = 0f;
+        }
+
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.Rebind();
+            animator.Update(0f);
         }
     }
 
     public void Release(float delay = 0f)
     {
-        if (owner == null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
+        if (owner == null) { Debug.LogWarning($"{nameof(EnemyPoolMember)} on {name} has no owner pool."); return; }
         if (!isActive) return;
-
-        owner.Release(this, delay);
+        owner.Return(this, delay);
     }
 }
