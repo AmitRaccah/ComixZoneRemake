@@ -173,6 +173,17 @@ public class EnemyPool : MonoBehaviour
 
         SpawnUsingAssignment(assignment);
     }
+    private IEnumerator SpawnAssignmentAfterDelay(SpawnAssignment assignment, float delay)
+    {
+        if (assignment == null) yield break;
+
+        if (delay > 0f)
+        {
+            yield return new WaitForSeconds(delay);
+        }
+
+        SpawnUsingAssignment(assignment);
+    }
 
     private void EnsurePool(GameObject prefab)
     {
@@ -236,6 +247,19 @@ public class EnemyPool : MonoBehaviour
 
         SpawnAssignment assignment = spawnAssignments[index];
         return SpawnUsingAssignment(assignment);
+    }
+
+    internal Coroutine ScheduleSpawnFromAssignment(string id, float delay)
+    {
+        if (string.IsNullOrEmpty(id)) return null;
+
+        if (!assignmentLookup.TryGetValue(id, out SpawnAssignment assignment))
+        {
+            Debug.LogWarning($"EnemyPool could not schedule spawn. No assignment with id '{id}'.");
+            return null;
+        }
+
+        return StartCoroutine(SpawnAssignmentAfterDelay(assignment, Mathf.Max(0f, delay)));
     }
 
     public GameObject SpawnFromAssignment(string id)

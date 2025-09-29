@@ -58,7 +58,6 @@ public class DeathHandler : MonoBehaviour
         Health h = GetComponent<Health>();
         float delay = h != null ? h.DeathDelay : 0f;
         if (delay > 0f) yield return new WaitForSeconds(delay);
-        Destroy(gameObject);
         EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
         if (pooled != null && pooled.IsPooled)
         {
