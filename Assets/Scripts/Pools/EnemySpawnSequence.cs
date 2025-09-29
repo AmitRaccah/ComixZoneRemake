@@ -8,15 +8,20 @@ public class EnemySpawnSequence : MonoBehaviour
     {
         [Tooltip("The ID of the spawn assignment from the EnemyPool.")]
         public string assignmentId;
+
+        [Tooltip("The ID of the encounter this stage belongs to. Kills will count towards this encounter.")]
+        public string encounterId;
+
         [Tooltip("How many times the enemy will spawn at this stage.")]
         public int spawnCount = 1;
+
         [Tooltip("Delay in seconds before respawning at the same stage.")]
         public float respawnDelay = 2f;
+
         [Tooltip("Delay in seconds before transitioning to the next stage.")]
         public float transitionDelay = 1f;
     }
 
-    [Tooltip("The sequence of stages this enemy will follow.")]
     [SerializeField] private Stage[] stages;
 
     private EnemyPoolMember poolMember;
@@ -33,7 +38,7 @@ public class EnemySpawnSequence : MonoBehaviour
         int initialStageIndex = -1;
         for (int i = 0; i < stages.Length; i++)
         {
-            if (stages[i].assignmentId == initialAssignmentId)
+            if (stages[i] != null && stages[i].assignmentId == initialAssignmentId)
             {
                 initialStageIndex = i;
                 break;
@@ -49,7 +54,7 @@ public class EnemySpawnSequence : MonoBehaviour
         currentStageIndex = initialStageIndex;
         livesRemainingInStage = stages[currentStageIndex].spawnCount;
 
-        ScheduleSpawn(stages[currentStageIndex].assignmentId, delay);
+        ScheduleSpawn(stages[currentStageIndex], delay, true);
     }
 
     private void OnReturnedToPool()
@@ -58,8 +63,7 @@ public class EnemySpawnSequence : MonoBehaviour
 
         if (livesRemainingInStage > 0)
         {
-            Stage currentStage = stages[currentStageIndex];
-            ScheduleSpawn(currentStage.assignmentId, currentStage.respawnDelay);
+            ScheduleSpawn(stages[currentStageIndex], stages[currentStageIndex].respawnDelay);
         }
         else
         {
@@ -68,19 +72,22 @@ public class EnemySpawnSequence : MonoBehaviour
             {
                 Stage nextStage = stages[currentStageIndex];
                 livesRemainingInStage = nextStage.spawnCount;
-                ScheduleSpawn(nextStage.assignmentId, nextStage.transitionDelay);
+                ScheduleSpawn(nextStage, nextStage.transitionDelay);
             }
             else
             {
-                currentStageIndex = -1; // Sequence finished
+                currentStageIndex = -1; 
             }
         }
     }
 
-    private void ScheduleSpawn(string assignmentId, float delay)
+    private void ScheduleSpawn(Stage stage, float delay, bool isFirstSpawn = false)
     {
-        // The enemy is inactive, so it asks the active Pool Manager to run the coroutine for it.
-        livesRemainingInStage--;
-        EnemyPool.Instance.ScheduleSpawn(poolMember, assignmentId, delay);
+        if (!isFirstSpawn)
+        {
+            livesRemainingInStage--;
+        }
+
+        EnemyPool.Instance.ScheduleSpawn(poolMember, stage.assignmentId, stage.encounterId, delay);
     }
 }

@@ -3,12 +3,7 @@ using System.Collections;
 
 public class DeathHandler : MonoBehaviour
 {
-    [Header("Death FX")]
-    [Tooltip("The name of the trigger parameter in the Animator to play the death animation.")]
     [SerializeField] private string deathTriggerName = "Death";
-
-    [Header("Pooling")]
-    [Tooltip("Delay before the object is returned to the pool, allowing time for the death animation to finish.")]
     [SerializeField] private float poolReleaseDelay = 0f;
 
     private Animator anim;
@@ -35,7 +30,6 @@ public class DeathHandler : MonoBehaviour
     private void OnDead(HealthDepletedEvent e)
     {
         if (e.entityId != myId) return;
-
         HandleDeath(e.killerId);
     }
 
@@ -51,9 +45,14 @@ public class DeathHandler : MonoBehaviour
 
         if (CompareTag("Player"))
         {
-            Debug.Log("Player Down! Firing PlayerDownEvent to trigger respawn.");
             CombatBus.Publish(new PlayerDownEvent(myId, killerId));
             return;
+        }
+
+        EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
+        if (pooled != null && !string.IsNullOrEmpty(pooled.currentEncounterId))
+        {
+            CoreBus.Publish(new EnemyDefeatedEvent(pooled.currentEncounterId));
         }
 
         StartCoroutine(ReleaseAfterDelays());

@@ -101,3 +101,13 @@ public struct StunChangedEvent
     public bool isStunned;
     public StunChangedEvent(int id, bool s) { entityId = id; isStunned = s; }
 }
+
+public struct EnemyDefeatedEvent
+{
+    public readonly string encounterId;
+
+    public EnemyDefeatedEvent(string encounterId)
+    {
+        this.encounterId = encounterId;
+    }
+}

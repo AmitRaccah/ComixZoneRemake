@@ -10,18 +10,11 @@ public class EnemyPool : MonoBehaviour
     [System.Serializable]
     public class SpawnAssignment
     {
-        [Tooltip("A unique identifier for this spawn point.")]
         public string id;
-        [Tooltip("The Transform where the enemy will be spawned.")]
         public Transform spawnPoint;
     }
 
-    [Header("Spawn Configuration")]
-    [Tooltip("A list of all possible spawn assignments in the level.")]
     [SerializeField] private SpawnAssignment[] spawnAssignments;
-
-    [Header("Scene Enemies")]
-    [Tooltip("Drag all enemy GameObjects from the Hierarchy that this pool should manage.")]
     [SerializeField] private List<EnemyPoolMember> enemiesInScene;
 
     private readonly Dictionary<string, Transform> assignmentLookup = new Dictionary<string, Transform>();
@@ -49,29 +42,26 @@ public class EnemyPool : MonoBehaviour
     {
         if (enemy == null || !enemiesInScene.Contains(enemy))
         {
-            Debug.LogError($"Attempted to start a sequence for an enemy '{enemy?.name}' that is not registered in the EnemyPool's 'enemiesInScene' list. Make sure you dragged the enemy from the Hierarchy, not the Project folder.", this);
+            Debug.LogError($"Attempted to start a sequence for an enemy '{enemy?.name}' that is not registered in the EnemyPool.", this);
             return;
         }
-
         var sequence = enemy.GetComponent<EnemySpawnSequence>();
         if (sequence == null)
         {
             Debug.LogError($"The enemy '{enemy.name}' is missing the EnemySpawnSequence component.", enemy);
             return;
         }
-
         sequence.BeginSequence(initialAssignmentId, delay);
     }
 
-    internal void Spawn(EnemyPoolMember member, string assignmentId)
+    internal void Spawn(EnemyPoolMember member, string assignmentId, string encounterId)
     {
         if (!assignmentLookup.TryGetValue(assignmentId, out Transform spawnPoint))
         {
-            Debug.LogError($"Spawn Assignment with ID '{assignmentId}' was not found in the EnemyPool.", this);
+            Debug.LogError($"Spawn Assignment with ID '{assignmentId}' was not found.", this);
             return;
         }
-
-        member.PrepareForSpawn(spawnPoint, assignmentId);
+        member.PrepareForSpawn(spawnPoint, assignmentId, encounterId);
     }
 
     internal void ReturnToPool(EnemyPoolMember member)
@@ -82,30 +72,30 @@ public class EnemyPool : MonoBehaviour
         }
     }
 
-    public void ScheduleSpawn(EnemyPoolMember member, string assignmentId, float delay)
+    public void ScheduleSpawn(EnemyPoolMember member, string assignmentId, string encounterId, float delay)
     {
         if (member == null) return;
-
         if (scheduledSpawns.TryGetValue(member, out Coroutine existingCoroutine) && existingCoroutine != null)
         {
             StopCoroutine(existingCoroutine);
         }
-
-        Coroutine newCoroutine = StartCoroutine(SpawnRoutine(member, assignmentId, delay));
+        Coroutine newCoroutine = StartCoroutine(SpawnRoutine(member, assignmentId, encounterId, delay));
         scheduledSpawns[member] = newCoroutine;
     }
 
-    private IEnumerator SpawnRoutine(EnemyPoolMember member, string assignmentId, float delay)
+    private IEnumerator SpawnRoutine(EnemyPoolMember member, string assignmentId, string encounterId, float delay)
     {
         if (delay > 0)
         {
             yield return new WaitForSeconds(delay);
         }
-
         if (member != null)
         {
-            Spawn(member, assignmentId);
-            scheduledSpawns.Remove(member); 
+            Spawn(member, assignmentId, encounterId);
+            if (scheduledSpawns.ContainsKey(member))
+            {
+                scheduledSpawns.Remove(member);
+            }
         }
     }
 }

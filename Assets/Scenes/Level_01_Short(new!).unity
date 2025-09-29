@@ -13356,6 +13356,26 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &256768076 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3611000853189783858, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
+  m_PrefabInstance: {fileID: 5719676765369459287}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &256768079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 256768076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 259499aa939a0ec4785bc10b42a331a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDuration: 0.5
+  offDuration: 0.5
+  blinkCycles: 6
 --- !u!1 &259835146
 GameObject:
   m_ObjectHideFlags: 0
@@ -30787,6 +30807,26 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &373848902 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 684043045915810602, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
+  m_PrefabInstance: {fileID: 5719676765369459287}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &373848905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373848902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 259499aa939a0ec4785bc10b42a331a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onDuration: 0.5
+  offDuration: 0.5
+  blinkCycles: 6
 --- !u!43 &374231041
 Mesh:
   m_ObjectHideFlags: 0
@@ -39950,6 +39990,11 @@ MeshFilter:
 Transform:
   m_CorrespondingSourceObject: {fileID: 170026359718176736, guid: ccca2038293d60249bc66ebbbb05e77e, type: 3}
   m_PrefabInstance: {fileID: 868991817521987135}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &531176455 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1225468092660658847, guid: 28353375d430d454fa0808401f8f4756, type: 3}
+  m_PrefabInstance: {fileID: 8684020230768524889}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &533563166
 PrefabInstance:
@@ -52261,7 +52306,7 @@ GameObject:
   - component: {fileID: 797365389}
   - component: {fileID: 797365388}
   m_Layer: 0
-  m_Name: RespawnManager (1)
+  m_Name: EnemyPool Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53803,6 +53848,58 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &831998234
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 831998237}
+  - component: {fileID: 831998238}
+  m_Layer: 0
+  m_Name: StagePassUnlock Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &831998237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831998234}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.3854502, y: 5.0565386, z: -4.008921}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &831998238
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831998234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2b65a01481f06f4ab7147121c782539, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  encounters:
+  - encounterId: 1
+    killsRequired: 6
+    objectsToEnable:
+    - {fileID: 373848902}
+    - {fileID: 531176455}
+    currentKills: 0
+    isCompleted: 0
 --- !u!1 &837391861
 GameObject:
   m_ObjectHideFlags: 0
@@ -55042,7 +55139,7 @@ GameObject:
   - component: {fileID: 861955842}
   - component: {fileID: 861955841}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: SpawnTrigger1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109738,6 +109835,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: stages.Array.data[0].encounterId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: stages.Array.data[1].encounterId
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5920193934724359245, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: poolReleaseDelay
       value: 2
@@ -109752,7 +109857,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: maxHp
-      value: 85
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: deathDelay
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
@@ -149113,7 +149222,13 @@ PrefabInstance:
     - {fileID: 1126384488872370449, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
     - {fileID: 6540623752489098803, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3611000853189783858, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 256768079}
+    - targetCorrespondingSourceObject: {fileID: 684043045915810602, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 373848905}
   m_SourcePrefab: {fileID: 100100000, guid: e84c6f43e19b6b843bdf2f0808b1b80e, type: 3}
 --- !u!33 &5733843908083516274
 MeshFilter:
@@ -156786,6 +156901,7 @@ SceneRoots:
   - {fileID: 868991817521987135}
   - {fileID: 1097498377}
   - {fileID: 797365389}
+  - {fileID: 831998237}
   - {fileID: 1044197103}
   - {fileID: 1878413142}
   - {fileID: 43980142}
