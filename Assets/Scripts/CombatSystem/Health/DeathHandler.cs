@@ -4,29 +4,39 @@ using System.Collections;
 public class DeathHandler : MonoBehaviour
 {
     [Header("Death FX")]
+    [Tooltip("The name of the trigger parameter in the Animator to play the death animation.")]
     [SerializeField] private string deathTriggerName = "Death";
 
     [Header("Pooling")]
-    [Tooltip("השהייה נוספת לפני שהאויב חוזר לבריכה (בנוסף להשהייה מסקריפט ה-Health).")]
+    [Tooltip("Delay before the object is returned to the pool, allowing time for the death animation to finish.")]
     [SerializeField] private float poolReleaseDelay = 0f;
 
     private Animator anim;
     private bool isDying = false;
+    private int myId;
 
     void Awake()
     {
         anim = GetComponent<Animator>();
+        myId = gameObject.GetInstanceID();
     }
 
     void OnEnable()
     {
         isDying = false;
-        // CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
     }
 
     void OnDisable()
     {
-        // CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
+    }
+
+    private void OnDead(HealthDepletedEvent e)
+    {
+        if (e.entityId != myId) return;
+
+        HandleDeath();
     }
 
     public void HandleDeath()
@@ -41,6 +51,7 @@ public class DeathHandler : MonoBehaviour
 
         if (CompareTag("Player"))
         {
+            Debug.Log("Player Died. Game Over logic should be implemented here.");
             return;
         }
 
@@ -49,12 +60,9 @@ public class DeathHandler : MonoBehaviour
 
     private IEnumerator ReleaseAfterDelays()
     {
-        float totalDelay = poolReleaseDelay;
-
-
-        if (totalDelay > 0f)
+        if (poolReleaseDelay > 0f)
         {
-            yield return new WaitForSeconds(totalDelay);
+            yield return new WaitForSeconds(poolReleaseDelay);
         }
 
         EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
