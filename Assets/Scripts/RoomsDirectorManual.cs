@@ -9,6 +9,11 @@ public class RoomsDirectorManual : MonoBehaviour
         public Health[] enemies;
         public GameObject[] gates;
         public GameObject[] arrows;
+        [Tooltip("If greater than zero, this number of enemy defeats is required to unlock the room. Overrides the enemies array check when set.")]
+        public int requiredKills;
+
+        [HideInInspector] public int killsSoFar;
+        [HideInInspector] public bool isUnlocked;
     }
 
     public static RoomsDirectorManual Instance;
@@ -68,6 +73,9 @@ public class RoomsDirectorManual : MonoBehaviour
         Room r = GetRoom(index);
         if (r == null) return;
 
+        r.killsSoFar = 0;
+        r.isUnlocked = false;
+
         if (r.gates != null)
             for (int i = 0; i < r.gates.Length; i++)
                 if (r.gates[i] != null) r.gates[i].SetActive(false);
@@ -95,8 +103,22 @@ public class RoomsDirectorManual : MonoBehaviour
     {
         Room r = GetRoom(index);
         if (r == null) return;
-        if (!AllEnemiesDead(r)) return;
+        if (!ShouldUnlock(r)) return;
 
+        UnlockRoom(r);
+    }
+
+    bool ShouldUnlock(Room r)
+    {
+        if (r.requiredKills > 0)
+            return r.killsSoFar >= r.requiredKills;
+
+        return AllEnemiesDead(r);
+    }
+
+    void UnlockRoom(Room r)
+    {
+        r.isUnlocked = true;
         if (r.gates != null)
             for (int i = 0; i < r.gates.Length; i++)
                 if (r.gates[i] != null) r.gates[i].SetActive(true);
@@ -115,5 +137,20 @@ public class RoomsDirectorManual : MonoBehaviour
             if (h != null && !h.IsDead) return false;
         }
         return true;
+    }
+    public void NotifyEnemyKilled(int roomIndex)
+    {
+        Room r = GetRoom(roomIndex);
+        if (r == null) return;
+
+        r.killsSoFar++;
+        TryUnlock(roomIndex);
+    }
+
+    public bool IsRoomUnlocked(int roomIndex)
+    {
+        Room r = GetRoom(roomIndex);
+        if (r == null) return false;
+        return r.isUnlocked;
     }
 }
