@@ -36,10 +36,10 @@ public class DeathHandler : MonoBehaviour
     {
         if (e.entityId != myId) return;
 
-        HandleDeath();
+        HandleDeath(e.killerId);
     }
 
-    public void HandleDeath()
+    public void HandleDeath(int killerId = -1)
     {
         if (isDying) return;
         isDying = true;
@@ -51,7 +51,8 @@ public class DeathHandler : MonoBehaviour
 
         if (CompareTag("Player"))
         {
-            Debug.Log("Player Died. Game Over logic should be implemented here.");
+            Debug.Log("Player Down! Firing PlayerDownEvent to trigger respawn.");
+            CombatBus.Publish(new PlayerDownEvent(myId, killerId));
             return;
         }
 

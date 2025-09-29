@@ -192,6 +192,8 @@ GameObject:
   - component: {fileID: 747308398821444354}
   - component: {fileID: 5897083792174015254}
   - component: {fileID: 6681461272722536898}
+  - component: {fileID: 6506263302392460564}
+  - component: {fileID: 1379033389560604084}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -554,6 +556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathTriggerName: Death
+  poolReleaseDelay: 0
 --- !u!114 &6728254842853753393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -647,6 +650,39 @@ MonoBehaviour:
   rightYaw: 90
   snapYawForCharacterController: 0
   snapYawForRigidbody: 1
+--- !u!114 &6506263302392460564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d82497b6c00d49440a5e85e58be58fbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1379033389560604084
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b3f57d694b564b4f87073c6fae3d623, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stages:
+  - assignmentId: 1
+    spawnCount: 3
+    respawnDelay: 2
+    transitionDelay: 1
+  - assignmentId: 2
+    spawnCount: 3
+    respawnDelay: 2
+    transitionDelay: 1
 --- !u!1 &603024565703877214
 GameObject:
   m_ObjectHideFlags: 0
