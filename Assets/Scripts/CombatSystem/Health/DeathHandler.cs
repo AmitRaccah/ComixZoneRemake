@@ -8,6 +8,10 @@ public class DeathHandler : MonoBehaviour
     [Header("Death FX")]
     [SerializeField] private string deathTriggerName = "Death";
 
+    [Header("Pooling")]
+    [Tooltip("Additional delay before the enemy is returned to the pool after dying.")]
+    [SerializeField] private float poolReleaseDelay = 0f;
+
     private int myId;
     private FactionId faction;
     private Animator anim;
@@ -55,5 +59,16 @@ public class DeathHandler : MonoBehaviour
         float delay = h != null ? h.DeathDelay : 0f;
         if (delay > 0f) yield return new WaitForSeconds(delay);
         Destroy(gameObject);
+        EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
+        if (pooled != null && pooled.IsPooled)
+        {
+            float totalDelay = Mathf.Max(0f, poolReleaseDelay);
+            pooled.Release(totalDelay);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
+
 }
