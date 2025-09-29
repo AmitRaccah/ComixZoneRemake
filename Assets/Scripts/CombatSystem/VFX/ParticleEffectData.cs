@@ -3,10 +3,10 @@ using UnityEngine;
 [System.Serializable]
 public class ParticleEffectData
 {
-    public GameObject prefab;
+    [Tooltip("The ID of the VFX to spawn from the VfxPoolManager.")]
+    public string vfxId;
     public Vector3 localOffset = Vector3.zero;
 }
-
 public static class ParticleEffectUtility
 {
     public static Vector3 CalculateSpawnPosition(Vector3 basePosition, Transform basis, Vector3 localOffset)
