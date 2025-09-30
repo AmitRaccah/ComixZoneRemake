@@ -27,6 +27,7 @@ public class PanelHopTimeline : MonoBehaviour
     private bool triggered = false;
     private bool playerInsideGate = false;
     private static PanelHopTimeline waitingCrouchGate = null;
+    private bool waitingForGrounded = false;
 
     void Awake()
     {
@@ -70,6 +71,7 @@ public class PanelHopTimeline : MonoBehaviour
         if (!other.CompareTag(playerTag)) return;
         playerInsideGate = false;
         if (waitingCrouchGate == this) waitingCrouchGate = null;
+        waitingForGrounded = false;
     }
 
     void Update()
@@ -80,11 +82,28 @@ public class PanelHopTimeline : MonoBehaviour
             waitingCrouchGate = null;
             StartTimeline();
         }
+
+        if (waitingForGrounded && controller != null && controller.Grounded && !triggered)
+        {
+            StartTimeline();
+        }
     }
 
     void StartTimeline()
     {
-        if (director == null) return;
+        if (director == null)
+        {
+            waitingForGrounded = false;
+            return;
+        }
+
+        if (controller != null && !controller.Grounded)
+        {
+            waitingForGrounded = true;
+            return;
+        }
+
+        waitingForGrounded = false;
         triggered = true;
 
         ResetAllInputs();
@@ -101,6 +120,7 @@ public class PanelHopTimeline : MonoBehaviour
     {
         if (d != null) d.stopped -= OnDirectorStopped;
         triggered = false;
+        waitingForGrounded = false;
 
         DisableRootMotion();
         SafeReleaseControl();
@@ -156,6 +176,7 @@ public class PanelHopTimeline : MonoBehaviour
 
     public void StopTimeline()
     {
+        waitingForGrounded = false;
         if (director == null) return;
         director.Stop();
     }

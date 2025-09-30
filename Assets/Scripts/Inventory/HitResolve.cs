@@ -16,11 +16,11 @@ public static class HitResolve
 
         foreach (var fx in list)
         {
-            if (!fx.prefab) continue;
+            if (string.IsNullOrEmpty(fx.vfxId)) continue;
 
             Vector3 spawnPosition = ParticleEffectUtility.CalculateSpawnPosition(basePos, basis, fx.localOffset);
 
-            Object.Instantiate(fx.prefab, spawnPosition, Quaternion.identity);
+            VfxPoolManager.Instance.Spawn(fx.vfxId, spawnPosition, Quaternion.identity);
         }
     }
 
