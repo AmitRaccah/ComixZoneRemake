@@ -21,7 +21,12 @@ MonoBehaviour:
   hitboxOffset: {x: 0, y: 0, z: 0}
   side: 3
   shakeAmplitude: 0.8
+  blockShakeAmplitude: -1
   freezeFrameDuration: 0.2
+  blockFreezeFrameDuration: -1
   additionalHitEffects:
-  - prefab: {fileID: 107418, guid: ea6edc3a0a047a243a9ec62ca1655977, type: 3}
+  - vfxId: 7
     localOffset: {x: 0, y: 0, z: -7}
+  - vfxId: 8
+    localOffset: {x: 0, y: 0, z: -7}
+  blockHitEffects: []
