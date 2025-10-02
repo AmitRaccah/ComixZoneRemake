@@ -1134,7 +1134,7 @@ ParticleSystem:
           m_RotationOrder: 4
     m_Mesh: {fileID: 0}
     m_MeshRenderer: {fileID: 0}
-    m_SkinnedMeshRenderer: {fileID: 1594513075}
+    m_SkinnedMeshRenderer: {fileID: 0}
     m_Sprite: {fileID: 0}
     m_SpriteRenderer: {fileID: 0}
     m_UseMeshMaterialIndex: 0
@@ -10222,7 +10222,7 @@ GameObject:
   - component: {fileID: 355188148}
   - component: {fileID: 355188147}
   - component: {fileID: 355188150}
-  m_Layer: 11
+  m_Layer: 15
   m_Name: InkPool_Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10460,62 +10460,6 @@ MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e5af08a5d9ce16f48aa912078be72a46, type: 3}
   m_PrefabInstance: {fileID: 1304489093}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &397828533
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 397828535}
-  - component: {fileID: 397828534}
-  m_Layer: 0
-  m_Name: DecalTest
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &397828534
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 397828533}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0777d029ed3dffa4692f417d4aba19ca, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 2100000, guid: b34037b10217d4240b022bb2a7d91b91, type: 2}
-  m_DrawDistance: 1000
-  m_FadeScale: 0.9
-  m_StartAngleFade: 180
-  m_EndAngleFade: 180
-  m_UVScale: {x: 1, y: 1}
-  m_UVBias: {x: 0, y: 0}
-  m_DecalLayerMask: 1
-  m_ScaleMode: 0
-  m_Offset: {x: 0, y: 0, z: 2.405}
-  m_Size: {x: 5.75, y: 4.11, z: 4.81}
-  m_FadeFactor: 1
---- !u!4 &397828535
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 397828533}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.66589, y: 0.00022000572, z: 0.0017499257, w: 0.746048}
-  m_LocalPosition: {x: 0.57, y: 5.77, z: -1.42}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 96.5, y: 181.346, z: 181.47}
 --- !u!1 &432072072
 GameObject:
   m_ObjectHideFlags: 0
@@ -47282,11 +47226,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &1594513075 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 5173358050045994402, guid: bb9daeb1564baff4191e4893c8b8066d, type: 3}
-  m_PrefabInstance: {fileID: 1800900495}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1674430653
 GameObject:
   m_ObjectHideFlags: 0
@@ -63401,7 +63340,7 @@ ParticleSystem:
           m_RotationOrder: 4
     m_Mesh: {fileID: 0}
     m_MeshRenderer: {fileID: 382946281}
-    m_SkinnedMeshRenderer: {fileID: 1594513075}
+    m_SkinnedMeshRenderer: {fileID: 0}
     m_Sprite: {fileID: 0}
     m_SpriteRenderer: {fileID: 0}
     m_UseMeshMaterialIndex: 0
@@ -66459,7 +66398,7 @@ ParticleSystem:
     radiusScale: 1.26
     collidesWith:
       serializedVersion: 2
-      m_Bits: 2048
+      m_Bits: 34816
     maxCollisionShapes: 256
     quality: 0
     voxelSize: 0.5
@@ -67489,10 +67428,14 @@ PrefabInstance:
     - target: {fileID: 3085336156958782557, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: ShapeModule.m_SkinnedMeshRenderer
       value: 
-      objectReference: {fileID: 1594513075}
+      objectReference: {fileID: 0}
     - target: {fileID: 6412891523081259212, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: m_Name
       value: InkDripsAndPuddle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6412891523081259212, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7701497092075240071, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: m_LocalPosition.x
@@ -67560,5 +67503,4 @@ SceneRoots:
   - {fileID: 1800900495}
   - {fileID: 1304489093}
   - {fileID: 1526270391}
-  - {fileID: 397828535}
   - {fileID: 1326688757}
