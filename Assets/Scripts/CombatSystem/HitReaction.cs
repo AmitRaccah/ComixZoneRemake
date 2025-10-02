@@ -7,13 +7,16 @@ public class HitReaction : MonoBehaviour
     [SerializeField] private string attackTag = "Attack";
 
     private Animator anim;
+    private BlockController bc;
     private int myId;
     private int hitHash;
     private bool queuedHit;
+    private bool wasBlocking;
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
+        bc = GetComponent<BlockController>();
         myId = gameObject.GetInstanceID();
         hitHash = Animator.StringToHash(hitTrigger);
     }
@@ -21,23 +24,58 @@ public class HitReaction : MonoBehaviour
     private void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
     private void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
 
+    private void Update()
+    {
+        bool nowBlocking = bc && bc.IsBlocking;
+        if (nowBlocking && !wasBlocking)
+        {
+            queuedHit = false;
+            anim.ResetTrigger(hitHash);
+        }
+        wasBlocking = nowBlocking;
+    }
+
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId) return;
 
-        var bc = GetComponent<BlockController>();
-        if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId)) return;
+        if (e.isBlocked)
+        {
+            queuedHit = false;
+            anim.ResetTrigger(hitHash);
+            return;
+        }
+
+        if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId))
+        {
+            queuedHit = false;
+            anim.ResetTrigger(hitHash);
+            return;
+        }
+
+        if (IsInAttack())
+        {
+            queuedHit = true;
+            anim.ResetTrigger(hitHash);
+            anim.SetTrigger(hitHash);
+            return;
+        }
 
         anim.ResetTrigger(hitHash);
         anim.SetTrigger(hitHash);
-
-        if (IsInAttack()) queuedHit = true;
     }
 
     public void CheckQueuedHit()
     {
         if (!queuedHit) return;
         queuedHit = false;
+
+        if (bc && bc.IsBlocking)
+        {
+            anim.ResetTrigger(hitHash);
+            return;
+        }
+
         anim.ResetTrigger(hitHash);
         anim.SetTrigger(hitHash);
     }
@@ -56,9 +94,7 @@ public class HitReaction : MonoBehaviour
 
     private bool IsFacingAttacker(int attackerId)
     {
-        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk))
-            return false;
-
+        if (!AttackActivator.TransformsById.TryGetValue(attackerId, out var atk)) return false;
         Vector3 dir = (atk.position - transform.position).normalized;
         return Vector3.Dot(transform.forward, dir) > 0.3f;
     }

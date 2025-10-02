@@ -3,8 +3,8 @@
 public class BlockController : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float blockStartup = 0.10f;   
-    [SerializeField] private float blockRecovery = 0.15f;  
+    [SerializeField] private float blockStartup = 0.10f;
+    [SerializeField] private float blockRecovery = 0.15f;
 
     private Animator anim;
     private MovementLock mLock;
@@ -13,14 +13,13 @@ public class BlockController : MonoBehaviour
     private enum BState { Idle, Starting, Holding, Recovery }
     private BState curState = BState.Idle;
 
-    public bool IsBlocking => curState == BState.Holding;
+    public bool IsBlocking => curState == BState.Holding || curState == BState.Starting;
     public bool IsInRecovery => curState == BState.Recovery;
-
 
     private void Awake()
     {
         anim = GetComponent<Animator>();
-        mLock = GetComponent<MovementLock>();     
+        mLock = GetComponent<MovementLock>();
     }
 
     private void Update()
@@ -56,7 +55,6 @@ public class BlockController : MonoBehaviour
                 EnterRecovery();
         }
     }
-
 
     private bool IsInHitAnimation()
     {

@@ -15,9 +15,8 @@ public class Health : MonoBehaviour
     void Awake()
     {
         faction = GetComponent<FactionId>();
-        myId = gameObject.GetInstanceID(); 
+        myId = gameObject.GetInstanceID();
     }
-
 
     void OnEnable()
     {
@@ -41,15 +40,18 @@ public class Health : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId || IsDead) return;
+
+        if (e.isBlocked || BlockUtil.IsBlocked(this, e.attackerId)) return;
+
         hp = Mathf.Max(0, hp - e.amount);
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, hp == 0));
-        if (hp == 0) CoreBus.Publish(new HealthDepletedEvent(myId, faction ? faction.faction : Faction.Neutral, e.attackerId));
-    }
 
+        if (hp == 0)
+            CoreBus.Publish(new HealthDepletedEvent(myId, faction != null ? faction.faction : Faction.Neutral, e.attackerId));
+    }
 
     [SerializeField] private float deathDelay = 0f;
     public float DeathDelay => deathDelay;
-
 
     public int EntityId => myId;
 
@@ -58,5 +60,4 @@ public class Health : MonoBehaviour
         hp = maxHp;
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
     }
-
 }

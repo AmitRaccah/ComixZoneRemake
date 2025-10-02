@@ -12,6 +12,8 @@ public struct DamageEvent
     //VFX
     public AttackData attackData;
 
+    public bool isBlocked;
+
 }
 
 public struct AttackPerformedEvent
@@ -90,5 +92,22 @@ public struct HealthDepletedEvent
         this.entityId = entityId;
         this.faction = faction;
         this.killerId = killerId;
+    }
+}
+
+public struct StunChangedEvent
+{
+    public int entityId;
+    public bool isStunned;
+    public StunChangedEvent(int id, bool s) { entityId = id; isStunned = s; }
+}
+
+public struct EnemyDefeatedEvent
+{
+    public readonly string encounterId;
+
+    public EnemyDefeatedEvent(string encounterId)
+    {
+        this.encounterId = encounterId;
     }
 }

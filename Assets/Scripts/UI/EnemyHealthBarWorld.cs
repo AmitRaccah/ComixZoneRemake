@@ -10,8 +10,10 @@ public class EnemyHealthBarWorld : MonoBehaviour
     private void OnEnable()
     {
         if (!target || !slider) { enabled = false; return; }
+
         CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged);
-        //  StartCoroutine(InitialSync());
+
+        StartCoroutine(InitialSync());
     }
 
     private void OnDisable()
@@ -19,11 +21,15 @@ public class EnemyHealthBarWorld : MonoBehaviour
         CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged);
     }
 
-    //private IEnumerator InitialSync()
-    //{
-    //    yield return null;
-    //    Apply(target.CurrentHp, target.MaxHp);
-    //}
+    private IEnumerator InitialSync()
+    {
+        yield return null;
+
+        if (target != null)
+        {
+            Apply(target.CurrentHp, target.MaxHp);
+        }
+    }
 
     private void OnHealthChanged(HealthChangedEvent e)
     {

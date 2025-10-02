@@ -1,29 +1,24 @@
 using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(FactionId))]
-[RequireComponent(typeof(Animator))]
 public class DeathHandler : MonoBehaviour
 {
-    [Header("Death FX")]
     [SerializeField] private string deathTriggerName = "Death";
+    [SerializeField] private float poolReleaseDelay = 0f;
 
-    private int myId;
-    private FactionId faction;
     private Animator anim;
-    private int deathHash;
+    private bool isDying = false;
+    private int myId;
 
     void Awake()
     {
-        faction = GetComponent<FactionId>();
         anim = GetComponent<Animator>();
-        myId = gameObject.GetInstanceID();   
-        deathHash = Animator.StringToHash(deathTriggerName);
+        myId = gameObject.GetInstanceID();
     }
-
 
     void OnEnable()
     {
+        isDying = false;
         CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
     }
 
@@ -35,25 +30,49 @@ public class DeathHandler : MonoBehaviour
     private void OnDead(HealthDepletedEvent e)
     {
         if (e.entityId != myId) return;
+        HandleDeath(e.killerId);
+    }
 
-        bool isPlayer = CompareTag("Player") || (faction != null && faction.faction == Faction.Player);
+    public void HandleDeath(int killerId = -1)
+    {
+        if (isDying) return;
+        isDying = true;
 
-        if (anim != null) anim.SetTrigger(deathHash);
-
-        if (isPlayer)
+        if (anim != null)
         {
-            CombatBus.Publish(new PlayerDownEvent(myId, e.killerId));
+            anim.SetTrigger(deathTriggerName);
+        }
+
+        if (CompareTag("Player"))
+        {
+            CombatBus.Publish(new PlayerDownEvent(myId, killerId));
             return;
         }
 
-        StartCoroutine(RemoveAfterDelayFromHealth());
+        EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
+        if (pooled != null && !string.IsNullOrEmpty(pooled.currentEncounterId))
+        {
+            CoreBus.Publish(new EnemyDefeatedEvent(pooled.currentEncounterId));
+        }
+
+        StartCoroutine(ReleaseAfterDelays());
     }
 
-    private IEnumerator RemoveAfterDelayFromHealth()
+    private IEnumerator ReleaseAfterDelays()
     {
-        Health h = GetComponent<Health>();
-        float delay = h != null ? h.DeathDelay : 0f;
-        if (delay > 0f) yield return new WaitForSeconds(delay);
-        Destroy(gameObject);
+        if (poolReleaseDelay > 0f)
+        {
+            yield return new WaitForSeconds(poolReleaseDelay);
+        }
+
+        EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
+        if (pooled != null)
+        {
+            pooled.Release();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

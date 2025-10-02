@@ -1,13 +1,7 @@
-
-
-
 using UnityEngine;
 using Unity.Behavior;
 
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(BehaviorGraphAgent))]
-[RequireComponent(typeof(EnemyCombatState))]
+
 public class EnemyCore : MonoBehaviour
 {
     public Animator Anim { get; private set; }
@@ -35,14 +29,13 @@ public class EnemyCore : MonoBehaviour
         p.z = laneZ;
         transform.position = p;
 
-        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        //Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
     private void OnEnable()
     {
         CombatBus.Subscribe<DamageEvent>(OnDamage);
-
-        Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
+        //Body.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionZ;
     }
 
     private void OnDisable()
@@ -50,22 +43,31 @@ public class EnemyCore : MonoBehaviour
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
     }
 
-    private void FixedUpdate()
-    {
-        Vector3 v = Body.linearVelocity;
-        if (v.z != 0f)
-        {
-            v.z = 0f;
-            Body.linearVelocity = v;
-        }
+    //private void FixedUpdate()
+    //{
+    //    Vector3 v = Body.linearVelocity;
+    //    if (v.z != 0f)
+    //    {
+    //        v.z = 0f;
+    //        Body.linearVelocity = v;
+    //    }
 
-        Vector3 pos = Body.position;
-        if (pos.z != laneZ)
-        {
-            pos.z = laneZ;
-            Body.position = pos;
-        }
-    }
+    //    Vector3 pos = Body.position;
+    //    if (pos.z != laneZ)
+    //    {
+    //        pos.z = laneZ;
+    //        Body.position = pos;
+    //    }
+    //}
+
+    //private void LateUpdate()
+    //{
+    //    float y = transform.eulerAngles.y;
+    //    float d90 = Mathf.Abs(Mathf.DeltaAngle(y, 90f));
+    //    float dm90 = Mathf.Abs(Mathf.DeltaAngle(y, -90f));
+    //    float target = (d90 <= dm90) ? 90f : -90f;
+    //    transform.rotation = Quaternion.Euler(0f, target, 0f);
+    //}
 
     private void Update()
     {
@@ -83,8 +85,20 @@ public class EnemyCore : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId) return;
+
+        if (e.isBlocked) return;
+
         if (combatState != null) combatState.RegisterHit();
         if (AI != null) AI.SetVariableValue("IsStunned", true);
+
+        if (AttackActivator.TransformsById.TryGetValue(e.attackerId, out var atk))
+        {
+            Vector3 toAtt = (atk.position - transform.position).normalized;
+            bool fromBehind = Vector3.Dot(transform.forward, toAtt) < 0f;
+            bool attackerOnRight = (atk.position.x - transform.position.x) > 0f;
+
+            AI?.SetVariableValue("HitFromBehind", fromBehind);
+            AI?.SetVariableValue("AttackerOnRight", attackerOnRight);
+        }
     }
 }
-

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class HitStunController : MonoBehaviour
@@ -6,8 +6,8 @@ public class HitStunController : MonoBehaviour
     [SerializeField] private float defaultHitStun = 0.25f;
     public bool IsStunned { get; private set; }
     private int myId;
-    void Awake() => myId = gameObject.GetInstanceID();
 
+    void Awake() => myId = gameObject.GetInstanceID();
     void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
     void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
 
@@ -15,6 +15,7 @@ public class HitStunController : MonoBehaviour
     {
         if (e.targetId != myId) return;
 
+        if (e.isBlocked || BlockUtil.IsBlocked(this, e.attackerId)) return;
         float dur = (e.freezeFrameDuration > 0f)
             ? Mathf.Max(defaultHitStun, e.freezeFrameDuration)
             : defaultHitStun;
@@ -22,6 +23,7 @@ public class HitStunController : MonoBehaviour
         StopAllCoroutines();
         StartCoroutine(StunFor(dur));
     }
+
     private IEnumerator StunFor(float dur)
     {
         IsStunned = true;
@@ -31,4 +33,3 @@ public class HitStunController : MonoBehaviour
         CombatBus.Publish(new StunChangedEvent(myId, false));
     }
 }
-public struct StunChangedEvent { public int entityId; public bool isStunned; public StunChangedEvent(int id, bool s) { entityId = id; isStunned = s; } }
