@@ -10156,7 +10156,7 @@ Transform:
   m_GameObject: {fileID: 375656128}
   serializedVersion: 2
   m_LocalRotation: {x: 0.062377732, y: -0.03550883, z: -0.0020806193, w: -0.99741864}
-  m_LocalPosition: {x: -0.64, y: 1.78, z: -5.065}
+  m_LocalPosition: {x: -0.64, y: 1.39, z: -4.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15244,13 +15244,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 662529915}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.07639165, y: -0.5588992, z: 0.3815634, w: 0.7322604}
-  m_LocalPosition: {x: 9.99, y: 10.19, z: 7.49}
+  m_LocalRotation: {x: -0.38799483, y: -0.65938824, z: 0.029741634, w: -0.64325947}
+  m_LocalPosition: {x: 9.99, y: 5.65, z: 7.49}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 32.574, y: -64.44, z: 34.18}
+  m_LocalEulerAnglesHint: {x: 32.574, y: -258.315, z: 34.179}
 --- !u!114 &662529918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49797,63 +49797,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!1001 &2068103028
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.487
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1.638
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -1.1731168
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
-      propertyPath: m_Name
-      value: TEAR4
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: af05842e383d8f44b97c0b98c1782952, type: 3}
 --- !u!1 &2099448138
 GameObject:
   m_ObjectHideFlags: 0
@@ -64531,6 +64474,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RealisticInk
       objectReference: {fileID: 0}
+    - target: {fileID: 4572456378145619573, guid: 72595ab33cd048640bdfa2ef02886cd3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6035330173611238859, guid: 72595ab33cd048640bdfa2ef02886cd3, type: 3}
       propertyPath: ShapeModule.m_MeshRenderer
       value: 
@@ -64683,4 +64630,3 @@ SceneRoots:
   - {fileID: 1304489093}
   - {fileID: 1526270391}
   - {fileID: 1326688757}
-  - {fileID: 2068103028}
