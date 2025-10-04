@@ -1406,6 +1406,10 @@ PrefabInstance:
       propertyPath: maxHp
       value: 80
       objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -426
@@ -9918,6 +9922,10 @@ PrefabInstance:
       propertyPath: maxHp
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -337.2
@@ -12952,6 +12960,10 @@ PrefabInstance:
       propertyPath: deathDelay
       value: 2.5
       objectReference: {fileID: 0}
+    - target: {fileID: 2653474030131112429, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2670376115971467160, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       propertyPath: m_Layer
       value: 6
@@ -13432,17 +13444,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 164979223501177955, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8672319952020327962, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       propertyPath: m_Name
       value: Barrel (5)
       objectReference: {fileID: 0}
     - target: {fileID: 8974952067974198408, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -457.933
+      value: -458.37
       objectReference: {fileID: 0}
     - target: {fileID: 8974952067974198408, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.92
+      value: 3.91
       objectReference: {fileID: 0}
     - target: {fileID: 8974952067974198408, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -13480,6 +13496,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8672319952020327962, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1394887844}
     - targetCorrespondingSourceObject: {fileID: 8672319952020327962, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1394887843}
@@ -35540,6 +35559,10 @@ PrefabInstance:
       propertyPath: maxHp
       value: 200
       objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -480.11
@@ -44057,6 +44080,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &628170196
 Animator:
@@ -76554,6 +76578,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &1264579580
 Animator:
@@ -78958,6 +78983,10 @@ PrefabInstance:
     - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: maxHp
       value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
@@ -82218,19 +82247,40 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8672319952020327962, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
   m_PrefabInstance: {fileID: 247779512}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1394887843
+--- !u!65 &1394887843
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394887834}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1.2256889, z: 1}
+  m_Center: {x: 0, y: -0.11284447, z: 0}
+--- !u!114 &1394887844
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1394887834}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f1b63ccbcb045de48a85f1a45cc775a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attack: {fileID: 11400000, guid: b0832a85f2ec7494082c939e3ef0e047, type: 2}
+  attack: {fileID: 11400000, guid: 5a3df0bfb2058724d8fcfe842da848c1, type: 2}
   targetLayers:
     serializedVersion: 2
     m_Bits: 64
@@ -110107,6 +110157,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &1876916364
 Animator:
@@ -112779,6 +112830,10 @@ PrefabInstance:
     - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: deathDelay
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7139903764344225786, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: resetHpOnEnable
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8039017682478004694, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_LocalPosition.x
