@@ -1,11 +1,11 @@
+// DeathVfxSpawner.cs
 using UnityEngine;
 
 [AddComponentMenu("Combat/Health/Death VFX Spawner")]
 public class DeathVfxSpawner : MonoBehaviour
 {
     [Header("VFX Settings")]
-    [SerializeField] private GameObject deathVfxPrefab;
-    [SerializeField] private Vector3 localOffset = Vector3.zero;
+    [SerializeField] private ParticleEffectData deathVfx;
 
     [Header("Lifetime")]
     [Tooltip("Fallback lifetime used when the spawned VFX has no finite particle duration.")]
@@ -40,13 +40,24 @@ public class DeathVfxSpawner : MonoBehaviour
         if (e.entityId != entityId)
             return;
 
-        if (deathVfxPrefab == null)
+        if (VfxPoolManager.Instance == null)
             return;
 
-        Vector3 spawnPosition = ParticleEffectUtility.CalculateSpawnPosition(transform.position, transform, localOffset);
+        if (deathVfx == null || string.IsNullOrEmpty(deathVfx.vfxId))
+            return;
 
-        GameObject vfxInstance = Instantiate(deathVfxPrefab, spawnPosition, Quaternion.identity);
+        Vector3 spawnPosition = ParticleEffectUtility.CalculateSpawnPosition(
+            transform.position, transform, deathVfx.localOffset
+        );
 
-        ParticleEffectUtility.DestroyAfterLifetime(vfxInstance, fallbackLifetimeSeconds);
+        GameObject spawned = VfxPoolManager.Instance.Spawn(
+            deathVfx.vfxId, spawnPosition, transform.rotation
+        );
+        if (!spawned) return;
+
+        var member = spawned.GetComponent<VfxPoolMember>();
+        if (!member) return;
+
+        ParticleEffectUtility.ReturnAfterLifetime(member, fallbackLifetimeSeconds);
     }
 }
