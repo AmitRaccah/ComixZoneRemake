@@ -55,6 +55,7 @@ public static class ParticleEffectUtility
         return maxLifetime;
     }
 
+    // return to pool instead of Destroy
     public static void ReturnAfterLifetime(VfxPoolMember member, float fallbackLifetimeSeconds)
     {
         if (!member) return;
@@ -64,14 +65,20 @@ public static class ParticleEffectUtility
     private static IEnumerator ReturnRoutine(VfxPoolMember member, float fallbackLifetimeSeconds)
     {
         var go = member.gameObject;
-        float waitTime = CalculateLifetime(go);
-        if (waitTime <= 0f)
-            waitTime = fallbackLifetimeSeconds;
+        float inferred = CalculateLifetime(go);
 
-        if (waitTime > 0f)
-            yield return new WaitForSeconds(waitTime);
-
-        if (VfxPoolManager.Instance != null)
-            VfxPoolManager.Instance.Return(member);
+        if (inferred > 0f)
+        {
+            yield return new WaitForSeconds(inferred + 0.05f);
+            if (member && member.IsActive && VfxPoolManager.Instance != null)
+                VfxPoolManager.Instance.Return(member);
+        }
+        else if (fallbackLifetimeSeconds > 0f)
+        {
+            yield return new WaitForSeconds(fallbackLifetimeSeconds);
+            if (member && member.IsActive && VfxPoolManager.Instance != null)
+                VfxPoolManager.Instance.Return(member);
+        }
+        // if inferred == 0 and fallback == 0 → looping with no fallback: rely on OnParticleSystemStopped (Callback)
     }
 }

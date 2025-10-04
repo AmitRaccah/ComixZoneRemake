@@ -1,11 +1,10 @@
-// DeathVfxSpawner.cs
 using UnityEngine;
 
 [AddComponentMenu("Combat/Health/Death VFX Spawner")]
 public class DeathVfxSpawner : MonoBehaviour
 {
     [Header("VFX Settings")]
-    [SerializeField] private ParticleEffectData deathVfx;
+    [SerializeField] private ParticleEffectData deathVfx; // use pooled id instead of prefab
 
     [Header("Lifetime")]
     [Tooltip("Fallback lifetime used when the spawned VFX has no finite particle duration.")]
@@ -50,6 +49,7 @@ public class DeathVfxSpawner : MonoBehaviour
             transform.position, transform, deathVfx.localOffset
         );
 
+        // spawn from pool (no Instantiate)
         GameObject spawned = VfxPoolManager.Instance.Spawn(
             deathVfx.vfxId, spawnPosition, transform.rotation
         );
@@ -58,6 +58,7 @@ public class DeathVfxSpawner : MonoBehaviour
         var member = spawned.GetComponent<VfxPoolMember>();
         if (!member) return;
 
+        // auto-return to pool after lifetime (fallback if looping)
         ParticleEffectUtility.ReturnAfterLifetime(member, fallbackLifetimeSeconds);
     }
 }
