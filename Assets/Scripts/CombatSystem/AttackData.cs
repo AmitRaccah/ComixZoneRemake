@@ -21,6 +21,12 @@ public class AttackData : ScriptableObject
     public List<ParticleEffectData> additionalHitEffects = new List<ParticleEffectData>();
     public List<ParticleEffectData> blockHitEffects = new List<ParticleEffectData>();
 
+    [Header("Audio")]
+    public AudioCue swingSfx;
+    public AudioCue hitSfx;
+    public AudioCue blockSfx;
+
+
     public float GetShakeAmplitude(bool blocked)
     {
         if (!blocked) return shakeAmplitude;
@@ -37,18 +43,16 @@ public class AttackData : ScriptableObject
     {
         if (blocked)
         {
-            if (blockHitEffects != null && blockHitEffects.Count > 0)
-                return blockHitEffects;
-
+            if (blockHitEffects != null && blockHitEffects.Count > 0) return blockHitEffects;
             return null;
         }
-
-        if (additionalHitEffects != null && additionalHitEffects.Count > 0)
-            return additionalHitEffects;
-
+        if (additionalHitEffects != null && additionalHitEffects.Count > 0) return additionalHitEffects;
         return null;
     }
+
+    public AudioCue GetImpactCue(bool blocked) => blocked ? blockSfx : hitSfx;
 }
+
 
 public enum DamageType
 {

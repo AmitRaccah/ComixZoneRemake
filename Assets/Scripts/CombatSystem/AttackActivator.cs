@@ -83,38 +83,29 @@ public class AttackActivator : MonoBehaviour
     //        return;  
 
     public void BeginHitbox(string attackKey = "")
-
     {
-
         AttackData data = null;
 
         if (!string.IsNullOrEmpty(attackKey) && map.TryGetValue(attackKey, out var explicitData))
-
             data = explicitData;
-
         else
-
             data = _currentAttack;
 
         if (data == null) return;
 
         bool mirrored = animator.GetBool("Mirror");
-
         var side = mirrored ? GetMirroredSide(data.side) : data.side;
-
         var socket = GetSocketForSide(side);
-
         if (!socket) return;
 
+        CombatBus.Publish(new AttackStartedEvent(myId, data, socket));
+
         var go = Instantiate(hitboxPrefab);
-
         activeHitbox = go.GetComponent<HitboxController>();
-
         activeHitbox.Init(data, socket, myId);
-
         activeHitbox.OnFirstHit += KillHitbox;
-
     }
+
 
     public void EndHitbox()
 
