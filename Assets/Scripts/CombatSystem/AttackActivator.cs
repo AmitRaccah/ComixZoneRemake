@@ -100,10 +100,17 @@ public class AttackActivator : MonoBehaviour
 
         CombatBus.Publish(new AttackStartedEvent(myId, data, socket));
 
-        var go = Instantiate(hitboxPrefab);
-        activeHitbox = go.GetComponent<HitboxController>();
-        activeHitbox.Init(data, socket, myId);
+        activeHitbox = HitboxPool.Instance.Spawn(socket, data, myId);
         activeHitbox.OnFirstHit += KillHitbox;
+    }
+
+    void KillHitbox()
+    {
+        if (activeHitbox == null) return;
+        activeHitbox.OnFirstHit -= KillHitbox;
+        activeHitbox.Despawn();       
+        activeHitbox = null;
+        _currentAttack = null;
     }
 
 
@@ -115,21 +122,6 @@ public class AttackActivator : MonoBehaviour
 
     }
 
-    void KillHitbox()
-
-    {
-
-        if (activeHitbox == null) return;
-
-        activeHitbox.OnFirstHit -= KillHitbox;
-
-        Destroy(activeHitbox.gameObject);
-
-        activeHitbox = null;
-
-        _currentAttack = null;
-
-    }
 
     Transform GetSocketForSide(AttackSide side)
 
