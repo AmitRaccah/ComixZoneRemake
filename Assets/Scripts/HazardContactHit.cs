@@ -1,18 +1,19 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Collider))]
 public class HazardContactHit : MonoBehaviour
 {
     [SerializeField] private AttackData attack;
     [SerializeField] private LayerMask targetLayers;
 
     private int attackerId;
-    private Collider col;
+    //private Collider col;
 
-    void Awake()
-    {
-        col = GetComponent<Collider>();
-        col.isTrigger = true;
-    }
+    //void Awake()
+    //{
+    //    col = GetComponent<Collider>();
+    //    col.isTrigger = true;
+    //}
 
     void OnEnable()
     {

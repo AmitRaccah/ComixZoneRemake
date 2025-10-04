@@ -4,13 +4,23 @@
 public class Health : MonoBehaviour
 {
     [SerializeField] private int maxHp = 20;
+
+    [Header("Lifecycle")]
+    [Tooltip("If true, HP will reset to Max on every OnEnable (useful for pooled enemies). Keep OFF for the Player.")]
+    [SerializeField] private bool resetHpOnEnable = false;
+
+    [SerializeField] private float deathDelay = 0f;
+
     private int hp;
     private int myId;
     private FactionId faction;
+    private bool initialized;
 
     public int CurrentHp => hp;
     public int MaxHp => maxHp;
     public bool IsDead => hp <= 0;
+    public float DeathDelay => deathDelay;
+    public int EntityId => myId;
 
     void Awake()
     {
@@ -20,10 +30,20 @@ public class Health : MonoBehaviour
 
     void OnEnable()
     {
-        hp = maxHp;
+        if (!initialized)
+        {
+            hp = maxHp;
+            initialized = true;
+        }
+        else if (resetHpOnEnable)
+        {
+            hp = maxHp;
+        }
+
         CoreBus.Publish(new HealthChangedEvent(myId, hp, maxHp, false));
         CombatBus.Subscribe<DamageEvent>(OnDamage);
     }
+
     void OnDisable()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
@@ -40,7 +60,6 @@ public class Health : MonoBehaviour
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId || IsDead) return;
-
         if (e.isBlocked || BlockUtil.IsBlocked(this, e.attackerId)) return;
 
         hp = Mathf.Max(0, hp - e.amount);
@@ -49,11 +68,6 @@ public class Health : MonoBehaviour
         if (hp == 0)
             CoreBus.Publish(new HealthDepletedEvent(myId, faction != null ? faction.faction : Faction.Neutral, e.attackerId));
     }
-
-    [SerializeField] private float deathDelay = 0f;
-    public float DeathDelay => deathDelay;
-
-    public int EntityId => myId;
 
     public void RespawnReset()
     {
