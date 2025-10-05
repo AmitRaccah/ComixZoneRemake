@@ -10,8 +10,11 @@ public class HitReaction : MonoBehaviour
     private BlockController bc;
     private int myId;
     private int hitHash;
-    private bool queuedHit;
     private bool wasBlocking;
+
+    private bool isDead = false;
+
+    private const string HitStateName = "TakeHit";
 
     private void Awake()
     {
@@ -21,76 +24,54 @@ public class HitReaction : MonoBehaviour
         hitHash = Animator.StringToHash(hitTrigger);
     }
 
-    private void OnEnable() => CombatBus.Subscribe<DamageEvent>(OnDamage);
-    private void OnDisable() => CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+    private void OnEnable()
+    {
+        CombatBus.Subscribe<DamageEvent>(OnDamage);
+        CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged);
+    }
+
+    private void OnDisable()
+    {
+        CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+        CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged);
+    }
 
     private void Update()
     {
         bool nowBlocking = bc && bc.IsBlocking;
         if (nowBlocking && !wasBlocking)
-        {
-            queuedHit = false;
             anim.ResetTrigger(hitHash);
-        }
         wasBlocking = nowBlocking;
     }
 
     private void OnDamage(DamageEvent e)
     {
         if (e.targetId != myId) return;
-
-        if (e.isBlocked)
-        {
-            queuedHit = false;
-            anim.ResetTrigger(hitHash);
-            return;
-        }
-
-        if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId))
-        {
-            queuedHit = false;
-            anim.ResetTrigger(hitHash);
-            return;
-        }
-
-        if (IsInAttack())
-        {
-            queuedHit = true;
-            anim.ResetTrigger(hitHash);
-            anim.SetTrigger(hitHash);
-            return;
-        }
+        if (isDead) return;                               
+        if (e.isBlocked) return;
+        if (bc && bc.IsBlocking && IsFacingAttacker(e.attackerId)) return;
 
         anim.ResetTrigger(hitHash);
-        anim.SetTrigger(hitHash);
+        anim.Play(HitStateName, 0, 0f);
+        anim.Update(0f);
     }
 
-    public void CheckQueuedHit()
+    private void OnDead(HealthDepletedEvent e)
     {
-        if (!queuedHit) return;
-        queuedHit = false;
-
-        if (bc && bc.IsBlocking)
-        {
-            anim.ResetTrigger(hitHash);
-            return;
-        }
-
+        if (e.entityId != myId) return;
+        isDead = true;
         anim.ResetTrigger(hitHash);
-        anim.SetTrigger(hitHash);
     }
 
-    private bool IsInAttack()
+    private void OnHealthChanged(HealthChangedEvent e)
     {
-        var s = anim.GetCurrentAnimatorStateInfo(0);
-        if (s.IsTag(attackTag)) return true;
-        if (anim.IsInTransition(0))
-        {
-            var n = anim.GetNextAnimatorStateInfo(0);
-            if (n.IsTag(attackTag)) return true;
-        }
-        return false;
+        if (e.entityId != myId) return;
+        if (!e.isDead && e.current > 0) isDead = false;   
     }
+
+    public void CheckQueuedHit() { }
 
     private bool IsFacingAttacker(int attackerId)
     {
