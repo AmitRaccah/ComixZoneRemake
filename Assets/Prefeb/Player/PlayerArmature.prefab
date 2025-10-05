@@ -348,8 +348,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2494e6c4fc4aede46900355633047b00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leftHandSocket: {fileID: 7352927945075265050}
-  rightHandSocket: {fileID: 8922161351712730404}
+  leftHandSocket: {fileID: 8332958441340870470}
+  rightHandSocket: {fileID: 3731700391331455663}
   leftFootSocket: {fileID: 7051907721886978282}
   rightFootSocket: {fileID: 891652705702664686}
   attacks:
@@ -643,6 +643,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathTriggerName: Death
+  poolReleaseDelay: 0
 --- !u!114 &6065251301749083187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -805,6 +806,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5847514152125872526, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
   m_PrefabInstance: {fileID: 6735487606305611872}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &3731700391331455663 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1247237651839647025, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
+  m_PrefabInstance: {fileID: 6735487606305611872}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6553858099824363403 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
@@ -815,13 +821,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4369664814990766218, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
   m_PrefabInstance: {fileID: 6735487606305611872}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7352927945075265050 stripped
+--- !u!4 &8332958441340870470 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -4939433630546694534, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
-  m_PrefabInstance: {fileID: 6735487606305611872}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &8922161351712730404 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2785652501832666436, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
+  m_CorrespondingSourceObject: {fileID: -5846270692196909274, guid: 0b863cd2745a35b4eb75c625bc2f2f34, type: 3}
   m_PrefabInstance: {fileID: 6735487606305611872}
   m_PrefabAsset: {fileID: 0}
