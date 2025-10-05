@@ -111,3 +111,17 @@ public struct EnemyDefeatedEvent
         this.encounterId = encounterId;
     }
 }
+
+public struct AttackStartedEvent
+{
+    public int attackerId;
+    public AttackData attack;
+    public UnityEngine.Transform socket;
+
+    public AttackStartedEvent(int attackerId, AttackData attack, UnityEngine.Transform socket)
+    {
+        this.attackerId = attackerId;
+        this.attack = attack;
+        this.socket = socket;
+    }
+}

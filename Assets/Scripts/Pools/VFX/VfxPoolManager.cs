@@ -37,9 +37,7 @@ public class VfxPoolManager : MonoBehaviour
             if (effect.vfxId == vfxId && !effect.IsActive)
             {
                 effect.PrepareForSpawn(position, rotation);
-
                 nextIndexPerId[vfxId] = (currentIndex + 1) % effectsInScene.Count;
-
                 return effect.gameObject;
             }
         }

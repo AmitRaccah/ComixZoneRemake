@@ -20,11 +20,21 @@ public class DeathHandler : MonoBehaviour
     {
         isDying = false;
         CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged); // NEW
     }
 
     void OnDisable()
     {
         CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged); // NEW
+    }
+
+    private void OnHealthChanged(HealthChangedEvent e) // NEW
+    {
+        if (e.entityId != myId) return;
+        // אם חזרנו לחיים (HP>0), אפשר לשחרר את הנעילה
+        if (isDying && !e.isDead && e.current > 0)
+            isDying = false;
     }
 
     private void OnDead(HealthDepletedEvent e)
@@ -39,9 +49,7 @@ public class DeathHandler : MonoBehaviour
         isDying = true;
 
         if (anim != null)
-        {
             anim.SetTrigger(deathTriggerName);
-        }
 
         if (CompareTag("Player"))
         {
@@ -51,9 +59,7 @@ public class DeathHandler : MonoBehaviour
 
         EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
         if (pooled != null && !string.IsNullOrEmpty(pooled.currentEncounterId))
-        {
             CoreBus.Publish(new EnemyDefeatedEvent(pooled.currentEncounterId));
-        }
 
         StartCoroutine(ReleaseAfterDelays());
     }
@@ -61,18 +67,10 @@ public class DeathHandler : MonoBehaviour
     private IEnumerator ReleaseAfterDelays()
     {
         if (poolReleaseDelay > 0f)
-        {
             yield return new WaitForSeconds(poolReleaseDelay);
-        }
 
         EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
-        if (pooled != null)
-        {
-            pooled.Release();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (pooled != null) pooled.Release();
+        else Destroy(gameObject);
     }
 }

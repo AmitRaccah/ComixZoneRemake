@@ -26,7 +26,7 @@ public class VfxPoolMember : MonoBehaviour
         var main = mainParticleSystem.main;
         if (main.stopAction != ParticleSystemStopAction.Callback)
         {
-            Debug.LogWarning($"The main particle system on {gameObject.name} does not have StopAction set to Callback. Auto-return to pool will not work.", this);
+            main.stopAction = ParticleSystemStopAction.Callback;
         }
     }
 
@@ -34,22 +34,24 @@ public class VfxPoolMember : MonoBehaviour
     {
         if (IsActive) return;
 
-        gameObject.SetActive(true);
         transform.SetPositionAndRotation(position, rotation);
+        gameObject.SetActive(true);
 
-        foreach (var ps in allParticleSystems)
-        {
-            ps.Play(true);
-        }
+        if (allParticleSystems == null || allParticleSystems.Length == 0)
+            allParticleSystems = GetComponentsInChildren<ParticleSystem>(true);
+
+        for (int i = 0; i < allParticleSystems.Length; i++)
+            allParticleSystems[i].Play(true);
 
         IsActive = true;
     }
 
     public void ReturnToPool()
     {
-        foreach (var ps in allParticleSystems)
+        if (allParticleSystems != null)
         {
-            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            for (int i = 0; i < allParticleSystems.Length; i++)
+                allParticleSystems[i].Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
         }
 
         IsActive = false;
@@ -58,7 +60,7 @@ public class VfxPoolMember : MonoBehaviour
 
     private void OnParticleSystemStopped()
     {
-        if (VfxPoolManager.Instance != null)
+        if (IsActive && VfxPoolManager.Instance != null)
         {
             VfxPoolManager.Instance.Return(this);
         }

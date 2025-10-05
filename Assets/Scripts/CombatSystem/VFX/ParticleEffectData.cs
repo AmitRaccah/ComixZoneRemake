@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 [System.Serializable]
 public class ParticleEffectData
@@ -7,6 +8,7 @@ public class ParticleEffectData
     public string vfxId;
     public Vector3 localOffset = Vector3.zero;
 }
+
 public static class ParticleEffectUtility
 {
     public static Vector3 CalculateSpawnPosition(Vector3 basePosition, Transform basis, Vector3 localOffset)
@@ -24,14 +26,11 @@ public static class ParticleEffectUtility
         for (int i = 0; i < particleSystems.Length; i++)
         {
             var system = particleSystems[i];
-            if (!system)
-                continue;
+            if (!system) continue;
 
             var main = system.main;
             if (main.loop)
-            {
                 return 0f;
-            }
 
             float systemLifetime = main.duration;
             var startLifetime = main.startLifetime;
@@ -50,32 +49,36 @@ public static class ParticleEffectUtility
             }
 
             if (systemLifetime > maxLifetime)
-            {
                 maxLifetime = systemLifetime;
-            }
         }
 
         return maxLifetime;
     }
 
-    public static void DestroyAfterLifetime(GameObject vfxInstance, float fallbackLifetimeSeconds)
+    // return to pool instead of Destroy
+    public static void ReturnAfterLifetime(VfxPoolMember member, float fallbackLifetimeSeconds)
     {
-        if (!vfxInstance)
-            return;
+        if (!member) return;
+        member.StartCoroutine(ReturnRoutine(member, fallbackLifetimeSeconds));
+    }
 
-        float waitTime = CalculateLifetime(vfxInstance);
-        if (waitTime <= 0f)
-        {
-            waitTime = fallbackLifetimeSeconds;
-        }
+    private static IEnumerator ReturnRoutine(VfxPoolMember member, float fallbackLifetimeSeconds)
+    {
+        var go = member.gameObject;
+        float inferred = CalculateLifetime(go);
 
-        if (waitTime > 0f)
+        if (inferred > 0f)
         {
-            Object.Destroy(vfxInstance, waitTime);
+            yield return new WaitForSeconds(inferred + 0.05f);
+            if (member && member.IsActive && VfxPoolManager.Instance != null)
+                VfxPoolManager.Instance.Return(member);
         }
-        else
+        else if (fallbackLifetimeSeconds > 0f)
         {
-            Object.Destroy(vfxInstance);
+            yield return new WaitForSeconds(fallbackLifetimeSeconds);
+            if (member && member.IsActive && VfxPoolManager.Instance != null)
+                VfxPoolManager.Instance.Return(member);
         }
+        // if inferred == 0 and fallback == 0 → looping with no fallback: rely on OnParticleSystemStopped (Callback)
     }
 }
