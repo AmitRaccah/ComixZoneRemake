@@ -7,32 +7,48 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Desk
-  m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: 592b725b371219045becb2d1e4ebe828, type: 2}
+  m_Name: StickyNote_Wind
+  m_Shader: {fileID: -6465566751694194690, guid: 40a74d02a713ffc48b38f513cbd8acdd, type: 3}
+  m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
-  m_LightmapFlags: 4
+  m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap:
-    RenderType: Opaque
+  stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _Amp: 0.02
+    - _Phase: 19.19
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _Speed: 2.45
     m_Colors:
-    - _BaseColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 1}
-    - _Color: {r: 0.16037735, g: 0.16037735, b: 0.16037735, a: 1}
+    - _Color: {r: 1, g: 0.7549823, b: 0.25943398, a: 0}
+    - _WindDir: {r: 7.87, g: 2.37, b: 2.17, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &240909914089615497
+--- !u!114 &474174260608055026
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
