@@ -125,3 +125,32 @@ public struct AttackStartedEvent
         this.socket = socket;
     }
 }
+
+
+public enum HazardSide { Left, Right }
+
+public struct HazardSweepRequest
+{
+    public string hazardId;    
+    public HazardSide side;   
+    public float warningLeadTime;
+
+    public HazardSweepRequest(string hazardId, HazardSide side, float warningLeadTime = 0f)
+    {
+        this.hazardId = hazardId;
+        this.side = side;
+        this.warningLeadTime = warningLeadTime;
+    }
+}
+
+public struct HazardWarningEvent
+{
+    public HazardSide side;
+    public float etaSeconds;
+    public HazardWarningEvent(HazardSide side, float etaSeconds)
+    {
+        this.side = side;
+        this.etaSeconds = etaSeconds;
+    }
+}
+
