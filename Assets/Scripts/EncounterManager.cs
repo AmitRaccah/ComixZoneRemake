@@ -4,35 +4,38 @@ using System.Collections.Generic;
 public class EncounterManager : MonoBehaviour
 {
     [System.Serializable]
+    public class HazardTrigger
+    {
+        public int onKills;
+        public EnemyPoolMember hazard;
+        public string assignmentId;
+        public float delay;
+    }
+
+    [System.Serializable]
     public class Encounter
     {
-        [Tooltip("A unique name for this encounter, e.g., 'FirstCorridor' or 'BossRoom'.")]
         public string encounterId;
-
-        [Tooltip("How many enemy kills are required to complete this encounter.")]
         public int killsRequired = 1;
-
-        [Tooltip("GameObjects (gates, arrows, etc.) to enable once the encounter is completed.")]
         public GameObject[] objectsToEnable;
+        public HazardTrigger[] hazardTriggers;
 
         [HideInInspector] public int currentKills = 0;
         [HideInInspector] public bool isCompleted = false;
     }
 
-    [Tooltip("List of all the encounters in the level.")]
     [SerializeField] private Encounter[] encounters;
 
-    private Dictionary<string, Encounter> encounterLookup = new Dictionary<string, Encounter>();
+    private readonly Dictionary<string, Encounter> encounterLookup = new Dictionary<string, Encounter>();
 
     private void Awake()
     {
-        foreach (var encounter in encounters)
+        for (int i = 0; i < encounters.Length; i++)
         {
-            if (encounter != null && !string.IsNullOrEmpty(encounter.encounterId))
-            {
-                encounterLookup[encounter.encounterId] = encounter;
-                SetObjectsActive(encounter, false);
-            }
+            var enc = encounters[i];
+            if (enc == null || string.IsNullOrEmpty(enc.encounterId)) continue;
+            encounterLookup[enc.encounterId] = enc;
+            SetObjectsActive(enc, false);
         }
     }
 
@@ -48,36 +51,39 @@ public class EncounterManager : MonoBehaviour
 
     private void OnEnemyDefeated(EnemyDefeatedEvent e)
     {
-        if (encounterLookup.TryGetValue(e.encounterId, out Encounter encounter))
+        if (!encounterLookup.TryGetValue(e.encounterId, out var encounter)) return;
+        if (encounter.isCompleted) return;
+
+        encounter.currentKills++;
+        TriggerHazards(encounter, e.encounterId);
+
+        if (encounter.currentKills >= encounter.killsRequired)
         {
-            if (encounter.isCompleted) return;
-
-            encounter.currentKills++;
-            Debug.Log($"Kill registered for encounter '{e.encounterId}'. Total kills: {encounter.currentKills}/{encounter.killsRequired}");
-
-            if (encounter.currentKills >= encounter.killsRequired)
-            {
-                CompleteEncounter(encounter);
-            }
+            encounter.isCompleted = true;
+            SetObjectsActive(encounter, true);
         }
     }
 
-    private void CompleteEncounter(Encounter encounter)
+    private void TriggerHazards(Encounter encounter, string encounterId)
     {
-        Debug.Log($"Encounter '{encounter.encounterId}' completed!");
-        encounter.isCompleted = true;
-        SetObjectsActive(encounter, true);
+        if (encounter.hazardTriggers == null || EnemyPool.Instance == null) return;
+
+        for (int i = 0; i < encounter.hazardTriggers.Length; i++)
+        {
+            var t = encounter.hazardTriggers[i];
+            if (t == null || t.hazard == null) continue;
+            if (t.onKills == encounter.currentKills)
+                EnemyPool.Instance.ScheduleSpawn(t.hazard, t.assignmentId, encounterId, t.delay);
+        }
     }
 
     private void SetObjectsActive(Encounter encounter, bool isActive)
     {
         if (encounter.objectsToEnable == null) return;
-        foreach (var obj in encounter.objectsToEnable)
+        for (int i = 0; i < encounter.objectsToEnable.Length; i++)
         {
-            if (obj != null)
-            {
-                obj.SetActive(isActive);
-            }
+            var go = encounter.objectsToEnable[i];
+            if (go) go.SetActive(isActive);
         }
     }
 }
