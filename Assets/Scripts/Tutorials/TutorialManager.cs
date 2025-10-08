@@ -89,13 +89,13 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private List<TutorialStage> stages = new();
     [SerializeField] private bool autoStart = true;
 
+    [Header("Balloon (World)")]
+    [SerializeField] private TutorialBalloonWorld balloonWorld;
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip successClip;
+    [SerializeField] private AudioClip successClip;      
     [SerializeField] private AudioClip wizardLaughClip;
-
-    [Header("Timing")]
-    [SerializeField] private float lockDelay = 0.05f;
     [SerializeField] private float betweenClipsDelay = 0.1f;
 
     private Coroutine runningRoutine;
@@ -113,15 +113,12 @@ public class TutorialManager : MonoBehaviour
 
     void OnEnable()
     {
-        if (autoStart)
-            StartTutorial();
+        if (autoStart) StartTutorial();
     }
 
     public void StartTutorial()
     {
-        if (runningRoutine != null)
-            StopCoroutine(runningRoutine);
-
+        if (runningRoutine != null) StopCoroutine(runningRoutine);
         currentStageIndex = -1;
         runningRoutine = StartCoroutine(RunTutorial());
     }
@@ -129,11 +126,9 @@ public class TutorialManager : MonoBehaviour
     public void SkipToStage(string stageId)
     {
         int targetIndex = stages.FindIndex(s => s != null && s.StageId == stageId);
-        if (targetIndex < 0)
-            return;
+        if (targetIndex < 0) return;
 
         StopTutorial();
-
         currentStageIndex = Mathf.Clamp(targetIndex - 1, -1, stages.Count - 1);
         runningRoutine = StartCoroutine(RunTutorial());
     }
@@ -147,11 +142,10 @@ public class TutorialManager : MonoBehaviour
         }
 
         if (currentStageIndex >= 0 && currentStageIndex < stages.Count)
-        {
             stages[currentStageIndex]?.Exit();
-        }
 
         currentStageIndex = -1;
+        HideBalloon();
     }
 
     private IEnumerator RunTutorial()
@@ -168,8 +162,7 @@ public class TutorialManager : MonoBehaviour
             }
 
             var stage = stages[currentStageIndex];
-            if (stage == null)
-                continue;
+            if (stage == null) continue;
 
             bool stageCompleted = false;
             stage.Enter(() => stageCompleted = true);
@@ -179,17 +172,15 @@ public class TutorialManager : MonoBehaviour
 
             stage.Exit();
 
-            bool hasMoreStages = currentStageIndex < stages.Count - 1;
-            if (hasMoreStages)
-                yield return PlayTransitionSequence();
+            // צלילי מעבר בין סטייג'ים
+            yield return PlayTransitionAudio();
+
+            HideBalloon();
         }
     }
 
-    private IEnumerator PlayTransitionSequence()
+    private IEnumerator PlayTransitionAudio()
     {
-        if (lockDelay > 0f)
-            yield return new WaitForSeconds(lockDelay);
-
         if (successClip && audioSource)
         {
             audioSource.PlayOneShot(successClip);
@@ -204,5 +195,15 @@ public class TutorialManager : MonoBehaviour
             audioSource.PlayOneShot(wizardLaughClip);
             yield return new WaitForSeconds(wizardLaughClip.length);
         }
+    }
+
+    public void ShowBalloon(Sprite s)
+    {
+        if (balloonWorld) balloonWorld.Show(s);
+    }
+
+    public void HideBalloon()
+    {
+        if (balloonWorld) balloonWorld.Hide();
     }
 }
