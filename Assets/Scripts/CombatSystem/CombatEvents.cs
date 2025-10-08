@@ -125,3 +125,6 @@ public struct AttackStartedEvent
         this.socket = socket;
     }
 }
+
+
+public enum HazardSide { Left, Right }

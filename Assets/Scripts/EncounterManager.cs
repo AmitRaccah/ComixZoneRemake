@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EncounterManager : MonoBehaviour
@@ -10,6 +11,9 @@ public class EncounterManager : MonoBehaviour
         public EnemyPoolMember hazard;
         public string assignmentId;
         public float delay;
+
+        public HazardSide side;
+        public float warningLeadTime = 0.5f; // כמה לפני ה-delay להבהב
     }
 
     [System.Serializable]
@@ -19,71 +23,67 @@ public class EncounterManager : MonoBehaviour
         public int killsRequired = 1;
         public GameObject[] objectsToEnable;
         public HazardTrigger[] hazardTriggers;
-
         [HideInInspector] public int currentKills = 0;
         [HideInInspector] public bool isCompleted = false;
     }
 
     [SerializeField] private Encounter[] encounters;
+    readonly Dictionary<string, Encounter> encounterLookup = new();
 
-    private readonly Dictionary<string, Encounter> encounterLookup = new Dictionary<string, Encounter>();
-
-    private void Awake()
+    void Awake()
     {
-        for (int i = 0; i < encounters.Length; i++)
+        foreach (var enc in encounters)
         {
-            var enc = encounters[i];
             if (enc == null || string.IsNullOrEmpty(enc.encounterId)) continue;
             encounterLookup[enc.encounterId] = enc;
             SetObjectsActive(enc, false);
         }
     }
 
-    private void OnEnable()
+    void OnEnable() { CoreBus.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated); }
+    void OnDisable() { CoreBus.Unsubscribe<EnemyDefeatedEvent>(OnEnemyDefeated); }
+
+    void OnEnemyDefeated(EnemyDefeatedEvent e)
     {
-        CoreBus.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated);
-    }
+        if (!encounterLookup.TryGetValue(e.encounterId, out var enc) || enc.isCompleted) return;
 
-    private void OnDisable()
-    {
-        CoreBus.Unsubscribe<EnemyDefeatedEvent>(OnEnemyDefeated);
-    }
+        enc.currentKills++;
+        TriggerHazards(enc, e.encounterId);
 
-    private void OnEnemyDefeated(EnemyDefeatedEvent e)
-    {
-        if (!encounterLookup.TryGetValue(e.encounterId, out var encounter)) return;
-        if (encounter.isCompleted) return;
-
-        encounter.currentKills++;
-        TriggerHazards(encounter, e.encounterId);
-
-        if (encounter.currentKills >= encounter.killsRequired)
+        if (enc.currentKills >= enc.killsRequired)
         {
-            encounter.isCompleted = true;
-            SetObjectsActive(encounter, true);
+            enc.isCompleted = true;
+            SetObjectsActive(enc, true);
         }
     }
 
-    private void TriggerHazards(Encounter encounter, string encounterId)
+    void TriggerHazards(Encounter enc, string encounterId)
     {
-        if (encounter.hazardTriggers == null || EnemyPool.Instance == null) return;
+        if (enc.hazardTriggers == null || EnemyPool.Instance == null) return;
 
-        for (int i = 0; i < encounter.hazardTriggers.Length; i++)
+        for (int i = 0; i < enc.hazardTriggers.Length; i++)
         {
-            var t = encounter.hazardTriggers[i];
+            var t = enc.hazardTriggers[i];
             if (t == null || t.hazard == null) continue;
-            if (t.onKills == encounter.currentKills)
-                EnemyPool.Instance.ScheduleSpawn(t.hazard, t.assignmentId, encounterId, t.delay);
+            if (t.onKills != enc.currentKills) continue;
+
+            EnemyPool.Instance.ScheduleSpawn(t.hazard, t.assignmentId, encounterId, t.delay);
+
+            if (HazardWarningUI.Instance)
+                StartCoroutine(WarningRoutine(t));
         }
     }
 
-    private void SetObjectsActive(Encounter encounter, bool isActive)
+    IEnumerator WarningRoutine(HazardTrigger t)
     {
-        if (encounter.objectsToEnable == null) return;
-        for (int i = 0; i < encounter.objectsToEnable.Length; i++)
-        {
-            var go = encounter.objectsToEnable[i];
-            if (go) go.SetActive(isActive);
-        }
+        float wait = Mathf.Max(0f, t.delay - Mathf.Max(0f, t.warningLeadTime));
+        if (wait > 0f) yield return new WaitForSeconds(wait);
+        HazardWarningUI.Instance.Ping(t.side);
+    }
+
+    void SetObjectsActive(Encounter enc, bool isActive)
+    {
+        if (enc.objectsToEnable == null) return;
+        foreach (var go in enc.objectsToEnable) if (go) go.SetActive(isActive);
     }
 }
