@@ -9,36 +9,39 @@ public class HitboxController : MonoBehaviour
     public event System.Action OnFirstHit;
     int attackerId;
 
-    public void Init(AttackData d, Transform hand, int attackerId)
+    HitboxPool pool;
+    Collider col;
+
+    public void AssignPool(HitboxPool p) => pool = p;
+
+    public void Init(AttackData d, Transform hand, int attacker)
     {
+        if (!col) col = GetComponent<Collider>();
+
         data = d;
         socket = hand;
-        this.attackerId = attackerId;
+        attackerId = attacker;
         timer = d.activeTime;
+        armed = false;
 
         transform.localScale = Vector3.one * d.hitboxRadius;
-        GetComponent<Collider>().enabled = false;
+        if (col) col.enabled = false;
     }
 
     void LateUpdate()
     {
-        if (socket == null)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (!socket) { Despawn(); return; }
 
         transform.position = socket.TransformPoint(data.hitboxOffset);
 
         if (!armed)
         {
-            GetComponent<Collider>().enabled = true;
+            if (col) col.enabled = true;
             armed = true;
         }
 
         timer -= Time.deltaTime;
-        if (timer <= 0f)
-            Destroy(gameObject);
+        if (timer <= 0f) Despawn();
     }
 
     void OnTriggerEnter(Collider other)
@@ -50,8 +53,18 @@ public class HitboxController : MonoBehaviour
 
         HitResolve.PublishDamageAndFx(attackerId, data, other, transform.position, transform);
 
-
         OnFirstHit?.Invoke();
-        Destroy(gameObject);
+        Despawn();
+    }
+
+    public void Despawn()
+    {
+        if (col) col.enabled = false;
+        armed = false;
+        socket = null;
+        data = null;
+        attackerId = 0;
+
+        pool?.Release(this);
     }
 }

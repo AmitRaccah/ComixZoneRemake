@@ -210,18 +210,17 @@ namespace StarterAssets
 
         private void Move()
         {
-            if (GetComponent<MovementLock>().IsLocked) return;
+            var locker = GetComponent<MovementLock>();
+            bool locked = locker != null && locker.IsLocked;
 
             float targetSpeed = _input.sprint ? SprintSpeed : MoveSpeed;
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
+            if (locked || _input.move == Vector2.zero) targetSpeed = 0.0f;
 
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
             float speedOffset = 0.1f;
             float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
 
-            if (currentHorizontalSpeed < targetSpeed - speedOffset ||
-                currentHorizontalSpeed > targetSpeed + speedOffset)
+            if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
             {
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -234,9 +233,9 @@ namespace StarterAssets
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
             if (_animationBlend < 0.01f) _animationBlend = 0f;
 
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, 0.0f).normalized;
+            Vector3 inputDirection = locked ? Vector3.zero : new Vector3(_input.move.x, 0.0f, 0.0f).normalized;
 
-            if (_input.move.x != 0)
+            if (!locked && _input.move.x != 0)
             {
                 bool faceRight = _input.move.x > 0;
                 _desiredRotationY = faceRight ? 90f : -90f;
@@ -249,7 +248,7 @@ namespace StarterAssets
             float delta = Mathf.DeltaAngle(currentY, _desiredRotationY);
             IsTurning = Mathf.Abs(delta) > TurnCompleteTolerance;
 
-            if (_shouldRotate)
+            if (!locked && _shouldRotate)
             {
                 float smooth = (Mathf.Abs(delta) > 45f) ? 0.05f : RotationSmoothTime;
                 float newY = Mathf.SmoothDampAngle(currentY, _desiredRotationY, ref _rotationVelocity, smooth);
@@ -263,25 +262,23 @@ namespace StarterAssets
                     IsTurning = false;
                 }
             }
+            else
+            {
+                _shouldRotate = false;
+                IsTurning = false;
+            }
 
             Vector3 targetDirection = inputDirection;
-
             _controller.Move(targetDirection * (_speed * Time.deltaTime) +
                              new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             if (_hasAnimator)
             {
                 _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                _animator.SetFloat(_animIDMotionSpeed, locked ? 0f : inputMagnitude);
             }
-
-            //if (!allowZMovementTemporarily)
-            //{
-            //    Vector3 fixedPos = transform.position;
-            //    fixedPos.z = 0f;
-            //    transform.position = fixedPos;
-            //}
         }
+
 
 
         private void JumpAndGravity()

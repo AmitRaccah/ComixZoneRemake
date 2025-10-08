@@ -1,83 +1,89 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class EncounterManager : MonoBehaviour
 {
     [System.Serializable]
+    public class HazardTrigger
+    {
+        public int onKills;
+        public EnemyPoolMember hazard;
+        public string assignmentId;
+        public float delay;
+
+        public HazardSide side;
+        public float warningLeadTime = 0.5f; // כמה לפני ה-delay להבהב
+    }
+
+    [System.Serializable]
     public class Encounter
     {
-        [Tooltip("A unique name for this encounter, e.g., 'FirstCorridor' or 'BossRoom'.")]
         public string encounterId;
-
-        [Tooltip("How many enemy kills are required to complete this encounter.")]
         public int killsRequired = 1;
-
-        [Tooltip("GameObjects (gates, arrows, etc.) to enable once the encounter is completed.")]
         public GameObject[] objectsToEnable;
-
+        public HazardTrigger[] hazardTriggers;
         [HideInInspector] public int currentKills = 0;
         [HideInInspector] public bool isCompleted = false;
     }
 
-    [Tooltip("List of all the encounters in the level.")]
     [SerializeField] private Encounter[] encounters;
+    readonly Dictionary<string, Encounter> encounterLookup = new();
 
-    private Dictionary<string, Encounter> encounterLookup = new Dictionary<string, Encounter>();
-
-    private void Awake()
+    void Awake()
     {
-        foreach (var encounter in encounters)
+        foreach (var enc in encounters)
         {
-            if (encounter != null && !string.IsNullOrEmpty(encounter.encounterId))
-            {
-                encounterLookup[encounter.encounterId] = encounter;
-                SetObjectsActive(encounter, false);
-            }
+            if (enc == null || string.IsNullOrEmpty(enc.encounterId)) continue;
+            encounterLookup[enc.encounterId] = enc;
+            SetObjectsActive(enc, false);
         }
     }
 
-    private void OnEnable()
-    {
-        CoreBus.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated);
-    }
+    void OnEnable() { CoreBus.Subscribe<EnemyDefeatedEvent>(OnEnemyDefeated); }
+    void OnDisable() { CoreBus.Unsubscribe<EnemyDefeatedEvent>(OnEnemyDefeated); }
 
-    private void OnDisable()
+    void OnEnemyDefeated(EnemyDefeatedEvent e)
     {
-        CoreBus.Unsubscribe<EnemyDefeatedEvent>(OnEnemyDefeated);
-    }
+        if (!encounterLookup.TryGetValue(e.encounterId, out var enc) || enc.isCompleted) return;
 
-    private void OnEnemyDefeated(EnemyDefeatedEvent e)
-    {
-        if (encounterLookup.TryGetValue(e.encounterId, out Encounter encounter))
+        enc.currentKills++;
+        TriggerHazards(enc, e.encounterId);
+
+        if (enc.currentKills >= enc.killsRequired)
         {
-            if (encounter.isCompleted) return;
-
-            encounter.currentKills++;
-            Debug.Log($"Kill registered for encounter '{e.encounterId}'. Total kills: {encounter.currentKills}/{encounter.killsRequired}");
-
-            if (encounter.currentKills >= encounter.killsRequired)
-            {
-                CompleteEncounter(encounter);
-            }
+            enc.isCompleted = true;
+            SetObjectsActive(enc, true);
         }
     }
 
-    private void CompleteEncounter(Encounter encounter)
+    void TriggerHazards(Encounter enc, string encounterId)
     {
-        Debug.Log($"Encounter '{encounter.encounterId}' completed!");
-        encounter.isCompleted = true;
-        SetObjectsActive(encounter, true);
+        if (enc.hazardTriggers == null || EnemyPool.Instance == null) return;
+
+        for (int i = 0; i < enc.hazardTriggers.Length; i++)
+        {
+            var t = enc.hazardTriggers[i];
+            if (t == null || t.hazard == null) continue;
+            if (t.onKills != enc.currentKills) continue;
+
+            EnemyPool.Instance.ScheduleSpawn(t.hazard, t.assignmentId, encounterId, t.delay);
+
+            if (HazardWarningUI.Instance)
+                StartCoroutine(WarningRoutine(t));
+        }
     }
 
-    private void SetObjectsActive(Encounter encounter, bool isActive)
+    IEnumerator WarningRoutine(HazardTrigger t)
     {
-        if (encounter.objectsToEnable == null) return;
-        foreach (var obj in encounter.objectsToEnable)
-        {
-            if (obj != null)
-            {
-                obj.SetActive(isActive);
-            }
-        }
+        float wait = Mathf.Max(0f, t.delay - Mathf.Max(0f, t.warningLeadTime));
+        if (wait > 0f) yield return new WaitForSeconds(wait);
+        HazardWarningUI.Instance.Ping(t.side);
+    }
+
+    void SetObjectsActive(Encounter enc, bool isActive)
+    {
+        if (enc.objectsToEnable == null) return;
+        foreach (var go in enc.objectsToEnable) if (go) go.SetActive(isActive);
     }
 }
