@@ -1374,11 +1374,11 @@ PrefabInstance:
     - target: {fileID: 1000528083991467588, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: leftHandSocket
       value: 
-      objectReference: {fileID: 121640581}
+      objectReference: {fileID: 0}
     - target: {fileID: 1000528083991467588, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: rightHandSocket
       value: 
-      objectReference: {fileID: 1890005563}
+      objectReference: {fileID: 0}
     - target: {fileID: 1000528083991467588, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: attacks.Array.size
       value: 1
@@ -4374,6 +4374,7 @@ MonoBehaviour:
     objectsToEnable:
     - {fileID: 373848902}
     - {fileID: 531176455}
+    hazardTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!1 &111211925
@@ -4739,11 +4740,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!4 &121640581 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8266779876552158293, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
-  m_PrefabInstance: {fileID: 43980142}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &122400484
 Mesh:
   m_ObjectHideFlags: 0
@@ -12462,6 +12458,7 @@ MonoBehaviour:
     objectsToEnable:
     - {fileID: 5719676765369459288}
     - {fileID: 8684020230768524890}
+    hazardTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!1 &240905577
@@ -15417,6 +15414,7 @@ MonoBehaviour:
     objectsToEnable:
     - {fileID: 5719676765369459289}
     - {fileID: 8684020230768524891}
+    hazardTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!1 &297948864
@@ -43422,6 +43420,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &628170196
 Animator:
@@ -70871,6 +70870,7 @@ MonoBehaviour:
     objectsToEnable:
     - {fileID: 5719676765369459290}
     - {fileID: 8684020230768524892}
+    hazardTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!43 &1109053452
@@ -75883,6 +75883,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &1264579580
 Animator:
@@ -109472,6 +109473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 5
+  resetHpOnEnable: 0
   deathDelay: 0
 --- !u!95 &1876916364
 Animator:
@@ -109704,11 +109706,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!4 &1890005563 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 5280935703707663042, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
-  m_PrefabInstance: {fileID: 43980142}
-  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1893144383
 Mesh:
   m_ObjectHideFlags: 0
