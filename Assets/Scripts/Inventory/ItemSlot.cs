@@ -3,62 +3,45 @@ using UnityEngine.UI;
 
 public class ItemSlot : MonoBehaviour
 {
-    public Item m_item = null;
+    public Item m_item;
+    [SerializeField] private Image iconImage;
 
-    [SerializeField] private Image image;
-    [SerializeField] private Sprite frameSprite;
-
-    private void Reset()
+    void Awake()
     {
-        image = GetComponent<Image>();
-        if (image != null && frameSprite == null)
-            frameSprite = image.sprite;
-    }
-
-    private void Awake()
-    {
-        if (image == null) image = GetComponent<Image>();
-        if (frameSprite == null && image != null)
-            frameSprite = image.sprite;
-
+        if (!iconImage)
+        {
+            var t = transform.Find("Icon");
+            if (t) iconImage = t.GetComponent<Image>();
+        }
         ApplyVisual(m_item);
     }
 
-    private void OnValidate()
+    void OnValidate()
     {
-        if (image == null) image = GetComponent<Image>();
-        if (frameSprite == null && image != null)
-            frameSprite = image.sprite;
+        if (!iconImage)
+        {
+            var t = transform.Find("Icon");
+            if (t) iconImage = t.GetComponent<Image>();
+        }
+        ApplyVisual(m_item);
     }
 
-    private void ApplyVisual(Item item)
+    void ApplyVisual(Item item)
     {
-        if (image == null) return;
-
-        image.sprite = frameSprite;
-
+        if (!iconImage) return;
         if (item != null && item.icon != null)
-            image.overrideSprite = item.icon;
+        {
+            iconImage.sprite = item.icon;
+            iconImage.enabled = true;
+        }
         else
-            image.overrideSprite = null; 
-
-        image.enabled = true;
+        {
+            iconImage.sprite = null;
+            iconImage.enabled = false;
+        }
     }
 
-    public void Initialize(Item item)
-    {
-        m_item = item;
-        ApplyVisual(item);
-    }
-
-    public void Clear()
-    {
-        m_item = null;
-        ApplyVisual(null); 
-    }
-
-    public void OnUseItem()
-    {
-        InventoryManager.Instance.TryUseSlot(this);
-    }
+    public void Initialize(Item item) { m_item = item; ApplyVisual(item); }
+    public void Clear() { m_item = null; ApplyVisual(null); }
+    public void OnUseItem() { InventoryManager.Instance.TryUseSlot(this); }
 }
