@@ -11,19 +11,17 @@ public class TutorialManager : MonoBehaviour
         [SerializeField] private string stageId;
         [SerializeField] private TutorialObjective[] objectives;
 
-        private TutorialManager owner;
-        private int currentObjectiveIndex;
         private System.Action onStageCompleted;
+        private int currentObjectiveIndex;
 
         public string StageId => stageId;
 
-        public void Configure(TutorialManager tutorialManager)
+        public void Configure(TutorialManager owner)
         {
-            owner = tutorialManager;
             if (objectives == null) return;
             for (int i = 0; i < objectives.Length; i++)
             {
-                if (objectives[i] == null) continue;
+                if (!objectives[i]) continue;
                 objectives[i].Configure(owner);
                 objectives[i].ResetObjective();
                 objectives[i].EndObjective();
@@ -42,45 +40,33 @@ public class TutorialManager : MonoBehaviour
             if (objectives == null) return;
             for (int i = 0; i < objectives.Length; i++)
             {
-                var objective = objectives[i];
-                if (objective == null) continue;
-                objective.Completed -= HandleObjectiveCompleted;
-                objective.EndObjective();
+                var o = objectives[i];
+                if (!o) continue;
+                o.Completed -= HandleCompleted;
+                o.EndObjective();
             }
         }
 
-        private void Advance()
+        void Advance()
         {
-            if (objectives == null || objectives.Length == 0)
-            {
-                onStageCompleted?.Invoke();
-                return;
-            }
+            if (objectives == null || objectives.Length == 0) { onStageCompleted?.Invoke(); return; }
 
             currentObjectiveIndex++;
-            if (currentObjectiveIndex >= objectives.Length)
-            {
-                onStageCompleted?.Invoke();
-                return;
-            }
+            if (currentObjectiveIndex >= objectives.Length) { onStageCompleted?.Invoke(); return; }
 
-            var objective = objectives[currentObjectiveIndex];
-            if (objective == null)
-            {
-                Advance();
-                return;
-            }
+            var o = objectives[currentObjectiveIndex];
+            if (!o) { Advance(); return; }
 
-            objective.Completed -= HandleObjectiveCompleted;
-            objective.Completed += HandleObjectiveCompleted;
-            objective.ResetObjective();
-            objective.BeginObjective();
+            o.Completed -= HandleCompleted;
+            o.Completed += HandleCompleted;
+            o.ResetObjective();
+            o.BeginObjective();
         }
 
-        private void HandleObjectiveCompleted(TutorialObjective objective)
+        void HandleCompleted(TutorialObjective o)
         {
-            objective.Completed -= HandleObjectiveCompleted;
-            objective.EndObjective();
+            o.Completed -= HandleCompleted;
+            o.EndObjective();
             Advance();
         }
     }
@@ -94,21 +80,17 @@ public class TutorialManager : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
-    [SerializeField] private AudioClip successClip;      
+    [SerializeField] private AudioClip successClip;
     [SerializeField] private AudioClip wizardLaughClip;
     [SerializeField] private float betweenClipsDelay = 0.1f;
 
-    private Coroutine runningRoutine;
-    private int currentStageIndex = -1;
+    Coroutine runningRoutine;
+    int currentStageIndex = -1;
 
     void Awake()
     {
         for (int i = 0; i < stages.Count; i++)
-        {
-            var stage = stages[i];
-            if (stage == null) continue;
-            stage.Configure(this);
-        }
+            stages[i]?.Configure(this);
     }
 
     void OnEnable()
@@ -125,11 +107,10 @@ public class TutorialManager : MonoBehaviour
 
     public void SkipToStage(string stageId)
     {
-        int targetIndex = stages.FindIndex(s => s != null && s.StageId == stageId);
-        if (targetIndex < 0) return;
-
+        int idx = stages.FindIndex(s => s != null && s.StageId == stageId);
+        if (idx < 0) return;
         StopTutorial();
-        currentStageIndex = Mathf.Clamp(targetIndex - 1, -1, stages.Count - 1);
+        currentStageIndex = Mathf.Clamp(idx - 1, -1, stages.Count - 1);
         runningRoutine = StartCoroutine(RunTutorial());
     }
 
@@ -144,53 +125,44 @@ public class TutorialManager : MonoBehaviour
         if (currentStageIndex >= 0 && currentStageIndex < stages.Count)
             stages[currentStageIndex]?.Exit();
 
-        currentStageIndex = -1;
         HideBalloon();
+        currentStageIndex = -1;
     }
 
-    private IEnumerator RunTutorial()
+    IEnumerator RunTutorial()
     {
         currentStageIndex = Mathf.Clamp(currentStageIndex, -1, stages.Count - 1);
 
         while (true)
         {
             currentStageIndex++;
-            if (currentStageIndex >= stages.Count)
-            {
-                runningRoutine = null;
-                yield break;
-            }
+            if (currentStageIndex >= stages.Count) { runningRoutine = null; yield break; }
 
             var stage = stages[currentStageIndex];
             if (stage == null) continue;
 
-            bool stageCompleted = false;
-            stage.Enter(() => stageCompleted = true);
-
-            while (!stageCompleted)
-                yield return null;
+            bool done = false;
+            stage.Enter(() => done = true);
+            while (!done) yield return null;
 
             stage.Exit();
 
-            // צלילי מעבר בין סטייג'ים
-            yield return PlayTransitionAudio();
-
-            HideBalloon();
+            bool hasMore = currentStageIndex < stages.Count - 1;
+            if (hasMore) yield return PlayTransitionSequence();
         }
     }
 
-    private IEnumerator PlayTransitionAudio()
+    IEnumerator PlayTransitionSequence()
     {
-        if (successClip && audioSource)
+        if (audioSource && successClip)
         {
             audioSource.PlayOneShot(successClip);
             yield return new WaitForSeconds(successClip.length);
         }
 
-        if (betweenClipsDelay > 0f)
-            yield return new WaitForSeconds(betweenClipsDelay);
+        if (betweenClipsDelay > 0f) yield return new WaitForSeconds(betweenClipsDelay);
 
-        if (wizardLaughClip && audioSource)
+        if (audioSource && wizardLaughClip)
         {
             audioSource.PlayOneShot(wizardLaughClip);
             yield return new WaitForSeconds(wizardLaughClip.length);
@@ -199,7 +171,7 @@ public class TutorialManager : MonoBehaviour
 
     public void ShowBalloon(Sprite s)
     {
-        if (balloonWorld) balloonWorld.Show(s);
+        if (balloonWorld && s) balloonWorld.Show(s);
     }
 
     public void HideBalloon()

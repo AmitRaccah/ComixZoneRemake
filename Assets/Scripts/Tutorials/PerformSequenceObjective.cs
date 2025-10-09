@@ -1,16 +1,28 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PerformSequencesObjective : TutorialObjective
 {
+    [Header("Sequences")]
     [SerializeField] private AttackSequence[] sequences;
-    [SerializeField] private Sprite[] comboBalloons;
+    [SerializeField] private GameObject playerActor;
     [SerializeField] private GameObject targetActor;
 
-    private const float STEP_TIMEOUT = 1.0f;
-    private const float HIT_CONFIRM_WINDOW = 0.4f;
+    [Header("Timing")]
+    [SerializeField] private float stepTimeout = 2.0f;      // פרק זמן בין צעדי קומבו
+    [SerializeField] private float hitConfirmWindow = 0.6f; // חלון לפגיעה אחרי הצעד האחרון
 
-    private int targetId;
+    [Header("Balloons")]
+    [SerializeField] private BalloonEntry[] balloons;
+
+    [System.Serializable]
+    private struct BalloonEntry
+    {
+        public AttackSequence sequence;
+        public Sprite sprite;
+    }
 
     private class Tracker
     {
@@ -24,32 +36,41 @@ public class PerformSequencesObjective : TutorialObjective
     }
 
     private readonly List<Tracker> trackers = new();
+    private readonly Dictionary<AttackSequence, Sprite> balloonBySeq = new();
+
     private int completedCount;
+    private int targetId;
     private int lastProcessedFrame = -1;
 
     protected override void OnConfigure(TutorialManager manager)
     {
         CacheIds();
+        BuildBalloonMap();
     }
 
     protected override void OnReset()
     {
         CacheIds();
+        BuildBalloonMap();
         ResetTrackers();
     }
 
     protected override void OnBegin()
     {
         CacheIds();
+        BuildBalloonMap();
         ResetTrackers();
         CombatBus.Subscribe<DamageEvent>(OnDamage);
         lastProcessedFrame = -1;
+        Debug.Log($"[Tutor] Combos Begin. TargetId={targetId}, Trackers={trackers.Count}");
         ShowNextBalloon();
     }
 
     protected override void OnEnd()
     {
         CombatBus.Unsubscribe<DamageEvent>(OnDamage);
+        Manager?.HideBalloon();
+        Debug.Log("[Tutor] Combos End.");
     }
 
     private void CacheIds()
@@ -57,27 +78,62 @@ public class PerformSequencesObjective : TutorialObjective
         targetId = targetActor ? targetActor.GetInstanceID() : 0;
     }
 
+    private void BuildBalloonMap()
+    {
+        balloonBySeq.Clear();
+        if (balloons != null)
+        {
+            for (int i = 0; i < balloons.Length; i++)
+            {
+                var b = balloons[i];
+                if (b.sequence == null) continue;
+                if (!balloonBySeq.ContainsKey(b.sequence))
+                    balloonBySeq.Add(b.sequence, b.sprite);
+            }
+        }
+        if (sequences != null)
+        {
+            for (int i = 0; i < sequences.Length; i++)
+            {
+                var s = sequences[i];
+                if (s == null) continue;
+                if (!balloonBySeq.TryGetValue(s, out var spr) || spr == null)
+                    Debug.LogWarning($"[Tutor] No balloon sprite mapped for sequence '{s.name}' (index {i}).");
+            }
+        }
+    }
+
     private void ResetTrackers()
     {
         trackers.Clear();
         completedCount = 0;
 
-        if (sequences == null) return;
-        for (int i = 0; i < sequences.Length; i++)
+        if (sequences != null)
         {
-            var s = sequences[i];
-            if (s == null || s.steps == null || s.steps.Length == 0) continue;
-            trackers.Add(new Tracker
+            for (int i = 0; i < sequences.Length; i++)
             {
-                seq = s,
-                stepIndex = 0,
-                lastStepTime = -999f,
-                awaitingHit = false,
-                awaitHitUntil = -1f,
-                completed = false,
-                originalIndex = i
-            });
+                var s = sequences[i];
+                if (s == null || s.steps == null || s.steps.Length == 0) continue;
+                trackers.Add(new Tracker
+                {
+                    seq = s,
+                    stepIndex = 0,
+                    lastStepTime = -999f,
+                    awaitingHit = false,
+                    awaitHitUntil = -1f,
+                    completed = false,
+                    originalIndex = i
+                });
+            }
         }
+
+        var names = new StringBuilder();
+        for (int i = 0; i < trackers.Count; i++)
+        {
+            if (i > 0) names.Append(", ");
+            names.Append(trackers[i].seq.name);
+        }
+        Debug.Log($"[Tutor] Trackers Ready: [{names}]");
     }
 
     void Update()
@@ -93,8 +149,9 @@ public class PerformSequencesObjective : TutorialObjective
             var t = trackers[i];
             if (t.completed) continue;
 
-            if (t.stepIndex > 0 && now - t.lastStepTime > STEP_TIMEOUT)
+            if (t.stepIndex > 0 && now - t.lastStepTime > stepTimeout)
             {
+                Debug.Log($"[Tutor] Timeout Reset: {t.seq.name} at step {t.stepIndex}");
                 t.stepIndex = 0;
                 t.awaitingHit = false;
                 t.awaitHitUntil = -1f;
@@ -102,6 +159,7 @@ public class PerformSequencesObjective : TutorialObjective
 
             if (t.awaitingHit && now > t.awaitHitUntil)
             {
+                Debug.Log($"[Tutor] Hit Window Expired: {t.seq.name}");
                 t.stepIndex = 0;
                 t.awaitingHit = false;
                 t.awaitHitUntil = -1f;
@@ -118,7 +176,10 @@ public class PerformSequencesObjective : TutorialObjective
 
         int best = -1;
         int bestScore = int.MinValue;
-        var stanceNow = PlayerStanceTracker.Current;
+
+        List<int> singleStepMatches = null;
+
+        var stanceNowGlobal = PlayerStanceTracker.Current;
 
         for (int i = 0; i < trackers.Count; i++)
         {
@@ -130,25 +191,43 @@ public class PerformSequencesObjective : TutorialObjective
 
             var req = steps[t.stepIndex];
             if (last.inputType != req.input) continue;
-            if (req.stance != PlayerStance.Any && req.stance != stanceNow) continue;
+
+            if (req.stance != PlayerStance.Any && req.stance != stanceNowGlobal) continue;
 
             int remaining = steps.Length - t.stepIndex;
             int score = (t.stepIndex > 0 ? 1000 : 0) + remaining;
             if (score > bestScore) { bestScore = score; best = i; }
+
+            if (steps.Length == 1 && t.stepIndex == 0)
+            {
+                singleStepMatches ??= new List<int>(2);
+                singleStepMatches.Add(i);
+            }
         }
 
         if (best >= 0)
         {
             var t = trackers[best];
             var steps = t.seq.steps;
-            buf.RemoveAt(buf.Count - 1);
             t.stepIndex++;
             t.lastStepTime = now;
+
+            Debug.Log($"[Tutor] Input Accepted: {t.seq.name} step {t.stepIndex}/{steps.Length} key={last.inputType}");
+
+            if (t.stepIndex == 1)
+            {
+                if (balloonBySeq.TryGetValue(t.seq, out var spr) && spr != null)
+                {
+                    Debug.Log($"[Tutor] Balloon swap on begin → {t.seq.name} ({spr.name})");
+                    Manager?.ShowBalloon(spr);
+                }
+            }
 
             if (t.stepIndex >= steps.Length)
             {
                 t.awaitingHit = true;
-                t.awaitHitUntil = now + HIT_CONFIRM_WINDOW;
+                t.awaitHitUntil = now + hitConfirmWindow;
+                Debug.Log($"[Tutor] Await Hit: {t.seq.name} until {t.awaitHitUntil:F2}");
             }
             else
             {
@@ -156,13 +235,44 @@ public class PerformSequencesObjective : TutorialObjective
                 t.awaitHitUntil = -1f;
             }
         }
+        else
+        {
+            Debug.Log($"[Tutor] Input Ignored: {last.inputType}");
+        }
+
+        if (singleStepMatches != null)
+        {
+            for (int k = 0; k < singleStepMatches.Count; k++)
+            {
+                int idx = singleStepMatches[k];
+                if (idx == best) continue;
+
+                var t = trackers[idx];
+                if (t.completed || t.awaitingHit) continue;
+                var steps = t.seq.steps;
+
+                t.stepIndex = steps.Length;
+                t.lastStepTime = now;
+                t.awaitingHit = true;
+                t.awaitHitUntil = now + hitConfirmWindow;
+
+                Debug.Log($"[Tutor] Single-step match: {t.seq.name} → Await Hit until {t.awaitHitUntil:F2}");
+
+                if (balloonBySeq.TryGetValue(t.seq, out var spr) && spr != null)
+                {
+                    Debug.Log($"[Tutor] Balloon swap on begin(single) → {t.seq.name} ({spr.name})");
+                    Manager?.ShowBalloon(spr);
+                }
+            }
+        }
     }
 
     private void OnDamage(DamageEvent e)
     {
         if (!IsActive) return;
+
+        Debug.Log($"[Tutor] Damage Event: targetId={e.targetId} time={Time.time:F2}");
         if (targetId != 0 && e.targetId != targetId) return;
-        if (e.isBlocked) return;
 
         float now = Time.time;
 
@@ -180,10 +290,11 @@ public class PerformSequencesObjective : TutorialObjective
             {
                 t.completed = true;
                 completedCount++;
+                Debug.Log($"[Tutor] Sequence Completed: {t.seq.name} ({completedCount}/{trackers.Count})");
 
                 if (completedCount >= trackers.Count && trackers.Count > 0)
                 {
-                    Manager.HideBalloon();
+                    Debug.Log("[Tutor] All Sequences Completed");
                     CompleteObjective();
                 }
                 else
@@ -197,23 +308,28 @@ public class PerformSequencesObjective : TutorialObjective
 
     private void ShowNextBalloon()
     {
-        int idx = NextPendingOriginalIndex();
-        Sprite s = GetBalloon(idx);
-        Manager.ShowBalloon(s);
-    }
+        Tracker t = null;
+        Sprite s = null;
 
-    private int NextPendingOriginalIndex()
-    {
         for (int i = 0; i < trackers.Count; i++)
-            if (!trackers[i].completed) return trackers[i].originalIndex;
-        return -1;
-    }
+        {
+            if (trackers[i].completed) continue;
+            if (balloonBySeq.TryGetValue(trackers[i].seq, out var spr) && spr != null)
+            {
+                t = trackers[i];
+                s = spr;
+                break;
+            }
+        }
 
-    private Sprite GetBalloon(int originalIndex)
-    {
-        if (originalIndex < 0) return null;
-        if (comboBalloons == null) return null;
-        if (originalIndex >= comboBalloons.Length) return null;
-        return comboBalloons[originalIndex];
+        if (t == null)
+        {
+            Debug.Log("[Tutor] No pending sequence with a mapped balloon → Hide.");
+            Manager?.HideBalloon();
+            return;
+        }
+
+        Debug.Log($"[Tutor] Balloon → index={t.originalIndex} sprite={(s ? s.name : "null")}");
+        Manager?.ShowBalloon(s);
     }
 }

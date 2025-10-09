@@ -1,21 +1,15 @@
 using UnityEngine;
 
-[RequireComponent(typeof(SpriteRenderer))]
 public class TutorialBalloonWorld : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer bubbleRenderer;
 
-    void Awake()
-    {
-        if (!bubbleRenderer) bubbleRenderer = GetComponent<SpriteRenderer>();
-        if (bubbleRenderer) bubbleRenderer.enabled = false;
-    }
-
-    public void Show(Sprite sprite)
+    public void Show(Sprite s)
     {
         if (!bubbleRenderer) return;
-        bubbleRenderer.sprite = sprite;
-        bubbleRenderer.enabled = sprite != null;
+        bubbleRenderer.sprite = s;
+        bubbleRenderer.enabled = true;
+        var c = bubbleRenderer.color; c.a = 1f; bubbleRenderer.color = c;
     }
 
     public void Hide()

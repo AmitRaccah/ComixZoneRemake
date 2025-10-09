@@ -2,50 +2,60 @@ using UnityEngine;
 
 public class PickupObjective : TutorialObjective
 {
-    [SerializeField, Min(1)]
-    private int requiredAmountToCollect = 2;
+    [Header("Balloon")]
+    [SerializeField] private Sprite promptSprite; // אייקון "Pickup" / מקש הרמה
+
+    [SerializeField] private int requiredCount = 2;
 
     private int baselineCount;
 
     protected override void OnBegin()
     {
-        baselineCount = GetTotalItemCount();
+        if (promptSprite) Manager.ShowBalloon(promptSprite);
+        CacheBaseline();
         CoreBus.Subscribe<InventoryChangedEvent>(OnInventoryChanged);
-        TryComplete();
+        CheckCompletion();
     }
 
     protected override void OnEnd()
     {
         CoreBus.Unsubscribe<InventoryChangedEvent>(OnInventoryChanged);
+        Manager.HideBalloon();
     }
 
     protected override void OnReset()
     {
-        baselineCount = GetTotalItemCount();
+        CacheBaseline();
+    }
+
+    private void CacheBaseline()
+    {
+        baselineCount = CountMatches();
     }
 
     private void OnInventoryChanged(InventoryChangedEvent _)
     {
         if (!IsActive) return;
-        TryComplete();
+        CheckCompletion();
     }
 
-    private void TryComplete()
+    private void CheckCompletion()
     {
-        int now = GetTotalItemCount();
-        if (now - baselineCount >= requiredAmountToCollect)
+        if (CountMatches() >= baselineCount + requiredCount)
             CompleteObjective();
     }
 
-    private int GetTotalItemCount()
+    private int CountMatches()
     {
         if (InventoryManager.Instance == null) return 0;
-
         int count = 0;
         var inv = InventoryManager.Instance.inventory;
-        for (int i = 0; i < inv.Count; i++)
-            if (inv[i] != null)
-                count++; 
+        for (int i = 0; i < inv.Count; i++) if (inv[i] != null) count++;
         return count;
+    }
+
+    protected override void OnComplete()
+    {
+        Manager.HideBalloon();
     }
 }

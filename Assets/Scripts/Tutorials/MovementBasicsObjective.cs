@@ -2,62 +2,64 @@ using UnityEngine;
 
 public class MovementBasicsObjective : TutorialObjective
 {
+    [Header("Balloon")]
+    [SerializeField] private Sprite promptSprite;
+
     [Header("References")]
-    [SerializeField] private Transform trackedTransform; 
-    [SerializeField] private Animator animator;         
+    [SerializeField] private Transform trackedTransform;
+    [SerializeField] private Animator animator;
 
-    [Header("Distance to move each side (meters)")]
-    [SerializeField] private float requiredSideDistance = 0.5f; 
+    [Header("Requirements")]
+    [SerializeField] private float requiredSideDistance = 0.5f;
+    [SerializeField] private string lookUpBool = "IsLookUp";
+    [SerializeField] private string crouchBool = "IsCrouching";
 
-    [Header("Animator bool names")]
-    [SerializeField] private string lookUpBool = "IsLookUp";   
-    [SerializeField] private string crouchBool = "IsCrouching";   
+    float startX;
+    bool movedRight, movedLeft, lookedUp, crouched;
+    int lookUpHash, crouchHash;
 
-    private float lastX;
-    private float movedRight; 
-    private float movedLeft; 
-    private bool didRight, didLeft, didUp, didDown;
-
-    protected override void OnConfigure(TutorialManager manager)
+    protected override void OnBegin()
     {
-        if (!trackedTransform)
-        {
-            Debug.LogError("[MovementBasicsObjective] trackedTransform is missing (player Transform).");
-        }
-        if (!animator && trackedTransform)
-        {
-            animator = trackedTransform.GetComponentInChildren<Animator>();
-            if (!animator)
-                Debug.LogError("[MovementBasicsObjective] Animator is missing.");
-        }
+        if (promptSprite) Manager.ShowBalloon(promptSprite);
+
+        if (!trackedTransform && animator) trackedTransform = animator.transform;
+        if (!animator && trackedTransform) animator = trackedTransform.GetComponent<Animator>();
+
+        startX = trackedTransform ? trackedTransform.position.x : 0f;
+        movedRight = movedLeft = lookedUp = crouched = false;
+
+        lookUpHash = Animator.StringToHash(lookUpBool);
+        crouchHash = Animator.StringToHash(crouchBool);
     }
 
-    protected override void OnReset()
+    protected override void OnEnd()
     {
-        movedRight = movedLeft = 0f;
-        didRight = didLeft = didUp = didDown = false;
-        if (trackedTransform) lastX = trackedTransform.position.x;
+        Manager.HideBalloon();
+    }
+
+    protected override void OnComplete()
+    {
+        Manager.HideBalloon();
     }
 
     void Update()
     {
-        if (!IsActive || trackedTransform == null || animator == null)
-            return;
+        if (!IsActive) return;
 
-        float x = trackedTransform.position.x;
-        float dx = x - lastX;
-        lastX = x;
+        if (trackedTransform)
+        {
+            float x = trackedTransform.position.x;
+            if (!movedRight && x >= startX + requiredSideDistance) movedRight = true;
+            if (!movedLeft && x <= startX - requiredSideDistance) movedLeft = true;
+        }
 
-        if (dx > 0f) movedRight += dx;
-        else if (dx < 0f) movedLeft += -dx;
+        if (animator)
+        {
+            if (!lookedUp && animator.GetBool(lookUpHash)) lookedUp = true;
+            if (!crouched && animator.GetBool(crouchHash)) crouched = true;
+        }
 
-        if (!didRight && movedRight >= requiredSideDistance) didRight = true;
-        if (!didLeft && movedLeft >= requiredSideDistance) didLeft = true;
-
-        if (!didUp && animator.GetBool(lookUpBool)) didUp = true;
-        if (!didDown && animator.GetBool(crouchBool)) didDown = true;
-
-        if (didRight && didLeft && didUp && didDown)
+        if (movedRight && movedLeft && lookedUp && crouched)
             CompleteObjective();
     }
 }

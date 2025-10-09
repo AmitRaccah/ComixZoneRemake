@@ -45452,10 +45452,15 @@ MonoBehaviour:
   - stageId: 1
     objectives:
     - {fileID: 937412458}
-    - {fileID: 937412458}
   - stageId: 2
     objectives:
     - {fileID: 702759127}
+  - stageId: 3
+    objectives:
+    - {fileID: 634510449}
+  - stageId: 4
+    objectives:
+    - {fileID: 634510449}
   autoStart: 1
   balloonWorld: {fileID: 1464733684}
   audioSource: {fileID: 8067808121113660116}
@@ -46316,6 +46321,74 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2cae0bd97da66bf45b75fea9fd2bc929, type: 3}
+--- !u!1 &634510448
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 634510450}
+  - component: {fileID: 634510449}
+  m_Layer: 0
+  m_Name: StageCombo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &634510449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634510448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6509a6053c00e234da4c5a978d08826c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sequences:
+  - {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+  - {fileID: 11400000, guid: 5540e29af3fed6146b5ad37c8a1959f2, type: 2}
+  - {fileID: 11400000, guid: 009e77855d61fa94dbb50dbb542fda53, type: 2}
+  - {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
+  - {fileID: 11400000, guid: 0450aa820c861fc41880062172ae51a7, type: 2}
+  - {fileID: 11400000, guid: cd19b3ba4d893744b9fe80a5373e4f17, type: 2}
+  playerActor: {fileID: 238262872}
+  targetActor: {fileID: 1837821433}
+  stepTimeout: 2
+  hitConfirmWindow: 1.2
+  balloons:
+  - sequence: {fileID: 11400000, guid: e4e89c442c2c4ae41bf3029e6b19dd2b, type: 2}
+    sprite: {fileID: 21300000, guid: 6539c0ffa5ab15e4087813054d865ace, type: 3}
+  - sequence: {fileID: 11400000, guid: 5540e29af3fed6146b5ad37c8a1959f2, type: 2}
+    sprite: {fileID: 21300000, guid: 7c150efe1f782c0409ebf6c81f790af0, type: 3}
+  - sequence: {fileID: 11400000, guid: 009e77855d61fa94dbb50dbb542fda53, type: 2}
+    sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  - sequence: {fileID: 11400000, guid: e03a6897890fcfa4ba5769f8ad5ec27a, type: 2}
+    sprite: {fileID: 21300000, guid: 321de211d308b794bb26972063dea7f6, type: 3}
+  - sequence: {fileID: 11400000, guid: 0450aa820c861fc41880062172ae51a7, type: 2}
+    sprite: {fileID: 21300000, guid: e5a34de17d20063408c26dfd94e86740, type: 3}
+  - sequence: {fileID: 11400000, guid: cd19b3ba4d893744b9fe80a5373e4f17, type: 2}
+    sprite: {fileID: 21300000, guid: ce85737cbc0eda14897825c2c8e92ebd, type: 3}
+--- !u!4 &634510450
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 634510448}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -461.20206, y: 2.623628, z: -0.5189467}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &636053674
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48419,7 +48492,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ecf4ba7965792845a238fc58fd3b7c7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requiredAmountToCollect: 2
+  promptSprite: {fileID: 21300000, guid: db6afad6816035742b7d1789c7628d92, type: 3}
+  requiredCount: 2
 --- !u!4 &702759128
 Transform:
   m_ObjectHideFlags: 0
@@ -59750,6 +59824,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5abecdd7d3587448895962de121e713, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  promptSprite: {fileID: 21300000, guid: 64b94976e9843544daecc98a9b5cc338, type: 3}
   trackedTransform: {fileID: 1442819582}
   animator: {fileID: 1442819581}
   requiredSideDistance: 0.5
@@ -165472,3 +165547,4 @@ SceneRoots:
   - {fileID: 612782277}
   - {fileID: 937412459}
   - {fileID: 702759128}
+  - {fileID: 634510450}
