@@ -61,8 +61,6 @@ GameObject:
   - component: {fileID: 6728254842853753393}
   - component: {fileID: 3363437438081058195}
   - component: {fileID: 4065923666449503550}
-  - component: {fileID: 747308398821444354}
-  - component: {fileID: 5897083792174015254}
   - component: {fileID: 6681461272722536898}
   - component: {fileID: 6506263302392460564}
   - component: {fileID: 1379033389560604084}
@@ -466,44 +464,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   requestBool: AI_RequestBlock
---- !u!114 &747308398821444354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 550769658104927547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b4489a770284364fb421870d28ac7b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stepsIntParam: AI_RetreatSteps
-  targetVar: RetreatTarget
-  retreatFlagVar: IsRetreating
-  speedFloatParam: Speed
-  stepDistance: 0.8
-  arrivalThreshold: 0.05
-  speedDampTime: 0.1
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  skin: 0.05
---- !u!114 &5897083792174015254
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 550769658104927547}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2340dff92b2618498437981266e3104, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  knifeConfig: {fileID: 11400000, guid: 50650d6badc21364aa52bb195ae8a26e, type: 2}
-  knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
-  throwSocket: {fileID: 8638533217942301412}
 --- !u!114 &6681461272722536898
 MonoBehaviour:
   m_ObjectHideFlags: 0
