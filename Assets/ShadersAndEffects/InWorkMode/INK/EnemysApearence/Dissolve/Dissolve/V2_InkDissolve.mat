@@ -37,11 +37,23 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Diffuse_Texture:
+        m_Texture: {fileID: 2800000, guid: 0fdcc350084458c419ebf73dd3a64695, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _DissolveMask:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _DripMask:
+        m_Texture: {fileID: 2800000, guid: 3977faffaa814504eb68248307ef1955, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
+        m_Texture: {fileID: 2800000, guid: c444e3d02d2fcff4d9fe5211d67652a0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2DAsset_dc4b889732de43379df713a3cfaa2a51_Out_0_Texture2D:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -59,17 +71,29 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Ambient_Strength: 0.02
+    - _Diffuse_softness: 0.115
+    - _Diffuse_threshold: 0.208
     - _DissolveThreshold: 1
-    - _EdgeWidth: 0.15
-    - _InkBandWidth: 0
+    - _EdgeWidth: 0.0721
+    - _Falloff_Amount: 2.68
+    - _Fresnel_Sharpness: 0
+    - _InkBandWidth: 0.217
+    - _Lighting_Cutoff: 2.99
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _WipeMaxY: 1.5
-    - _WipeMinY: -0.98
-    - _WipeTheshold: 0.57
-    - _WipeWidth: 0.04
+    - _Saturation: 0.566
+    - _Smoothness: 994.03
+    - _Step: 2
+    - _WipeMaxY: 2
+    - _WipeMinY: -3
+    - _WipeTheshold: 0.672
+    - _WipeWidth: 0
     m_Colors:
+    - _Diffuse_Color: {r: 0.93108064, g: 0.023362402, b: 0.990566, a: 0}
+    - _Fresnel_Color: {r: 0.8962264, g: 0, b: 0, a: 0}
     - _Inkcolor: {r: 0, g: 0, b: 0, a: 0}
-    - _specColor: {r: 2, g: 2, b: 2, a: 0}
+    - _Specular_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _specColor: {r: 2.0404031, g: 1.7997894, b: 1.7997894, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
