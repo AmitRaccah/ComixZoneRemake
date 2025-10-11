@@ -17,11 +17,20 @@ MonoBehaviour:
   damage: 5
   knockback: 1
   activeTime: 0.15
-  hitboxRadius: 0.2
+  hitboxRadius: 1.2
   hitboxOffset: {x: 0, y: 0, z: 0}
   side: 2
   shakeAmplitude: 0.05
+  blockShakeAmplitude: -1
   freezeFrameDuration: 0
+  blockFreezeFrameDuration: -1
   additionalHitEffects:
-  - prefab: {fileID: 6265589298915445480, guid: 167d6aeb9c0abef4381e80ba5d40eceb, type: 3}
+  - vfxId: 
     localOffset: {x: 0, y: 0, z: 0}
+  blockHitEffects: []
+  swingSfx:
+    clips: []
+  hitSfx:
+    clips: []
+  blockSfx:
+    clips: []
