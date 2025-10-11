@@ -54095,6 +54095,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1850917541506294041, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
+      propertyPath: eyeHeight
+      value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1850917541506294041, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       propertyPath: attackDistance
       value: 2
       objectReference: {fileID: 0}
@@ -72822,6 +72826,10 @@ PrefabInstance:
       propertyPath: stages.Array.data[2].transitionDelay
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1850917541506294041, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
+      propertyPath: eyeHeight
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6616747335621965707, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -89779,7 +89787,7 @@ MonoBehaviour:
   speedDampTime: 0.1
   obstacleMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 24511
   skin: 0.05
 --- !u!114 &1488758652
 MonoBehaviour:

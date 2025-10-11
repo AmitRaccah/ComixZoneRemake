@@ -15,11 +15,7 @@ public class EnemyRecognizePlayer : MonoBehaviour
     {
         _agent = GetComponent<BehaviorGraphAgent>();
         var p = GameObject.FindGameObjectWithTag("Player");
-        if (p)
-        {
-            _player = p.transform;
-            _agent.SetVariableValue("PlayerTransform", p);
-        }
+        if (p) { _player = p.transform; _agent.SetVariableValue("PlayerTransform", p); }
     }
 
     void Update()
@@ -27,7 +23,6 @@ public class EnemyRecognizePlayer : MonoBehaviour
         if (!_player) return;
 
         Vector3 eye = transform.position + Vector3.up * eyeHeight;
-
         float signX = Mathf.Sign(_player.position.x - transform.position.x);
         if (signX == 0f) signX = 1f;
         Vector3 dir = new Vector3(signX, 0f, 0f);
@@ -39,7 +34,7 @@ public class EnemyRecognizePlayer : MonoBehaviour
         if (Physics.Raycast(origin, dir, out RaycastHit hit, viewDistance + skin, targetLayers))
             seeingPlayer = (hit.transform && hit.transform.root == _player);
 
-        float dx = Mathf.Abs(_player.position.x - transform.position.x);
+        float dx = seeingPlayer ? Mathf.Abs(_player.position.x - transform.position.x) : 999f;
         bool inRange = seeingPlayer && dx <= attackDistance;
 
         _agent.SetVariableValue("CanSeePlayer", seeingPlayer);

@@ -3,6 +3,7 @@ using Unity.Behavior;
 using System.Collections;
 
 [RequireComponent(typeof(BehaviorGraphAgent))]
+[DefaultExecutionOrder(-100)] // שירוץ לפני שאר ה-AI בפריים הראשון
 public class EnemyBlackboardResetOnSpawn : MonoBehaviour
 {
     BehaviorGraphAgent agent;
@@ -23,7 +24,9 @@ public class EnemyBlackboardResetOnSpawn : MonoBehaviour
         TrySet("Distance", 999f);
 
         var p = GameObject.FindGameObjectWithTag("Player");
-        if (p) { TrySet("PlayerTransform", p); TrySet("RetreatTarget", p); }
+        if (p) TrySet("PlayerTransform", p);
+
+        TrySet("RetreatTarget", gameObject);
 
         StartCoroutine(EndOfFrameFix());
     }
