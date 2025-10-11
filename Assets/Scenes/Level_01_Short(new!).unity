@@ -53975,7 +53975,15 @@ PrefabInstance:
       value: Enemy_Hit
       objectReference: {fileID: 0}
     - target: {fileID: 716565341951188050, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
+      propertyPath: m_Graph
+      value: 
+      objectReference: {fileID: 1767513627651888046, guid: eba8757e033a24444a31d48543c23d46, type: 2}
+    - target: {fileID: 716565341951188050, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       propertyPath: managedReferences[4177865193454043266].m_Value
+      value: 
+      objectReference: {fileID: 238262872}
+    - target: {fileID: 716565341951188050, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
+      propertyPath: managedReferences[6653084966923010118].m_Value
       value: 
       objectReference: {fileID: 238262872}
     - target: {fileID: 1379033389560604084, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
@@ -54144,7 +54152,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8039017682478004694, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1310736292}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 550769658104927547, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1488758631}
   m_SourcePrefab: {fileID: 100100000, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
 --- !u!43 &804824282
 Mesh:
@@ -74947,6 +74958,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1117302611 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 550769658104927547, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
+  m_PrefabInstance: {fileID: 802047414}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &1117625753
 Mesh:
   m_ObjectHideFlags: 0
@@ -89725,7 +89741,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6506263302392460564, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
   m_PrefabInstance: {fileID: 802047414}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1117302611}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d82497b6c00d49440a5e85e58be58fbb, type: 3}
@@ -89736,6 +89752,29 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8039017682478004694, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
   m_PrefabInstance: {fileID: 802047414}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1488758631
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117302611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b4489a770284364fb421870d28ac7b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stepsIntParam: AI_RetreatSteps
+  targetVar: RetreatTarget
+  retreatFlagVar: IsRetreating
+  speedFloatParam: Speed
+  stepDistance: 0.8
+  arrivalThreshold: 0.2
+  speedDampTime: 0.1
+  obstacleMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  skin: 0.05
 --- !u!43 &1489559647
 Mesh:
   m_ObjectHideFlags: 0
