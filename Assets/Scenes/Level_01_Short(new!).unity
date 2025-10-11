@@ -16325,9 +16325,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e27a7889a6c89b84da5113cafeec1731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyToTrigger: {fileID: 0}
-  initialAssignmentId: 5
-  startDelay: 2
+  enemyToTrigger: {fileID: 396479683}
+  initialAssignmentId: 4
+  startDelay: 1
 --- !u!65 &280630264
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16411,7 +16411,7 @@ Transform:
   m_GameObject: {fileID: 280630262}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
-  m_LocalPosition: {x: -336.41, y: 1.176, z: 0}
+  m_LocalPosition: {x: -423.28, y: 1.176, z: 0}
   m_LocalScale: {x: 1.2132, y: 1.5614674, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -68504,7 +68504,7 @@ GameObject:
   - component: {fileID: 997538156}
   - component: {fileID: 997538155}
   m_Layer: 0
-  m_Name: 1SPAWNENEMY2
+  m_Name: 1SPAWNENEMY3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73857,7 +73857,7 @@ GameObject:
   - component: {fileID: 1114497957}
   - component: {fileID: 1114497956}
   m_Layer: 0
-  m_Name: 1SPAWNENEMY1
+  m_Name: 1SPAWNENEMY2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -88084,6 +88084,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy_Hazard
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: cf390e43344b06341886c137094d70d7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -94973,6 +94977,114 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &1614086825
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1614086826}
+  - component: {fileID: 1614086829}
+  - component: {fileID: 1614086828}
+  - component: {fileID: 1614086827}
+  m_Layer: 0
+  m_Name: 1SPAWNENEMY4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1614086826
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614086825}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: -333.869, y: -4.643, z: 4.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4335666709427305677}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!23 &1614086827
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614086825}
+  m_Enabled: 0
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1614086828
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614086825}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &1614086829
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1614086825}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 0
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!43 &1619802621
 Mesh:
   m_ObjectHideFlags: 0
@@ -122720,6 +122832,18 @@ PrefabInstance:
       propertyPath: stages.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: stages.Array.data[0].spawnCount
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: stages.Array.data[0].encounterId
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
+      propertyPath: stages.Array.data[0].assignmentId
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6616747335621965707, guid: c56ac145fad0eef49afbb3d975c08adf, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -127401,7 +127525,7 @@ GameObject:
   - component: {fileID: 22724075164109393}
   - component: {fileID: 2317999986418969314}
   m_Layer: 0
-  m_Name: 1SPAWNENEMY
+  m_Name: 1SPAWNENEMY1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -155041,6 +155165,7 @@ Transform:
   - {fileID: 4012637166810832148}
   - {fileID: 1114497955}
   - {fileID: 997538154}
+  - {fileID: 1614086826}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4344094133751131344
@@ -155299,7 +155424,7 @@ MonoBehaviour:
   - id: 3
     spawnPoint: {fileID: 997538154}
   - id: 4
-    spawnPoint: {fileID: 0}
+    spawnPoint: {fileID: 1614086826}
   - id: 5
     spawnPoint: {fileID: 0}
   - id: 6
