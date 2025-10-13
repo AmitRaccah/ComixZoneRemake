@@ -14,14 +14,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: 
   damageType: 2
-  damage: 50
+  damage: 25
   knockback: 2
   activeTime: 0.15
   hitboxRadius: 0.25
   hitboxOffset: {x: 0, y: 0, z: 0}
   side: 1
   shakeAmplitude: 1
+  blockShakeAmplitude: -1
   freezeFrameDuration: 0.1
+  blockFreezeFrameDuration: -1
   additionalHitEffects:
-  - prefab: {fileID: 6265589298915445480, guid: 167d6aeb9c0abef4381e80ba5d40eceb, type: 3}
+  - vfxId: 
     localOffset: {x: 0, y: 0, z: 0}
+  blockHitEffects: []
+  swingSfx:
+    clips: []
+  hitSfx:
+    clips: []
+  blockSfx:
+    clips: []
