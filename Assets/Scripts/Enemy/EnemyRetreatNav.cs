@@ -26,6 +26,7 @@ public class EnemyRetreatNav : MonoBehaviour
     BehaviorGraphAgent agent;
     Transform retreatTarget;
 
+    Transform player;      // לשימוש בחישוב כיוון בריחה
     int stepsId, speedId;
     bool isRetreating;
     float arrivalSqr;
@@ -38,23 +39,49 @@ public class EnemyRetreatNav : MonoBehaviour
         stepsId = Animator.StringToHash(stepsIntParam);
         speedId = Animator.StringToHash(speedFloatParam);
         arrivalSqr = arrivalThreshold * arrivalThreshold;
-
-        var go = new GameObject("RetreatTarget");
-        go.hideFlags = HideFlags.HideInHierarchy;
-        retreatTarget = go.transform;
-
+        EnsureTarget();
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
         lastPos = transform.position;
     }
 
+    void OnEnable() => Reinit();
+
     void OnDisable()
     {
-        if (retreatTarget) Destroy(retreatTarget.gameObject);
+        if (retreatTarget)
+        {
+            Destroy(retreatTarget.gameObject);
+            retreatTarget = null;
+        }
     }
 
-    float AllowedBack(float want)
+    void OnSpawnedFromPool() => Reinit();
+
+    void Reinit()
     {
-        int sign = (transform.right.x >= 0f) ? +1 : -1;
-        Vector3 dir = new Vector3(-sign, 0f, 0f);
+        EnsureTarget();
+
+        isRetreating = false;
+        agent.SetVariableValue(retreatFlagVar, false);
+        anim.SetInteger(stepsId, 0);
+
+        if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (player) agent.SetVariableValue(targetVar, player.gameObject);
+    }
+
+    void EnsureTarget()
+    {
+        if (!retreatTarget)
+        {
+            var go = new GameObject("RetreatTarget");
+            go.hideFlags = HideFlags.HideInHierarchy;
+            retreatTarget = go.transform;
+        }
+    }
+
+    float AllowedBack(Vector3 dir, float want)
+    {
+        Vector3 nDir = dir.sqrMagnitude > 0f ? dir.normalized : Vector3.zero;
 
         var cc = GetComponent<CharacterController>();
         if (cc)
@@ -63,7 +90,7 @@ public class EnemyRetreatNav : MonoBehaviour
             float h = Mathf.Max(cc.height - 2f * r, 0.01f);
             Vector3 p1 = transform.position + Vector3.up * r;
             Vector3 p2 = transform.position + Vector3.up * (r + h);
-            if (Physics.CapsuleCast(p1, p2, r, dir, out var hit, want, obstacleMask, QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(p1, p2, r, nDir, out var hit, want, obstacleMask, QueryTriggerInteraction.Ignore))
                 return Mathf.Max(0f, hit.distance - skin);
             return want;
         }
@@ -77,13 +104,13 @@ public class EnemyRetreatNav : MonoBehaviour
             Vector3 up = transform.up * half;
             Vector3 p1 = c + up;
             Vector3 p2 = c - up;
-            if (Physics.CapsuleCast(p1, p2, r, dir, out var hit2, want, obstacleMask, QueryTriggerInteraction.Ignore))
+            if (Physics.CapsuleCast(p1, p2, r, nDir, out var hit2, want, obstacleMask, QueryTriggerInteraction.Ignore))
                 return Mathf.Max(0f, hit2.distance - skin);
             return want;
         }
 
         Vector3 origin = transform.position + Vector3.up * 1f;
-        if (Physics.Raycast(origin, dir, out var rh, want, obstacleMask, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(origin, nDir, out var rh, want, obstacleMask, QueryTriggerInteraction.Ignore))
             return Mathf.Max(0f, rh.distance - skin);
 
         return want;
@@ -96,11 +123,18 @@ public class EnemyRetreatNav : MonoBehaviour
         {
             anim.SetInteger(stepsId, 0);
 
-            int sign = (transform.right.x >= 0f) ? +1 : -1;
-            Vector3 backDir = new Vector3(-sign, 0f, 0f);
+            float backSign = (player && player.position.x >= transform.position.x) ? -1f : 1f;
+            Vector3 backDir = new Vector3(backSign, 0f, 0f);
 
             float want = steps * stepDistance;
-            float allowed = AllowedBack(want);
+            float allowed = AllowedBack(backDir, want);
+
+            if (allowed <= 0.001f)
+            {
+                isRetreating = false;
+                agent.SetVariableValue(retreatFlagVar, false);
+                return;
+            }
 
             Vector3 pos = transform.position + backDir * allowed;
             pos.z = transform.position.z;
