@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7521815257170680765
+--- !u!114 &-8562004373306643477
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -20,8 +20,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: _LIT_InkDissolve
-  m_Shader: {fileID: -6465566751694194690, guid: 2d1544b114abeaa459c3295d87642d4f, type: 3}
+  m_Name: _LIT_InkDissolveWithAlphsClipping
+  m_Shader: {fileID: -6465566751694194690, guid: 118e9d5c0ac1f714da0e8c4f88c7671c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -55,26 +55,26 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Ambient_Strength: 0.2
-    - _Diffuse_softness: 0.54
-    - _Diffuse_threshold: 1.2
-    - _Falloff_Amount: 9.38
+    - _Ambient_Strength: 0.02
+    - _Diffuse_softness: 0.1
+    - _Diffuse_threshold: 0.9
+    - _Falloff_Amount: 13
     - _Fresnel_Sharpness: 3
-    - _InkBandWidth: 0.312
-    - _Lighting_Cutoff: 7.55
+    - _InkBandWidth: 0.2
+    - _Lighting_Cutoff: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Saturation: 0.622
+    - _Saturation: 0.5
     - _Smoothness: 1000
     - _Step: 3
     - _WipeMaxY: 1.5
-    - _WipeMinY: -5
-    - _WipeTheshold: 0.266
+    - _WipeMinY: 0.5
+    - _WipeTheshold: 1
     m_Colors:
-    - _Diffuse_Color: {r: 0.48584908, g: 1, b: 0.69323766, a: 0}
-    - _Fresnel_Color: {r: 1, g: 0.033018887, b: 0.033018887, a: 0}
+    - _Diffuse_Color: {r: 0, g: 0, b: 0, a: 0}
+    - _Fresnel_Color: {r: 1, g: 1, b: 1, a: 0}
     - _Inkcolor: {r: 0, g: 0, b: 0, a: 0}
-    - _Specular_Color: {r: 1, g: 0, b: 0.85810804, a: 0}
+    - _Specular_Color: {r: 1, g: 1, b: 1, a: 0}
     - _specColor: {r: 2, g: 2, b: 2, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
