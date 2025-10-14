@@ -13,7 +13,7 @@ public class PlaneShakeDriver : MonoBehaviour
     public float DecaySeconds = 4f;
     public float DecayCurve = 2f;
 
-    [Header("Timeline Reference")]
+    [Header("IMPORTANT: Manually assign your Timeline!")]
     public PlayableDirector timeline;
 
     Renderer r;
@@ -35,9 +35,14 @@ public class PlaneShakeDriver : MonoBehaviour
         r = GetComponent<Renderer>();
         if (mpb == null) mpb = new MaterialPropertyBlock();
         
+        // DON'T auto-find timeline - user must assign it manually!
         if (timeline == null)
         {
-            timeline = FindObjectOfType<PlayableDirector>();
+            Debug.LogWarning($"[{gameObject.name}] PlaneShakeDriver: Timeline not assigned! Please drag your Timeline into the Timeline field.", this);
+        }
+        else
+        {
+            Debug.Log($"[{gameObject.name}] PlaneShakeDriver enabled with timeline: {timeline.name}");
         }
         
         PushStaticParams();
@@ -63,6 +68,7 @@ public class PlaneShakeDriver : MonoBehaviour
             runtimeKick = Mathf.Max(0f, Kick);
             lastAuthKick = Kick;
             startTime = currentTime;
+            Debug.Log($"[{gameObject.name}] Kick triggered! Value: {Kick}, Time: {currentTime}");
         }
 
         // Calculate decay over time
