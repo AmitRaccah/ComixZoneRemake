@@ -6,10 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="b60162fc-b825-4c3a-9767-59cfe560c790" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ComixZoneRemake/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ComixZoneRemake/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Render Texture/Panel2RT/Panel2RT.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Render Texture/Panel2RT/Panel2RT.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Render Texture/Panel3RT/Panel3RT.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Render Texture/Panel3RT/Panel3RT.renderTexture" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Render Texture/Panel7RT/Panel7RT.renderTexture" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Render Texture/Panel7RT/Panel7RT.renderTexture" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/Level_01_Short(new!).unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/Level_01_Short(new!).unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/Dissolve/Dissolve/LIT_InkDissolve.shadergraph" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/Dissolve/Dissolve/LIT_InkDissolve.shadergraph" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/Dissolve/Dissolve/_LIT_InkDissolve.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/Dissolve/Dissolve/_LIT_InkDissolve.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/DuelMaterialShaders/_EnemyOuline.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/EnemysApearence/DuelMaterialShaders/_EnemyOuline.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/InkScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/INK/InkScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/TransitionEffect/Scripts/PlaneShakeDriver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/TransitionEffect/Scripts/PlaneShakeDriver.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UserSettings/EditorUserSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/UserSettings/EditorUserSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,6 +25,8 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Enemy/EnemyCombatState.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Inventory/ItemSlot.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/ShadersAndEffects/InWorkMode/TransitionEffect/Scripts/Driver.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/UI/OpeningScrene/Scripts/LoadSceneOnAnimationComplete.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.behavior@3aef49b1615b/Runtime/Execution/Nodes/Actions/Animation/SetAnimatorTriggerAction.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.behavior@3aef49b1615b/Runtime/Execution/Nodes/Composites/BranchingConditionComposite.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@a394fe607f89/ShaderLibrary/BRDF.hlsl" root0="SKIP_HIGHLIGHTING" />
@@ -37,18 +41,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "EffectOnSystem",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;EnemyInkTransition&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
     <configuration name="Standalone Player" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="$PROJECT_DIR$/../../Builds/Beta\ComixZoneRemake.exe" />
@@ -136,6 +140,11 @@
       <workItem from="1759091082756" duration="2438000" />
       <workItem from="1759186207662" duration="9000" />
       <workItem from="1759435013536" duration="598000" />
+      <workItem from="1759570863328" duration="642000" />
+      <workItem from="1759686441938" duration="1407000" />
+      <workItem from="1759850161200" duration="1403000" />
+      <workItem from="1760132130908" duration="5552000" />
+      <workItem from="1760434856058" duration="2726000" />
     </task>
     <servers />
   </component>

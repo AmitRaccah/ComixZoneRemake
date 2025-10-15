@@ -17,7 +17,7 @@ MonoBehaviour:
   damage: 15
   knockback: 1
   activeTime: 0.15
-  hitboxRadius: 0.4
+  hitboxRadius: 1
   hitboxOffset: {x: 0, y: 0, z: 0}
   side: 1
   shakeAmplitude: 0.06
@@ -30,5 +30,11 @@ MonoBehaviour:
   - vfxId: 8
     localOffset: {x: 0, y: 0, z: -0.2}
   blockHitEffects:
-  - vfxId: 6
-    localOffset: {x: 0, y: 0, z: 0}
+  - vfxId: 20
+    localOffset: {x: 0.44, y: 0, z: -3}
+  swingSfx:
+    clips: []
+  hitSfx:
+    clips: []
+  blockSfx:
+    clips: []

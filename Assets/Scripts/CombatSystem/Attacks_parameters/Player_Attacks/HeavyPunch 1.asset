@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackName: HeavyPunch
   damageType: 1
-  damage: 20
+  damage: 30
   knockback: 1
   activeTime: 0.15
-  hitboxRadius: 0.25
+  hitboxRadius: 0.4
   hitboxOffset: {x: 0, y: 0, z: 0}
   side: 0
   shakeAmplitude: 0.4
@@ -31,4 +31,12 @@ MonoBehaviour:
     localOffset: {x: 0, y: 0, z: -3}
   - vfxId: 7
     localOffset: {x: 0, y: 0, z: -3}
-  blockHitEffects: []
+  blockHitEffects:
+  - vfxId: 20
+    localOffset: {x: 0.44, y: 0, z: -3}
+  swingSfx:
+    clips: []
+  hitSfx:
+    clips: []
+  blockSfx:
+    clips: []
