@@ -10,6 +10,11 @@ public class DiegeticUIManager : MonoBehaviour
     [SerializeField] private GameObject settingsButton;
     [SerializeField] private GameObject exitButton;
     
+    [Header("Settings Panel")]
+    [SerializeField] private GameObject settingsPanel; // Can now be a Canvas
+    [SerializeField] private bool hideButtonsWhenSettingsOpen = true;
+    [SerializeField] private bool disableMenuInteractionWhenSettingsOpen = true;
+    
     [Header("New Game Settings")]
     [SerializeField] private Animation newGameAnimation;
     [SerializeField] private string animationName; // Leave empty to use default animation
@@ -56,6 +61,12 @@ public class DiegeticUIManager : MonoBehaviour
         // Check for colliders on buttons
         CheckButtonColliders();
         
+        // Hide settings panel at start
+        if (settingsPanel != null)
+        {
+            settingsPanel.SetActive(false);
+        }
+        
         // Store original materials for hover effect
         if (enableHoverEffect)
         {
@@ -100,7 +111,11 @@ public class DiegeticUIManager : MonoBehaviour
 
     void Update()
     {
-        if (!actionInProgress)
+        // Don't interact with menu buttons if settings is open and interaction is disabled
+        bool canInteractWithMenu = !actionInProgress && 
+                                   !(settingsPanel != null && settingsPanel.activeSelf && disableMenuInteractionWhenSettingsOpen);
+        
+        if (canInteractWithMenu)
         {
             // Check for hover effect
             if (enableHoverEffect)
@@ -216,6 +231,14 @@ public class DiegeticUIManager : MonoBehaviour
     void OnNewGameClicked()
     {
         actionInProgress = true;
+        
+        // Reset hover effect
+        if (currentlyHovered != null)
+        {
+            ResetMaterial(currentlyHovered);
+            currentlyHovered = null;
+        }
+        
         Debug.Log("New Game clicked!");
         
         if (newGameAnimation != null)
@@ -235,6 +258,21 @@ public class DiegeticUIManager : MonoBehaviour
         {
             // If no animation, just load scene directly
             LoadScene(sceneToLoad);
+        }
+    }
+    
+    void OnDestroy()
+    {
+        // Clean up material copies to avoid memory leaks
+        if (originalMaterials != null)
+        {
+            foreach (Material mat in originalMaterials)
+            {
+                if (mat != null)
+                {
+                    Destroy(mat);
+                }
+            }
         }
     }
 
@@ -259,10 +297,34 @@ public class DiegeticUIManager : MonoBehaviour
     void OnSettingsClicked()
     {
         Debug.Log("Settings clicked!");
-        
-        // Add your settings logic here
-        // For example: Load settings scene, open settings panel, etc.
-        // LoadScene("SettingsScene");
+        ToggleSettings();
+    }
+    
+    public void ToggleSettings()
+    {
+        if (settingsPanel != null)
+        {
+            // Toggle settings panel
+            bool isActive = settingsPanel.activeSelf;
+            settingsPanel.SetActive(!isActive);
+            
+            // Optionally hide menu buttons when settings is open
+            if (hideButtonsWhenSettingsOpen)
+            {
+                if (newGameButton != null) newGameButton.SetActive(isActive);
+                if (resumeButton != null) resumeButton.SetActive(isActive);
+                if (settingsButton != null) settingsButton.SetActive(isActive);
+                if (exitButton != null) exitButton.SetActive(isActive);
+            }
+        }
+    }
+    
+    public void CloseSettings()
+    {
+        if (settingsPanel != null && settingsPanel.activeSelf)
+        {
+            ToggleSettings();
+        }
     }
 
     void OnExitClicked()
