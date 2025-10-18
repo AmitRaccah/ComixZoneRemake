@@ -34,10 +34,14 @@ public class KnifeProjectile : MonoBehaviour
     {
         if (other.transform.root.gameObject.GetInstanceID() == attackerId) return;
 
-        if (other.GetComponentInParent<Health>())
+        var health = other.GetComponentInParent<Health>();
+        if (health)
         {
-            HitResolve.PublishDamageAndFx(attackerId, attackData, other, transform.position, transform);
+            Vector3 hitPos = other.ClosestPoint(transform.position);
+            Transform targetRoot = other.transform.root;
+            if (targetRoot) hitPos.z = targetRoot.position.z;
 
+            HitResolve.PublishDamageAndFx(attackerId, attackData, other, hitPos, null);
         }
 
         Destroy(gameObject);
