@@ -4302,7 +4302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   encounters:
   - encounterId: 1
-    killsRequired: 3
+    killsRequired: 5
     objectsToEnable:
     - {fileID: 373848902}
     - {fileID: 531176455}
@@ -4320,18 +4320,14 @@ MonoBehaviour:
       side: 0
       warningLeadTime: 5
     enemyTriggers:
-    - onKills: 2
-      enemy: {fileID: 1488758589}
-      initialAssignmentId: 1
-      initialDelay: 0
     - onKills: 3
       enemy: {fileID: 413739089}
       initialAssignmentId: 2
-      initialDelay: 0
+      initialDelay: 2
     - onKills: 3
       enemy: {fileID: 1504046173}
       initialAssignmentId: 1
-      initialDelay: 0
+      initialDelay: 4
     currentKills: 0
     isCompleted: 0
 --- !u!1 &111211925
@@ -59526,7 +59522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].spawnCount
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].spawnCount
@@ -59554,7 +59550,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].assignmentId
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[2].assignmentId
@@ -76428,7 +76424,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].spawnCount
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].encounterId
