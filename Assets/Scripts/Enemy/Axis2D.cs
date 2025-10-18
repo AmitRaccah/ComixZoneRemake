@@ -6,11 +6,9 @@ public static class Axis2D
 {
     public static ForwardAxis Forward = ForwardAxis.Z;
 
-    public static float YawForDx(float dx, bool invert)
+    public static float YawForDx(float dx)
     {
-        float yaw = Forward == ForwardAxis.Z ? (dx >= 0f ? 90f : -90f) : (dx >= 0f ? 0f : 180f);
-        if (invert) yaw = (yaw + 180f) % 360f;
-        return yaw;
+        return Forward == ForwardAxis.Z ? (dx >= 0f ? 90f : -90f) : (dx >= 0f ? 0f : 180f);
     }
 
     public static bool IsInFront(Transform t, Vector3 pos)
