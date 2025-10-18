@@ -11,9 +11,17 @@ public class EncounterManager : MonoBehaviour
         public EnemyPoolMember hazard;
         public string assignmentId;
         public float delay;
-
         public HazardSide side;
-        public float warningLeadTime = 0.5f; // כמה לפני ה-delay להבהב
+        public float warningLeadTime = 0.5f;
+    }
+
+    [System.Serializable]
+    public class EnemyTrigger
+    {
+        public int onKills;
+        public EnemyPoolMember enemy;
+        public string initialAssignmentId;
+        public float initialDelay;
     }
 
     [System.Serializable]
@@ -23,6 +31,7 @@ public class EncounterManager : MonoBehaviour
         public int killsRequired = 1;
         public GameObject[] objectsToEnable;
         public HazardTrigger[] hazardTriggers;
+        public EnemyTrigger[] enemyTriggers;
         [HideInInspector] public int currentKills = 0;
         [HideInInspector] public bool isCompleted = false;
     }
@@ -49,6 +58,7 @@ public class EncounterManager : MonoBehaviour
 
         enc.currentKills++;
         TriggerHazards(enc, e.encounterId);
+        TriggerEnemies(enc);
 
         if (enc.currentKills >= enc.killsRequired)
         {
@@ -71,6 +81,22 @@ public class EncounterManager : MonoBehaviour
 
             if (HazardWarningUI.Instance)
                 StartCoroutine(WarningRoutine(t));
+        }
+    }
+
+    void TriggerEnemies(Encounter enc)
+    {
+        if (enc.enemyTriggers == null) return;
+        var pool = EnemyPool.Instance;
+        if (!pool) return;
+
+        for (int i = 0; i < enc.enemyTriggers.Length; i++)
+        {
+            var t = enc.enemyTriggers[i];
+            if (t == null || t.enemy == null) continue;
+            if (t.onKills != enc.currentKills) continue;
+
+            pool.StartEnemySequence(t.enemy, t.initialAssignmentId, t.initialDelay);
         }
     }
 

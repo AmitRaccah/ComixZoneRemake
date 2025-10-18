@@ -667,7 +667,6 @@ MonoBehaviour:
     encounterId: 1
     spawnCount: 1
     respawnDelay: 0
-    transitionDelay: 0
 --- !u!114 &10867016
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4320,6 +4319,19 @@ MonoBehaviour:
       delay: 2
       side: 0
       warningLeadTime: 5
+    enemyTriggers:
+    - onKills: 2
+      enemy: {fileID: 1488758589}
+      initialAssignmentId: 1
+      initialDelay: 0
+    - onKills: 3
+      enemy: {fileID: 413739089}
+      initialAssignmentId: 2
+      initialDelay: 0
+    - onKills: 3
+      enemy: {fileID: 1504046173}
+      initialAssignmentId: 1
+      initialDelay: 0
     currentKills: 0
     isCompleted: 0
 --- !u!1 &111211925
@@ -10819,6 +10831,7 @@ MonoBehaviour:
     - {fileID: 5719676765369459288}
     - {fileID: 8684020230768524890}
     hazardTriggers: []
+    enemyTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!1 &240905577
@@ -14383,7 +14396,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 396479683}
   initialAssignmentId: 4
-  startDelay: 1
+  initialDelay: 0
 --- !u!65 &280630264
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15604,6 +15617,7 @@ MonoBehaviour:
     - {fileID: 5719676765369459289}
     - {fileID: 8684020230768524891}
     hazardTriggers: []
+    enemyTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!1 &297948864
@@ -47561,7 +47575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 1246814788}
   initialAssignmentId: 11
-  startDelay: 2
+  initialDelay: 0
 --- !u!65 &788558505
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -47950,11 +47964,11 @@ PrefabInstance:
       objectReference: {fileID: 238262872}
     - target: {fileID: 1379033389560604084, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       propertyPath: stages.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       propertyPath: stages.Array.data[0].spawnCount
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: 58d6db78c455df94a8adf6a4421ab50b, type: 3}
       propertyPath: stages.Array.data[1].spawnCount
@@ -48653,7 +48667,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 871340803}
   initialAssignmentId: 7
-  startDelay: 2
+  initialDelay: 0
 --- !u!65 &809582847
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51448,7 +51462,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 1488758589}
   initialAssignmentId: 1
-  startDelay: 0.5
+  initialDelay: 0
 --- !u!65 &861955842
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59512,11 +59526,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].spawnCount
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].spawnCount
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[2].spawnCount
@@ -59528,7 +59542,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].encounterId
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[2].encounterId
@@ -59536,11 +59550,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].assignmentId
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[1].assignmentId
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[2].assignmentId
@@ -61429,6 +61443,7 @@ MonoBehaviour:
     - {fileID: 5719676765369459290}
     - {fileID: 8684020230768524892}
     hazardTriggers: []
+    enemyTriggers: []
     currentKills: 0
     isCompleted: 0
 --- !u!43 &1109053452
@@ -65184,7 +65199,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 816533859}
   initialAssignmentId: 12
-  startDelay: 2
+  initialDelay: 0
 --- !u!65 &1208154451
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -75059,7 +75074,6 @@ MonoBehaviour:
     encounterId: 1
     spawnCount: 1
     respawnDelay: 0
-    transitionDelay: 0
 --- !u!114 &1481970035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -76406,19 +76420,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].spawnCount
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
+      propertyPath: stages.Array.data[1].spawnCount
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].encounterId
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
+      propertyPath: stages.Array.data[1].encounterId
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: stages.Array.data[0].assignmentId
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1379033389560604084, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
+      propertyPath: stages.Array.data[1].assignmentId
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1850917541506294041, guid: d603c82d6441dd041b4ac3b81e5d628c, type: 3}
       propertyPath: eyeHeight
@@ -83244,7 +83270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 413739089}
   initialAssignmentId: 3
-  startDelay: 0.5
+  initialDelay: 0
 --- !u!65 &1682762347
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -94102,7 +94128,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 1504046173}
   initialAssignmentId: 6
-  startDelay: 0.05
+  initialDelay: 0
 --- !u!65 &1815647735
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -102468,7 +102494,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyToTrigger: {fileID: 980265605}
   initialAssignmentId: 9
-  startDelay: 2
+  initialDelay: 0
 --- !u!65 &1985636980
 BoxCollider:
   m_ObjectHideFlags: 0
