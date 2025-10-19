@@ -11,9 +11,12 @@ public class DiegeticUIManager : MonoBehaviour
     [SerializeField] private GameObject exitButton;
     
     [Header("Settings Panel")]
-    [SerializeField] private GameObject settingsPanel; // Can now be a Canvas
+    [SerializeField] private GameObject settingsPanel; // 3D diegetic settings panel
     [SerializeField] private bool hideButtonsWhenSettingsOpen = true;
     [SerializeField] private bool disableMenuInteractionWhenSettingsOpen = true;
+    [SerializeField] private bool parentSettingsPanelToCamera = true;
+    [SerializeField] private Vector3 settingsPanelLocalPosition = new Vector3(0, 0, 1.5f);
+    [SerializeField] private Vector3 settingsPanelLocalRotation = new Vector3(0, 0, 0);
     
     [Header("New Game Settings")]
     [SerializeField] private Animation newGameAnimation;
@@ -33,6 +36,14 @@ public class DiegeticUIManager : MonoBehaviour
     [SerializeField] private bool enableHoverEffect = true;
     [SerializeField] private float brightnessMultiplier = 1.3f; // How much brighter (1.3 = 30% brighter)
     
+    [Header("Sound Effects")]
+    [SerializeField] private AudioSource audioSource; // Audio source for UI sounds
+    [SerializeField] private AudioClip hoverSound; // Sound when hovering over buttons
+    [SerializeField] private AudioClip clickSound; // Sound when clicking buttons
+    [SerializeField] private AudioClip settingsOpenSound; // Sound when opening settings
+    [SerializeField] private AudioClip settingsCloseSound; // Sound when closing settings
+    [SerializeField] private float soundVolume = 1f;
+    
     private bool actionInProgress = false;
     private GameObject currentlyHovered = null;
     private Material[] originalMaterials;
@@ -44,6 +55,14 @@ public class DiegeticUIManager : MonoBehaviour
         if (playerCamera == null)
         {
             playerCamera = Camera.main;
+        }
+        
+        // Setup audio source
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0; // 2D sound
         }
         
         // Setup cursor
@@ -65,6 +84,14 @@ public class DiegeticUIManager : MonoBehaviour
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(false);
+            
+            // Parent to camera if option is enabled
+            if (parentSettingsPanelToCamera && playerCamera != null)
+            {
+                settingsPanel.transform.SetParent(playerCamera.transform);
+                settingsPanel.transform.localPosition = settingsPanelLocalPosition;
+                settingsPanel.transform.localRotation = Quaternion.Euler(settingsPanelLocalRotation);
+            }
         }
         
         // Store original materials for hover effect
@@ -111,23 +138,22 @@ public class DiegeticUIManager : MonoBehaviour
 
     void Update()
     {
-        // Don't interact with menu buttons if settings is open and interaction is disabled
-        bool canInteractWithMenu = !actionInProgress && 
-                                   !(settingsPanel != null && settingsPanel.activeSelf && disableMenuInteractionWhenSettingsOpen);
+        if (actionInProgress)
+            return;
         
-        if (canInteractWithMenu)
+        // Check if settings is open
+        bool settingsIsOpen = settingsPanel != null && settingsPanel.activeSelf;
+        
+        // Always check for clicks
+        if (Input.GetMouseButtonDown(0))
         {
-            // Check for hover effect
-            if (enableHoverEffect)
-            {
-                CheckHover();
-            }
-            
-            // Check for click
-            if (Input.GetMouseButtonDown(0))
-            {
-                CheckForButtonClick();
-            }
+            CheckForButtonClick();
+        }
+        
+        // Only check hover effect if we can interact with menu buttons
+        if (enableHoverEffect && !(settingsIsOpen && disableMenuInteractionWhenSettingsOpen))
+        {
+            CheckHover();
         }
     }
     
@@ -162,6 +188,7 @@ public class DiegeticUIManager : MonoBehaviour
             if (hoveredObject != null)
             {
                 BrightenMaterial(hoveredObject);
+                PlaySound(hoverSound); // Play hover sound
             }
             
             currentlyHovered = hoveredObject;
@@ -225,7 +252,30 @@ public class DiegeticUIManager : MonoBehaviour
             {
                 OnExitClicked();
             }
+            // If settings panel is open and we clicked something that's not part of it, close it
+            else if (settingsPanel != null && settingsPanel.activeSelf && !IsPartOfSettingsPanel(clickedObject))
+            {
+                CloseSettings();
+            }
         }
+        // Clicked on nothing and settings is open - close it
+        else if (settingsPanel != null && settingsPanel.activeSelf)
+        {
+            CloseSettings();
+        }
+    }
+    
+    bool IsPartOfSettingsPanel(GameObject obj)
+    {
+        // Check if the clicked object is the settings panel or a child of it
+        Transform current = obj.transform;
+        while (current != null)
+        {
+            if (current.gameObject == settingsPanel)
+                return true;
+            current = current.parent;
+        }
+        return false;
     }
 
     void OnNewGameClicked()
@@ -238,6 +288,8 @@ public class DiegeticUIManager : MonoBehaviour
             ResetMaterial(currentlyHovered);
             currentlyHovered = null;
         }
+        
+        PlaySound(clickSound); // Play click sound
         
         Debug.Log("New Game clicked!");
         
@@ -278,6 +330,7 @@ public class DiegeticUIManager : MonoBehaviour
 
     void OnResumeClicked()
     {
+        PlaySound(clickSound); // Play click sound
         Debug.Log("Resume clicked!");
         
         // Add your resume logic here
@@ -296,6 +349,7 @@ public class DiegeticUIManager : MonoBehaviour
 
     void OnSettingsClicked()
     {
+        PlaySound(clickSound); // Play click sound
         Debug.Log("Settings clicked!");
         ToggleSettings();
     }
@@ -305,16 +359,26 @@ public class DiegeticUIManager : MonoBehaviour
         if (settingsPanel != null)
         {
             // Toggle settings panel
-            bool isActive = settingsPanel.activeSelf;
-            settingsPanel.SetActive(!isActive);
+            bool wasActive = settingsPanel.activeSelf;
+            settingsPanel.SetActive(!wasActive);
+            
+            // Play appropriate sound
+            if (!wasActive)
+            {
+                PlaySound(settingsOpenSound);
+            }
+            else
+            {
+                PlaySound(settingsCloseSound);
+            }
             
             // Optionally hide menu buttons when settings is open
             if (hideButtonsWhenSettingsOpen)
             {
-                if (newGameButton != null) newGameButton.SetActive(isActive);
-                if (resumeButton != null) resumeButton.SetActive(isActive);
-                if (settingsButton != null) settingsButton.SetActive(isActive);
-                if (exitButton != null) exitButton.SetActive(isActive);
+                if (newGameButton != null) newGameButton.SetActive(wasActive);
+                if (resumeButton != null) resumeButton.SetActive(wasActive);
+                if (settingsButton != null) settingsButton.SetActive(wasActive);
+                if (exitButton != null) exitButton.SetActive(wasActive);
             }
         }
     }
@@ -329,6 +393,7 @@ public class DiegeticUIManager : MonoBehaviour
 
     void OnExitClicked()
     {
+        PlaySound(clickSound); // Play click sound
         Debug.Log("Exit clicked!");
         
         // Quit the application
@@ -337,6 +402,14 @@ public class DiegeticUIManager : MonoBehaviour
         #else
             Application.Quit();
         #endif
+    }
+    
+    void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip, soundVolume);
+        }
     }
 
     IEnumerator WaitForAnimationAndLoadScene()

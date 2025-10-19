@@ -4,7 +4,6 @@ using UnityEngine;
 public class EnemyShooter : MonoBehaviour
 {
     [SerializeField] private KnifeItem knifeConfig;
-    [SerializeField] private GameObject knifePrefab;
     [SerializeField] private Transform throwSocket;
 
     int myId;
@@ -27,9 +26,7 @@ public class EnemyShooter : MonoBehaviour
 
     public void Anim_SpawnKnife()
     {
-        if (!knifeConfig || !knifeConfig.Data || !knifePrefab) return;
-
-        KnifeFactory.Spawn(gameObject, knifePrefab, throwSocket,
-                           knifeConfig.Data, knifeConfig.speed, knifeConfig.distance, knifeConfig.rotationSpeed);
+        if (!knifeConfig || !knifeConfig.Data || string.IsNullOrEmpty(knifeConfig.poolId)) return;
+        KnifeFactory.Spawn(gameObject, knifeConfig.poolId, throwSocket, knifeConfig.Data, knifeConfig.speed, knifeConfig.distance, knifeConfig.rotationSpeed);
     }
 }

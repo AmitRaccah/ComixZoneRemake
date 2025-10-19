@@ -1,25 +1,14 @@
 using UnityEngine;
-using System.Collections;
 
 public class EnemySpawnSequence : MonoBehaviour
 {
     [System.Serializable]
     public class Stage
     {
-        [Tooltip("The ID of the spawn assignment from the EnemyPool.")]
         public string assignmentId;
-
-        [Tooltip("The ID of the encounter this stage belongs to. Kills will count towards this encounter.")]
         public string encounterId;
-
-        [Tooltip("How many times the enemy will spawn at this stage.")]
         public int spawnCount = 1;
-
-        [Tooltip("Delay in seconds before respawning at the same stage.")]
         public float respawnDelay = 2f;
-
-        [Tooltip("Delay in seconds before transitioning to the next stage.")]
-        public float transitionDelay = 1f;
     }
 
     [SerializeField] private Stage[] stages;
@@ -33,7 +22,7 @@ public class EnemySpawnSequence : MonoBehaviour
         poolMember = GetComponent<EnemyPoolMember>();
     }
 
-    public void BeginSequence(string initialAssignmentId, float delay)
+    public void BeginSequence(string initialAssignmentId, float initialDelay)
     {
         int initialStageIndex = -1;
         for (int i = 0; i < stages.Length; i++)
@@ -54,7 +43,7 @@ public class EnemySpawnSequence : MonoBehaviour
         currentStageIndex = initialStageIndex;
         livesRemainingInStage = stages[currentStageIndex].spawnCount;
 
-        ScheduleSpawn(stages[currentStageIndex], delay, true);
+        ScheduleSpawn(stages[currentStageIndex], initialDelay, true);
     }
 
     private void OnReturnedToPool()
@@ -72,22 +61,18 @@ public class EnemySpawnSequence : MonoBehaviour
             {
                 Stage nextStage = stages[currentStageIndex];
                 livesRemainingInStage = nextStage.spawnCount;
-                ScheduleSpawn(nextStage, nextStage.transitionDelay);
+                ScheduleSpawn(nextStage, 0f);
             }
             else
             {
-                currentStageIndex = -1; 
+                currentStageIndex = -1;
             }
         }
     }
 
     private void ScheduleSpawn(Stage stage, float delay, bool isFirstSpawn = false)
     {
-        if (!isFirstSpawn)
-        {
-            livesRemainingInStage--;
-        }
-
+        if (!isFirstSpawn) livesRemainingInStage--;
         EnemyPool.Instance.ScheduleSpawn(poolMember, stage.assignmentId, stage.encounterId, delay);
     }
 }
