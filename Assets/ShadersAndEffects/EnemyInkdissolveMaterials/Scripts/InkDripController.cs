@@ -7,38 +7,49 @@ public class InkDripController : MonoBehaviour
     [SerializeField] private Transform characterRoot;
     
     [Header("Drip Settings")]
-    [SerializeField] private float dripRadius = 1.5f;
-    [SerializeField] private int dripsPerSecond = 200;
+    [SerializeField] private float dripRadius = 0.3f;
+    [SerializeField] private int dripsPerSecond = 100;
     [SerializeField] private float dripSpeed = 2f;
-    [SerializeField] private Vector2 dripSizeRange = new Vector2(0.05f, 0.15f);
+    [SerializeField] private Vector2 dripSizeRange = new Vector2(0.0003f, 0.004f);
     [SerializeField] private Color inkColor = Color.black;
+    
+    private ParticleSystem.MainModule mainModule;
+    private ParticleSystem.EmissionModule emission;
+    private ParticleSystem.ShapeModule shapeModule;
     
     void Start()
     {
-        // If no particle system assigned, create one
-        if (dripParticles == null)
+        if (dripParticles != null)
         {
-            CreateDripParticleSystem();
+            ConfigureParticleSystem();
         }
-        
-        // NOTE: Configure the particle system manually in the Inspector!
-        // If you want automatic configuration, uncomment the line below:
-        // ConfigureParticleSystem();
     }
     
-    void CreateDripParticleSystem()
+    void ConfigureParticleSystem()
     {
-        GameObject particleObj = new GameObject("InkDrips");
-        particleObj.transform.SetParent(characterRoot != null ? characterRoot : transform);
-        particleObj.transform.localPosition = Vector3.zero;
-        
-        dripParticles = particleObj.AddComponent<ParticleSystem>();
+        mainModule = dripParticles.main;
+        emission = dripParticles.emission;
+        shapeModule = dripParticles.shape;
+    
+        mainModule.loop = false;
+        mainModule.playOnAwake = false;
+        mainModule.startLifetime = new ParticleSystem.MinMaxCurve(3f, 5f);  // MUCH LONGER lifetime
+        mainModule.startSpeed = 0f;  // No initial speed
+        mainModule.startSize = new ParticleSystem.MinMaxCurve(dripSizeRange.x, dripSizeRange.y);
+        mainModule.startColor = inkColor;
+        mainModule.gravityModifier = 0.3f;  // VERY SLOW gravity (was 1.5-2f)
+        mainModule.maxParticles = 500;
+        mainModule.simulationSpace = ParticleSystemSimulationSpace.World;
+    
+        emission.rateOverTime = dripsPerSecond;
+    
+        shapeModule.shapeType = ParticleSystemShapeType.Circle;
+        shapeModule.radius = dripRadius;
+        shapeModule.radiusThickness = 1f;
     }
     
     public void StartDrips(float yPosition)
     {
-        if (dripParticles == null) return;
-        
         Vector3 pos = dripParticles.transform.position;
         pos.y = yPosition;
         dripParticles.transform.position = pos;
@@ -54,8 +65,6 @@ public class InkDripController : MonoBehaviour
     
     public void UpdateDripPosition(float yPosition)
     {
-        if (dripParticles == null) return;
-        
         Vector3 pos = dripParticles.transform.position;
         pos.y = yPosition;
         dripParticles.transform.position = pos;
@@ -63,17 +72,13 @@ public class InkDripController : MonoBehaviour
     
     public void StopEmission()
     {
-        if (dripParticles == null) return;
-        
         var emission = dripParticles.emission;
-        emission.enabled = false;  // Stop spawning new drips, but existing ones keep falling
+        emission.enabled = false;
     }
     
     public void StopDrips()
     {
-        if (dripParticles == null) return;
-        
-        if (dripParticles.isPlaying)
+        if (dripParticles != null && dripParticles.isPlaying)
         {
             var emission = dripParticles.emission;
             emission.enabled = false;
