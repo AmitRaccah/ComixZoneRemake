@@ -123,7 +123,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26e54e5a728a9234ab24fcf1460ed8a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 2
+  MoveSpeed: 2.2
   SprintSpeed: 5.335
   RotationSmoothTime: 0.04
   SpeedChangeRate: 10
@@ -577,7 +577,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe0696e086211040ba90b07325983b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
   throwSocket: {fileID: 3211131276196081246}
   throwAnimationTrigger: Throw
 --- !u!114 &3585741332985080660
@@ -670,10 +669,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laneZ: 0
-  leftYaw: -90
-  rightYaw: 90
-  snapYawForCharacterController: 0
-  snapYawForRigidbody: 1
+  zeroZVelocity: 1
+  zeroAngularVelocity: 1
 --- !u!1 &8848633590746621208
 GameObject:
   m_ObjectHideFlags: 0

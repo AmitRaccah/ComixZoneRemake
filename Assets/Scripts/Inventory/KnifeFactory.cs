@@ -2,29 +2,19 @@ using UnityEngine;
 
 public static class KnifeFactory
 {
-    public static void Spawn(GameObject owner, GameObject prefab, Transform socket,
-                             AttackData data, float speed, float distance, float rotationSpeed)
+    public static void Spawn(GameObject owner, string knifeId, Transform socket, AttackData data, float speed, float distance, Vector3 spinPerSecond)
     {
-        if (owner == null || prefab == null || data == null) return;
+        if (!owner || string.IsNullOrEmpty(knifeId) || data == null || KnifePoolManager.Instance == null) return;
 
-        Vector3 startPos = socket
-            ? socket.position
-            : owner.transform.position + owner.transform.forward * 0.5f + Vector3.up * 1f;
-
+        Vector3 startPos = socket ? socket.position : owner.transform.position + owner.transform.forward * 0.5f + Vector3.up * 1f;
         startPos.z = owner.transform.position.z;
 
-        float sign = Mathf.Sign(Vector3.Dot(
-            socket ? socket.forward : owner.transform.forward,
-            Vector3.right
-        ));
+        Vector3 f = socket ? socket.forward : owner.transform.forward;
+        float sign = Mathf.Sign(Vector3.Dot(f, Vector3.right));
         if (sign == 0f) sign = 1f;
-
         Vector3 dir = new Vector3(sign, 0f, 0f);
         Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
 
-        var go = Object.Instantiate(prefab, startPos, rot);
-        go.GetComponent<KnifeProjectile>()?.Initialize(
-            owner.GetInstanceID(), data, speed, distance, rotationSpeed
-        );
+        KnifePoolManager.Instance.Spawn(knifeId, startPos, rot, owner.GetInstanceID(), data, speed, distance, spinPerSecond);
     }
 }
