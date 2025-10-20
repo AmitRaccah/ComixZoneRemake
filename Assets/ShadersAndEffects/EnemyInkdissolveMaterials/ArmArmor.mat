@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: LEGS2
+  m_Name: ArmArmor
   m_Shader: {fileID: -6465566751694194690, guid: 2d1544b114abeaa459c3295d87642d4f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -45,7 +45,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Diffuse_Texture:
-        m_Texture: {fileID: 2800000, guid: 79360ba8df0a4534890aa4ef9ee8b174, type: 3}
+        m_Texture: {fileID: 2800000, guid: e3f435b99bd707b4f9941353965d19cd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
@@ -100,24 +100,24 @@ Material:
     - _DetailAlbedoMapScale: 1
     - _DetailNormalMapScale: 1
     - _Diffuse_softness: 0.1
-    - _Diffuse_threshold: 1.082
+    - _Diffuse_threshold: 1.091
     - _DstBlend: 0
     - _DstBlendAlpha: 0
     - _EnvironmentReflections: 1
-    - _Falloff_Amount: 9.5
+    - _Falloff_Amount: 12.55
     - _Fresnel_Sharpness: 3
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
-    - _InkBandWidth: 0.7
-    - _Lighting_Cutoff: 0
+    - _InkBandWidth: 0.2
+    - _Lighting_Cutoff: 5.95
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _Saturation: 1.079
+    - _Saturation: 0.5
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -125,16 +125,15 @@ Material:
     - _SrcBlendAlpha: 1
     - _Step: 3
     - _Surface: 0
-    - _WipeMaxY: 1
-    - _WipeMinY: -2
-    - _WipeOffset: 6.31
-    - _WipeTheshold: 1
+    - _WipeMaxY: 1.5
+    - _WipeMinY: 0.5
+    - _WipeTheshold: 0.692
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Diffuse_Color: {r: 1, g: 1, b: 1, a: 0}
+    - _Diffuse_Color: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _Fresnel_Color: {r: 1, g: 1, b: 1, a: 0}
     - _Inkcolor: {r: 0, g: 0, b: 0, a: 0}
