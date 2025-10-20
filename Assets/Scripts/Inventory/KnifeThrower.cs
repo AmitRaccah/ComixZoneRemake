@@ -3,43 +3,20 @@ using UnityEngine;
 public class KnifeThrower : MonoBehaviour
 {
     [SerializeField] private Transform throwSocket;
-    [SerializeField] private string throwAnimationTrigger = "Throw";
 
-    private int playerId;
-    private bool pendingThrow;
-    private string pendingKnifeId;
-    private AttackData pendingData;
-    private float pendingSpeed, pendingDistance, pendingRotation;
-    private Animator anim;
-
-    void Awake()
+    void OnEnable()
     {
-        playerId = gameObject.GetInstanceID();
-        anim = GetComponent<Animator>();
+        CoreBus.Subscribe<KnifeThrownEvent>(OnKnifeThrown);
     }
 
-    void OnEnable() { CoreBus.Subscribe<KnifeThrownEvent>(OnKnifeThrown); }
-    void OnDisable() { CoreBus.Unsubscribe<KnifeThrownEvent>(OnKnifeThrown); }
-
-    void OnKnifeThrown(KnifeThrownEvent e)
+    void OnDisable()
     {
-        if (!CompareTag("Player")) return;
-        pendingThrow = true;
-        pendingKnifeId = e.knifeId;
-        pendingData = e.attackData;
-        pendingSpeed = e.speed;
-        pendingDistance = e.distance;
-        pendingRotation = e.rotationSpeed;
-        if (AnimationHelper.Instance) AnimationHelper.Instance.Trigger(throwAnimationTrigger);
-        else if (anim) anim.SetTrigger(throwAnimationTrigger);
+        CoreBus.Unsubscribe<KnifeThrownEvent>(OnKnifeThrown);
     }
 
-    public void Anim_SpawnKnife()
+    private void OnKnifeThrown(KnifeThrownEvent e)
     {
-        if (!pendingThrow || string.IsNullOrEmpty(pendingKnifeId) || pendingData == null) return;
-        KnifeFactory.Spawn(gameObject, pendingKnifeId, throwSocket, pendingData, pendingSpeed, pendingDistance, pendingRotation);
-        pendingThrow = false;
-        pendingKnifeId = null;
-        pendingData = null;
+        if (string.IsNullOrEmpty(e.knifeId) || e.attackData == null) return;
+        KnifeFactory.Spawn(gameObject, e.knifeId, throwSocket, e.attackData, e.speed, e.distance, e.rotationSpeedX, e.rotationSpeedZ);
     }
 }

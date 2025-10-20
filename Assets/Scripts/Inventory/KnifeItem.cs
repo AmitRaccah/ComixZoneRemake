@@ -7,14 +7,15 @@ public class KnifeItem : Item
     public string poolId;
     public float speed = 10f;
     public float distance = 15f;
-    public float rotationSpeed = 720f;
+    public float rotationSpeedX = 720f;
+    public float rotationSpeedZ = 0f;
 
     public AttackData Data => attackData;
 
     public override bool Use()
     {
         if (attackData == null || string.IsNullOrEmpty(poolId)) return false;
-        CoreBus.Publish(new KnifeThrownEvent(poolId, attackData, speed, distance, rotationSpeed));
+        CoreBus.Publish(new KnifeThrownEvent(poolId, attackData, speed, distance, rotationSpeedX, rotationSpeedZ));
         return true;
     }
 }

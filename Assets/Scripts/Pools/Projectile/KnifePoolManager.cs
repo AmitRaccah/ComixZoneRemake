@@ -15,7 +15,7 @@ public class KnifePoolManager : MonoBehaviour
         Instance = this;
     }
 
-    public KnifePoolMember Spawn(string knifeId, Vector3 position, Quaternion rotation, int attackerId, AttackData data, float speed, float distance, float rotationSpeed)
+    public KnifePoolMember Spawn(string knifeId, KnifeSpawnParams p)
     {
         if (string.IsNullOrEmpty(knifeId)) return null;
 
@@ -29,7 +29,7 @@ public class KnifePoolManager : MonoBehaviour
             var member = knivesInScene[currentIndex];
             if (member && member.knifeId == knifeId && !member.IsActive)
             {
-                member.PrepareForSpawn(position, rotation, attackerId, data, speed, distance, rotationSpeed);
+                member.PrepareForSpawn(p);
                 nextIndexPerId[knifeId] = (currentIndex + 1) % count;
                 return member;
             }

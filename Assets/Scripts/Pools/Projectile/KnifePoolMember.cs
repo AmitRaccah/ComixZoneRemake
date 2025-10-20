@@ -15,13 +15,13 @@ public class KnifePoolMember : MonoBehaviour
         IsActive = false;
     }
 
-    public void PrepareForSpawn(Vector3 position, Quaternion rotation, int attackerId, AttackData data, float speed, float distance, float rotationSpeed)
+    public void PrepareForSpawn(KnifeSpawnParams p)
     {
         if (IsActive) return;
-        transform.SetPositionAndRotation(position, rotation);
+        transform.SetPositionAndRotation(p.startPos, p.startRot);
         gameObject.SetActive(true);
         IsActive = true;
-        projectile.Activate(this, attackerId, data, speed, distance, rotationSpeed);
+        projectile.Activate(this, p);
     }
 
     public void ReturnToPool()
