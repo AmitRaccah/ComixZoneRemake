@@ -48,6 +48,31 @@ public class SfxPlayer : MonoBehaviour
         src.clip = clip;
         src.volume = 1f;
         src.pitch = 1f;
+        src.spatialBlend = spatialBlend;
+        src.rolloffMode = rolloff;
+        src.minDistance = minDistance;
+        src.maxDistance = maxDistance;
+        src.Play();
+
+        if (follow != null && spatialBlend > 0f)
+            StartCoroutine(FollowWhilePlaying(src, follow));
+    }
+
+    public void PlayClip(AudioClip clip, Vector3 position, Transform follow)
+    {
+        if (!clip) return;
+
+        var src = Next();
+        src.Stop();
+        src.transform.SetParent(null);
+        src.transform.position = position;
+        src.clip = clip;
+        src.volume = 1f;
+        src.pitch = 1f;
+        src.spatialBlend = spatialBlend;
+        src.rolloffMode = rolloff;
+        src.minDistance = minDistance;
+        src.maxDistance = maxDistance;
         src.Play();
 
         if (follow != null && spatialBlend > 0f)

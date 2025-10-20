@@ -19,8 +19,12 @@ public class PotionItem : Item
             VfxPoolManager.Instance.Spawn(consumeEffect.vfxId, pos, t.rotation);
         }
 
-        if (consumeClip != null && t != null)
-            AudioSource.PlayClipAtPoint(consumeClip, t.position);
+        if (consumeClip != null)
+        {
+            var sfx = Object.FindObjectOfType<SfxPlayer>();
+            if (sfx != null)
+                sfx.PlayClip(consumeClip, t ? t.position : Vector3.zero, t);
+        }
 
         CoreBus.Publish(new PotionConsumedEvent(healAmount));
         return true;
