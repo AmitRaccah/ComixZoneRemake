@@ -3,43 +3,73 @@ using DG.Tweening;
 
 public class KnifeProjectile : MonoBehaviour
 {
+    private KnifePoolMember member;
     private int attackerId;
     private AttackData attackData;
     private float speed;
     private float distance;
-    private float rotationSpeed;
+    private Vector3 spinPerSecond;
     private Collider knifeCollider;
+    private Tween moveTween;
+    private Tween rotateTween;
+    private bool active;
 
-    public void Initialize(int atkId, AttackData data, float spd, float dist, float rotSpeed)
+    void Awake()
     {
+        knifeCollider = GetComponent<Collider>();
+        if (knifeCollider) knifeCollider.isTrigger = true;
+    }
+
+    public void Activate(KnifePoolMember m, int atkId, AttackData data, float spd, float dist, Vector3 spin)
+    {
+        member = m;
         attackerId = atkId;
         attackData = data;
         speed = spd;
         distance = dist;
-        rotationSpeed = rotSpeed;
-        knifeCollider = GetComponent<Collider>();
-        knifeCollider.isTrigger = true;
+        spinPerSecond = spin;
+        active = true;
 
         float duration = distance / speed;
-        transform.DOMove(transform.position + transform.forward * distance, duration)
-            .SetEase(Ease.Linear)
-            .OnComplete(() => Destroy(gameObject));
 
-        transform.DORotate(new Vector3(rotationSpeed, 0, 0), duration, RotateMode.LocalAxisAdd)
+        moveTween = transform.DOMove(transform.position + transform.forward * distance, duration)
+            .SetEase(Ease.Linear)
+            .OnComplete(End);
+
+        Vector3 deltaAngles = spinPerSecond * duration;
+        rotateTween = transform.DORotate(deltaAngles, duration, RotateMode.LocalAxisAdd)
             .SetEase(Ease.Linear)
             .SetLoops(-1, LoopType.Incremental);
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void Deactivate()
     {
+        active = false;
+        if (moveTween != null) { moveTween.Kill(); moveTween = null; }
+        if (rotateTween != null) { rotateTween.Kill(); rotateTween = null; }
+    }
+
+    void End()
+    {
+        if (!active) return;
+        active = false;
+        if (KnifePoolManager.Instance != null) KnifePoolManager.Instance.Return(member);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (!active) return;
         if (other.transform.root.gameObject.GetInstanceID() == attackerId) return;
 
-        if (other.GetComponentInParent<Health>())
+        var health = other.GetComponentInParent<Health>();
+        if (health)
         {
-            HitResolve.PublishDamageAndFx(attackerId, attackData, other, transform.position, transform);
-
+            Vector3 hitPos = other.ClosestPoint(transform.position);
+            Transform targetRoot = other.transform.root;
+            if (targetRoot) hitPos.z = targetRoot.position.z;
+            HitResolve.PublishDamageAndFx(attackerId, attackData, other, hitPos, null);
         }
 
-        Destroy(gameObject);
+        End();
     }
 }

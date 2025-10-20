@@ -5,28 +5,20 @@ using Unity.Behavior;
 [RequireComponent(typeof(BehaviorGraphAgent))]
 public class EnemyRetreatNav : MonoBehaviour
 {
-    [Header("Blackboard / Animator names")]
     [SerializeField] string stepsIntParam = "AI_RetreatSteps";
     [SerializeField] string targetVar = "RetreatTarget";
     [SerializeField] string retreatFlagVar = "IsRetreating";
     [SerializeField] string speedFloatParam = "Speed";
-
-    [Header("Retreat step")]
     [SerializeField] float stepDistance = 0.8f;
     [SerializeField] float arrivalThreshold = 0.2f;
-
-    [Header("Tuning")]
     [SerializeField] float speedDampTime = 0.1f;
-
-    [Header("Obstacle")]
     [SerializeField] LayerMask obstacleMask = ~0;
     [SerializeField] float skin = 0.05f;
 
     Animator anim;
     BehaviorGraphAgent agent;
     Transform retreatTarget;
-
-    Transform player;      // לשימוש בחישוב כיוון בריחה
+    Transform player;
     int stepsId, speedId;
     bool isRetreating;
     float arrivalSqr;
@@ -60,11 +52,9 @@ public class EnemyRetreatNav : MonoBehaviour
     void Reinit()
     {
         EnsureTarget();
-
         isRetreating = false;
         agent.SetVariableValue(retreatFlagVar, false);
         anim.SetInteger(stepsId, 0);
-
         if (!player) player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (player) agent.SetVariableValue(targetVar, player.gameObject);
     }
@@ -123,9 +113,7 @@ public class EnemyRetreatNav : MonoBehaviour
         {
             anim.SetInteger(stepsId, 0);
 
-            float backSign = (player && player.position.x >= transform.position.x) ? -1f : 1f;
-            Vector3 backDir = new Vector3(backSign, 0f, 0f);
-
+            Vector3 backDir = Axis2D.BackDir(transform, player);
             float want = steps * stepDistance;
             float allowed = AllowedBack(backDir, want);
 
@@ -164,10 +152,7 @@ public class EnemyRetreatNav : MonoBehaviour
     void LateUpdate()
     {
         Vector3 delta = transform.position - lastPos; delta.y = 0f;
-        float signedSpeed = (Time.deltaTime > 0f)
-            ? Vector3.Dot(transform.forward, delta) / Time.deltaTime
-            : 0f;
-
+        float signedSpeed = Time.deltaTime > 0f ? Vector3.Dot(transform.forward, delta) / Time.deltaTime : 0f;
         anim.SetFloat(speedId, signedSpeed, speedDampTime, Time.deltaTime);
         lastPos = transform.position;
     }

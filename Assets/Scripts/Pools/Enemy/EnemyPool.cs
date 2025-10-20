@@ -38,7 +38,7 @@ public class EnemyPool : MonoBehaviour
         }
     }
 
-    public void StartEnemySequence(EnemyPoolMember enemy, string initialAssignmentId, float delay)
+    public void StartEnemySequence(EnemyPoolMember enemy, string initialAssignmentId, float initialDelay)
     {
         if (enemy == null || !enemiesInScene.Contains(enemy))
         {
@@ -51,7 +51,7 @@ public class EnemyPool : MonoBehaviour
             Debug.LogError($"The enemy '{enemy.name}' is missing the EnemySpawnSequence component.", enemy);
             return;
         }
-        sequence.BeginSequence(initialAssignmentId, delay);
+        sequence.BeginSequence(initialAssignmentId, initialDelay);
     }
 
     internal void Spawn(EnemyPoolMember member, string assignmentId, string encounterId)

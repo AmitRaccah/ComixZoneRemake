@@ -24,6 +24,9 @@ public class PanelHopTimeline : MonoBehaviour
     public TrackerFollowDeltaX trackerFollow;
     public string enterRoomId;
 
+    [Header("Facing")]
+    public float finalYaw = -90f;
+
     private bool triggered = false;
     private bool playerInsideGate = false;
     private static PanelHopTimeline waitingCrouchGate = null;
@@ -123,6 +126,7 @@ public class PanelHopTimeline : MonoBehaviour
         waitingForGrounded = false;
 
         DisableRootMotion();
+        ApplyFinalFacing();
         SafeReleaseControl();
         ResetAllInputs();
         ClearCombatBuffer();
@@ -149,7 +153,6 @@ public class PanelHopTimeline : MonoBehaviour
         if (movementLock != null) movementLock.SetExternalLock(true);
         if (inputs != null) inputs.enabled = false;
         if (controller != null) controller.allowZMovementTemporarily = true;
-
         ResetAllInputs();
         ClearCombatBuffer();
     }
@@ -165,6 +168,8 @@ public class PanelHopTimeline : MonoBehaviour
         player.position = worldLanding.position;
 
         if (cc != null) cc.enabled = true;
+
+        ApplyFinalFacing();
 
         if (trackerFollow != null) trackerFollow.ResetSync();
     }
@@ -196,13 +201,24 @@ public class PanelHopTimeline : MonoBehaviour
         inputs.jump = false;
         inputs.sprint = false;
         inputs.crouch = false;
+        inputs.block = false;
+        inputs.pickUp = false;
+        inputs.lookUp = false;
+        inputs.analogMovement = false;
     }
 
     void ClearCombatBuffer()
     {
-        if (InputBuffer.Instance != null)
+        if (InputBuffer.Instance != null) InputBuffer.Instance.Clear();
+    }
+
+    void ApplyFinalFacing()
+    {
+        if (player != null) player.rotation = Quaternion.Euler(0f, finalYaw, 0f);
+        if (playerAnimator != null)
         {
-            InputBuffer.Instance.Clear();
+            bool faceRight = Mathf.Abs(Mathf.DeltaAngle(finalYaw, 90f)) < 1f;
+            playerAnimator.SetBool("Mirror", !faceRight);
         }
     }
 }
