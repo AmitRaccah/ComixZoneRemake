@@ -338,6 +338,21 @@ namespace StarterAssets
             }
         }
 
+
+        public void FaceImmediate(float yaw)
+        {
+            _desiredRotationY = yaw;
+            _shouldRotate = false;
+            _rotationVelocity = 0f;
+            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+
+            if (_hasAnimator && _animator != null)
+            {
+                bool faceRight = Mathf.Abs(Mathf.DeltaAngle(yaw, 90f)) < 1f;
+                _animator.SetBool("Mirror", !faceRight);
+            }
+        }
+
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
             if (lfAngle < -360f) lfAngle += 360f;
