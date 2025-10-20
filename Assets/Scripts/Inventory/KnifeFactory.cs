@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class KnifeFactory
 {
-    public static void Spawn(GameObject owner, string knifeId, Transform socket, AttackData data, float speed, float distance, float rotationSpeed)
+    public static void Spawn(GameObject owner, string knifeId, Transform socket, AttackData data, float speed, float distance, Vector3 spinPerSecond)
     {
         if (!owner || string.IsNullOrEmpty(knifeId) || data == null || KnifePoolManager.Instance == null) return;
 
@@ -15,6 +15,6 @@ public static class KnifeFactory
         Vector3 dir = new Vector3(sign, 0f, 0f);
         Quaternion rot = Quaternion.LookRotation(dir, Vector3.up);
 
-        KnifePoolManager.Instance.Spawn(knifeId, startPos, rot, owner.GetInstanceID(), data, speed, distance, rotationSpeed);
+        KnifePoolManager.Instance.Spawn(knifeId, startPos, rot, owner.GetInstanceID(), data, speed, distance, spinPerSecond);
     }
 }

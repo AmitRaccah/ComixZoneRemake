@@ -9,7 +9,8 @@ public class KnifeThrower : MonoBehaviour
     private bool pendingThrow;
     private string pendingKnifeId;
     private AttackData pendingData;
-    private float pendingSpeed, pendingDistance, pendingRotation;
+    private float pendingSpeed, pendingDistance;
+    private Vector3 pendingSpin;
     private Animator anim;
 
     void Awake()
@@ -29,7 +30,7 @@ public class KnifeThrower : MonoBehaviour
         pendingData = e.attackData;
         pendingSpeed = e.speed;
         pendingDistance = e.distance;
-        pendingRotation = e.rotationSpeed;
+        pendingSpin = e.spinPerSecond;
         if (AnimationHelper.Instance) AnimationHelper.Instance.Trigger(throwAnimationTrigger);
         else if (anim) anim.SetTrigger(throwAnimationTrigger);
     }
@@ -37,7 +38,7 @@ public class KnifeThrower : MonoBehaviour
     public void Anim_SpawnKnife()
     {
         if (!pendingThrow || string.IsNullOrEmpty(pendingKnifeId) || pendingData == null) return;
-        KnifeFactory.Spawn(gameObject, pendingKnifeId, throwSocket, pendingData, pendingSpeed, pendingDistance, pendingRotation);
+        KnifeFactory.Spawn(gameObject, pendingKnifeId, throwSocket, pendingData, pendingSpeed, pendingDistance, pendingSpin);
         pendingThrow = false;
         pendingKnifeId = null;
         pendingData = null;

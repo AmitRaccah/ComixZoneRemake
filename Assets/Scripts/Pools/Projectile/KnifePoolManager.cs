@@ -7,29 +7,42 @@ public class KnifePoolManager : MonoBehaviour
 
     [SerializeField] private List<KnifePoolMember> knivesInScene;
 
+    // Round-robin pointer per knifeId so multiple instances של אותו סוג יחולקו בצורה מאוזנת
     private readonly Dictionary<string, int> nextIndexPerId = new Dictionary<string, int>();
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    public KnifePoolMember Spawn(string knifeId, Vector3 position, Quaternion rotation, int attackerId, AttackData data, float speed, float distance, float rotationSpeed)
+    /// <summary>
+    /// Spawns a pooled knife with full spin control (X/Y/Z in degrees per second).
+    /// </summary>
+    public KnifePoolMember Spawn(
+        string knifeId,
+        Vector3 position,
+        Quaternion rotation,
+        int attackerId,
+        AttackData data,
+        float speed,
+        float distance,
+        Vector3 spinPerSecond)
     {
-        if (string.IsNullOrEmpty(knifeId)) return null;
+        if (string.IsNullOrEmpty(knifeId) || data == null || knivesInScene == null || knivesInScene.Count == 0)
+            return null;
 
         if (!nextIndexPerId.TryGetValue(knifeId, out int startIndex))
             startIndex = 0;
 
-        int count = knivesInScene != null ? knivesInScene.Count : 0;
+        int count = knivesInScene.Count;
         for (int i = 0; i < count; i++)
         {
             int currentIndex = (startIndex + i) % count;
             var member = knivesInScene[currentIndex];
             if (member && member.knifeId == knifeId && !member.IsActive)
             {
-                member.PrepareForSpawn(position, rotation, attackerId, data, speed, distance, rotationSpeed);
+                member.PrepareForSpawn(position, rotation, attackerId, data, speed, distance, spinPerSecond);
                 nextIndexPerId[knifeId] = (currentIndex + 1) % count;
                 return member;
             }

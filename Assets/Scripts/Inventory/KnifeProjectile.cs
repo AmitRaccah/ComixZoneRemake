@@ -8,7 +8,7 @@ public class KnifeProjectile : MonoBehaviour
     private AttackData attackData;
     private float speed;
     private float distance;
-    private float rotationSpeed;
+    private Vector3 spinPerSecond;
     private Collider knifeCollider;
     private Tween moveTween;
     private Tween rotateTween;
@@ -20,19 +20,26 @@ public class KnifeProjectile : MonoBehaviour
         if (knifeCollider) knifeCollider.isTrigger = true;
     }
 
-    public void Activate(KnifePoolMember m, int atkId, AttackData data, float spd, float dist, float rotSpeed)
+    public void Activate(KnifePoolMember m, int atkId, AttackData data, float spd, float dist, Vector3 spin)
     {
         member = m;
         attackerId = atkId;
         attackData = data;
         speed = spd;
         distance = dist;
-        rotationSpeed = rotSpeed;
+        spinPerSecond = spin;
         active = true;
 
         float duration = distance / speed;
-        moveTween = transform.DOMove(transform.position + transform.forward * distance, duration).SetEase(Ease.Linear).OnComplete(End);
-        rotateTween = transform.DORotate(new Vector3(rotationSpeed, 0, 0), duration, RotateMode.LocalAxisAdd).SetEase(Ease.Linear).SetLoops(-1, LoopType.Incremental);
+
+        moveTween = transform.DOMove(transform.position + transform.forward * distance, duration)
+            .SetEase(Ease.Linear)
+            .OnComplete(End);
+
+        Vector3 deltaAngles = spinPerSecond * duration;
+        rotateTween = transform.DORotate(deltaAngles, duration, RotateMode.LocalAxisAdd)
+            .SetEase(Ease.Linear)
+            .SetLoops(-1, LoopType.Incremental);
     }
 
     public void Deactivate()

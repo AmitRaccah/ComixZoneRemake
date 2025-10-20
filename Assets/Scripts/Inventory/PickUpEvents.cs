@@ -17,13 +17,14 @@ public struct KnifeThrownEvent
     public AttackData attackData;
     public float speed;
     public float distance;
-    public float rotationSpeed;
-    public KnifeThrownEvent(string id, AttackData data, float spd, float dist, float rotSpeed)
+    public Vector3 spinPerSecond;
+
+    public KnifeThrownEvent(string id, AttackData data, float spd, float dist, Vector3 spin)
     {
         knifeId = id;
         attackData = data;
         speed = spd;
         distance = dist;
-        rotationSpeed = rotSpeed;
+        spinPerSecond = spin;
     }
 }
