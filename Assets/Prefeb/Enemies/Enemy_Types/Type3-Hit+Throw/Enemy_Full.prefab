@@ -238,7 +238,9 @@ MonoBehaviour:
   viewDistance: 19.96
   eyeHeight: 1.6
   attackDistance: 2
-  boxHalfExtents: {x: 0.5, y: 0.9, z: 0.1}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!195 &2598751809186388412
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -357,7 +359,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 150
   resetHpOnEnable: 1
-  deathDelay: 0
+  deathDelay: 2
 --- !u!114 &2824184118052618030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -427,7 +429,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deathTriggerName: Death
-  poolReleaseDelay: 0
+  poolReleaseDelay: 2
 --- !u!114 &6728254842853753393
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -502,7 +504,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   knifeConfig: {fileID: 11400000, guid: 50650d6badc21364aa52bb195ae8a26e, type: 2}
-  knifePrefab: {fileID: 8548932506986619119, guid: 406d3b9a4148fc04f9ed99a97a1f526c, type: 3}
   throwSocket: {fileID: 8638533217942301412}
 --- !u!114 &6681461272722536898
 MonoBehaviour:
@@ -517,10 +518,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   laneZ: 0
-  leftYaw: -90
-  rightYaw: 90
-  snapYawForCharacterController: 0
-  snapYawForRigidbody: 1
+  zeroZVelocity: 1
+  zeroAngularVelocity: 1
 --- !u!114 &6506263302392460564
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,12 +549,10 @@ MonoBehaviour:
     encounterId: 
     spawnCount: 3
     respawnDelay: 2
-    transitionDelay: 1
   - assignmentId: 2
     encounterId: 
     spawnCount: 3
     respawnDelay: 2
-    transitionDelay: 1
 --- !u!1 &944862254045562238
 GameObject:
   m_ObjectHideFlags: 0
