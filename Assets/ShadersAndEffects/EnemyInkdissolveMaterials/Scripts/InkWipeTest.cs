@@ -21,9 +21,8 @@ public class InkWipeTest : MonoBehaviour
     [SerializeField] private float splashScale = 0.17f;
 
     [Header("Puddle Effect")]
-    [SerializeField] private GameObject puddlePrefab;
+    [SerializeField] private string puddleVfxId;
     [SerializeField] private float puddleDelay = 0.3f;
-    [SerializeField] private float puddleDuration = 6f;
     [SerializeField] private Vector3 puddlePositionOffset = Vector3.zero;
     [SerializeField] private Vector3 puddleRotation = new Vector3(90f, 0.94f, 0f);
     [SerializeField] private float puddleScale = 0.44f;
@@ -43,27 +42,19 @@ public class InkWipeTest : MonoBehaviour
     {
         renderers = GetComponentsInChildren<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
-
         FindCharacterBounds();
 
         foreach (Renderer rend in renderers)
         {
             rend.GetPropertyBlock(propertyBlock);
             if (rend.material.HasProperty("_InkBandWidth"))
-            {
                 propertyBlock.SetFloat("_InkBandWidth", inkBandWidth);
-            }
             if (rend.material.HasProperty("_WipeTheshold"))
-            {
                 propertyBlock.SetFloat("_WipeTheshold", minY);
-            }
             rend.SetPropertyBlock(propertyBlock);
         }
 
-        if (autoPlay)
-        {
-            StartWipe();
-        }
+        if (autoPlay) StartWipe();
     }
 
     void FindCharacterBounds()
@@ -91,32 +82,28 @@ public class InkWipeTest : MonoBehaviour
 
     void Update()
     {
-        if (isWiping)
+        if (!isWiping) return;
+
+        wipeProgress += Time.deltaTime / wipeDuration;
+        float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
+
+        foreach (Renderer rend in renderers)
         {
-            wipeProgress += Time.deltaTime / wipeDuration;
-            float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
-
-            foreach (Renderer rend in renderers)
-            {
-                rend.GetPropertyBlock(propertyBlock);
-                propertyBlock.SetFloat("_WipeOffset", transform.position.y);
-                propertyBlock.SetFloat("_WipeMinY", minY - transform.position.y);
-                propertyBlock.SetFloat("_WipeMaxY", maxY - transform.position.y);
-                propertyBlock.SetFloat("_WipeTheshold", actualThreshold - transform.position.y);
-                rend.SetPropertyBlock(propertyBlock);
-            }
-
-            if (!splashTriggered && wipeProgress >= splashTriggerTime)
-            {
-                TriggerSplashAndPuddle();
-                splashTriggered = true;
-            }
-
-            if (wipeProgress >= 1f)
-            {
-                isWiping = false;
-            }
+            rend.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetFloat("_WipeOffset", transform.position.y);
+            propertyBlock.SetFloat("_WipeMinY", minY - transform.position.y);
+            propertyBlock.SetFloat("_WipeMaxY", maxY - transform.position.y);
+            propertyBlock.SetFloat("_WipeTheshold", actualThreshold - transform.position.y);
+            rend.SetPropertyBlock(propertyBlock);
         }
+
+        if (!splashTriggered && wipeProgress >= splashTriggerTime)
+        {
+            TriggerSplashAndPuddle();
+            splashTriggered = true;
+        }
+
+        if (wipeProgress >= 1f) isWiping = false;
     }
 
     void TriggerSplashAndPuddle()
@@ -130,23 +117,21 @@ public class InkWipeTest : MonoBehaviour
             spawnedSplash.Play();
         }
 
-        if (puddlePrefab != null)
-        {
+        if (!string.IsNullOrEmpty(puddleVfxId))
             StartCoroutine(SpawnPuddle());
-        }
     }
 
     IEnumerator SpawnPuddle()
     {
         yield return new WaitForSeconds(puddleDelay);
 
-        Vector3 puddlePosition = transform.position + puddlePositionOffset;
-        Quaternion puddleRot = Quaternion.Euler(puddleRotation);
-        GameObject puddle = Instantiate(puddlePrefab, puddlePosition, puddleRot);
-        puddle.transform.localScale = Vector3.one * puddleScale;
-        puddle.SetActive(true);
-
-        Destroy(puddle, puddleDuration);
+        if (VfxPoolManager.Instance != null)
+        {
+            Vector3 puddlePosition = transform.position + puddlePositionOffset;
+            Quaternion puddleRot = Quaternion.Euler(puddleRotation);
+            var go = VfxPoolManager.Instance.Spawn(puddleVfxId, puddlePosition, puddleRot);
+            if (go) go.transform.localScale = Vector3.one * puddleScale;
+        }
     }
 
     public void StartWipe()
