@@ -64,7 +64,6 @@ public class InkWipeTest : MonoBehaviour
     
     // Private variables
     private Renderer[] renderers;
-    private MaterialPropertyBlock propertyBlock;
     private float wipeProgress = 0f;
     private bool isWiping = false;
     private bool splashTriggered = false;
@@ -75,27 +74,44 @@ public class InkWipeTest : MonoBehaviour
     
     void Start()
     {
+        Debug.Log($"[{gameObject.name}] Creating material instances...");
+        
         // Find all renderers in children (all body parts)
         renderers = GetComponentsInChildren<Renderer>();
-        propertyBlock = new MaterialPropertyBlock();
     
-        // Calculate character bounds for proper top-to-bottom wipe
-        FindCharacterBounds();
+        Debug.Log($"[{gameObject.name}] Found {renderers.Length} renderers!");
     
-        // FORCE reset all materials to start at minimum (fully inked) BEFORE anything else!
+        // CREATE UNIQUE MATERIAL INSTANCES for this enemy
         foreach (Renderer rend in renderers)
         {
-            // Set ink band width
+            if (rend.material.HasProperty("_InkBandWidth"))
+            {
+                rend.material.SetFloat("_InkBandWidth", inkBandWidth);
+            }
+    
+            if (rend.material.HasProperty("_WipeTheshold"))
+            {
+                // Set the initial threshold to the RELATIVE minY
+                rend.material.SetFloat("_WipeTheshold", minY); 
+                Debug.Log($"[{gameObject.name}] Reset {rend.name} _WipeTheshold to {minY:F2} (Relative)");
+            }
+        }
+    
+        // Calculate character bounds
+        FindCharacterBounds();
+    
+        // Apply settings and reset
+        foreach (Renderer rend in renderers)
+        {
             if (rend.material.HasProperty("_InkBandWidth"))
             {
                 rend.material.SetFloat("_InkBandWidth", inkBandWidth);
             }
         
-            // CRITICAL: Reset to start position (bottom = fully inked)
             if (rend.material.HasProperty("_WipeTheshold"))
             {
                 rend.material.SetFloat("_WipeTheshold", minY);
-                Debug.Log($"Reset {rend.name} to minY: {minY:F2}");
+                Debug.Log($"[{gameObject.name}] Reset {rend.name} _WipeTheshold to {minY:F2}");
             }
         }
     
@@ -112,42 +128,43 @@ public class InkWipeTest : MonoBehaviour
     {
         if (useManualRange)
         {
-            minY = transform.position.y + manualMinY;
-            maxY = transform.position.y + manualMaxY;
-            Debug.Log($"Using MANUAL bounds: {minY:F2} to {maxY:F2}");
+            // Keep manualMinY and manualMaxY as the RELATIVE bounds
+            minY = manualMinY;
+            maxY = manualMaxY;
+            Debug.Log($"Using MANUAL bounds (Relative): {minY:F2} to {maxY:F2}");
             return;
         }
-    
+
         // Auto-calculate RELATIVE to character
         float relativeMinY = float.MaxValue;
         float relativeMaxY = float.MinValue;
-    
+
         Debug.Log("=== FINDING BOUNDS ===");
         foreach (Renderer rend in renderers)
         {
             Bounds bounds = rend.bounds;
-        
+    
             // Calculate RELATIVE to character position
             float rendererMinY = bounds.min.y - transform.position.y;
             float rendererMaxY = bounds.max.y - transform.position.y;
-        
+    
             Debug.Log($"Renderer: {rend.name}, Relative Y: {rendererMinY:F2} to {rendererMaxY:F2}");
-        
+    
             if (rendererMinY < relativeMinY) relativeMinY = rendererMinY;
             if (rendererMaxY > relativeMaxY) relativeMaxY = rendererMaxY;
         }
-    
+
         Debug.Log($"Relative bounds: {relativeMinY:F2} to {relativeMaxY:F2}");
-    
+
         // Add padding
         relativeMinY -= 0.2f;
         relativeMaxY += 0.2f;
-    
-        // Convert back to world space based on character position
-        minY = transform.position.y + relativeMinY;
-        maxY = transform.position.y + relativeMaxY;
-    
-        Debug.Log($"World bounds for character at Y={transform.position.y:F2}: {minY:F2} to {maxY:F2}");
+
+        // Assign the RELATIVE bounds to minY and maxY
+        minY = relativeMinY;
+        maxY = relativeMaxY;
+
+        Debug.Log($"Final RELATIVE bounds: {minY:F2} to {maxY:F2}");
     }
     
     void Update()
@@ -156,23 +173,31 @@ public class InkWipeTest : MonoBehaviour
         {
             // Update wipe progress
             wipeProgress += Time.deltaTime / wipeDuration;
+        
+            // actualThreshold is the calculated RELATIVE Y offset
             float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
-            
-            // Apply wipe threshold to all body part materials
+    
+            Debug.Log($"[{gameObject.name}] Wipe Progress: {wipeProgress:F2}, Relative Threshold: {actualThreshold:F2}");
+    
+            // Apply to material instances
             foreach (Renderer rend in renderers)
             {
-                rend.GetPropertyBlock(propertyBlock);
-                propertyBlock.SetFloat("_WipeTheshold", actualThreshold);
-                rend.SetPropertyBlock(propertyBlock);
+                if (rend.material.HasProperty("_WipeTheshold"))
+                {
+                    // Pass the RELATIVE Y threshold
+                    rend.material.SetFloat("_WipeTheshold", actualThreshold);
+                }
+                // *** NOTE: The code to set _WipeOffset has been removed ***
+                // *** because the shader should now use Object Space.    ***
             }
-            
+    
             // Trigger splash and puddle at specified time
             if (!splashTriggered && wipeProgress >= splashTriggerTime)
             {
                 TriggerSplashAndPuddle();
                 splashTriggered = true;
             }
-            
+    
             // Finish wipe
             if (wipeProgress >= 1f)
             {
