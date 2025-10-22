@@ -19,22 +19,25 @@ public class DeathHandler : MonoBehaviour
     void OnEnable()
     {
         isDying = false;
+        SetCollisionEnabled(true);
         CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
-        CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged); // NEW
+        CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged);
     }
 
     void OnDisable()
     {
         CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
-        CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged); // NEW
+        CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged);
     }
 
-    private void OnHealthChanged(HealthChangedEvent e) // NEW
+    private void OnHealthChanged(HealthChangedEvent e)
     {
         if (e.entityId != myId) return;
-        // אם חזרנו לחיים (HP>0), אפשר לשחרר את הנעילה
         if (isDying && !e.isDead && e.current > 0)
+        {
             isDying = false;
+            SetCollisionEnabled(true);
+        }
     }
 
     private void OnDead(HealthDepletedEvent e)
@@ -47,6 +50,8 @@ public class DeathHandler : MonoBehaviour
     {
         if (isDying) return;
         isDying = true;
+
+        SetCollisionEnabled(false);
 
         if (anim != null)
             anim.SetTrigger(deathTriggerName);
@@ -72,5 +77,14 @@ public class DeathHandler : MonoBehaviour
         EnemyPoolMember pooled = GetComponent<EnemyPoolMember>();
         if (pooled != null) pooled.Release();
         else Destroy(gameObject);
+    }
+
+    void SetCollisionEnabled(bool enabledState)
+    {
+        var cols = GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < cols.Length; i++) cols[i].enabled = enabledState;
+
+        var controllers = GetComponentsInChildren<CharacterController>(true);
+        for (int i = 0; i < controllers.Length; i++) controllers[i].enabled = enabledState;
     }
 }
