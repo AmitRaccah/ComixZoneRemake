@@ -71,17 +71,33 @@ public class InkWipeTest : MonoBehaviour
     
     private float minY;
     private float maxY;
+    private InkDripController dripController;
     
     void Start()
     {
         Debug.Log($"[{gameObject.name}] Creating material instances...");
-        
+    
         // Find all renderers in children (all body parts)
         renderers = GetComponentsInChildren<Renderer>();
-    
+
         Debug.Log($"[{gameObject.name}] Found {renderers.Length} renderers!");
-    
+
         // CREATE UNIQUE MATERIAL INSTANCES for this enemy
+        foreach (Renderer rend in renderers)
+        {
+            Material oldMat = rend.sharedMaterial;
+            // Use Material constructor to create a fresh instance
+            rend.material = new Material(rend.sharedMaterial); 
+            Debug.Log($"[{gameObject.name}] {rend.name}: Old={oldMat.GetInstanceID()}, New={rend.material.GetInstanceID()}");
+        }
+
+        // Calculate character bounds (minY/maxY are now RELATIVE)
+        FindCharacterBounds();
+    
+        // Get the Drip Controller reference
+        dripController = GetComponentInChildren<InkDripController>();
+
+        // Apply settings and reset
         foreach (Renderer rend in renderers)
         {
             if (rend.material.HasProperty("_InkBandWidth"))
@@ -92,29 +108,11 @@ public class InkWipeTest : MonoBehaviour
             if (rend.material.HasProperty("_WipeTheshold"))
             {
                 // Set the initial threshold to the RELATIVE minY
-                rend.material.SetFloat("_WipeTheshold", minY); 
+                rend.material.SetFloat("_WipeTheshold", minY);
                 Debug.Log($"[{gameObject.name}] Reset {rend.name} _WipeTheshold to {minY:F2} (Relative)");
             }
         }
-    
-        // Calculate character bounds
-        FindCharacterBounds();
-    
-        // Apply settings and reset
-        foreach (Renderer rend in renderers)
-        {
-            if (rend.material.HasProperty("_InkBandWidth"))
-            {
-                rend.material.SetFloat("_InkBandWidth", inkBandWidth);
-            }
-        
-            if (rend.material.HasProperty("_WipeTheshold"))
-            {
-                rend.material.SetFloat("_WipeTheshold", minY);
-                Debug.Log($"[{gameObject.name}] Reset {rend.name} _WipeTheshold to {minY:F2}");
-            }
-        }
-    
+
         if (autoPlay)
         {
             StartWipe();
@@ -128,8 +126,8 @@ public class InkWipeTest : MonoBehaviour
     {
         if (useManualRange)
         {
-            // Keep manualMinY and manualMaxY as the RELATIVE bounds
-            minY = manualMinY;
+            // Store relative offsets (from inspector)
+            minY = manualMinY; 
             maxY = manualMaxY;
             Debug.Log($"Using MANUAL bounds (Relative): {minY:F2} to {maxY:F2}");
             return;
@@ -143,7 +141,6 @@ public class InkWipeTest : MonoBehaviour
         foreach (Renderer rend in renderers)
         {
             Bounds bounds = rend.bounds;
-    
             // Calculate RELATIVE to character position
             float rendererMinY = bounds.min.y - transform.position.y;
             float rendererMaxY = bounds.max.y - transform.position.y;
@@ -156,55 +153,75 @@ public class InkWipeTest : MonoBehaviour
 
         Debug.Log($"Relative bounds: {relativeMinY:F2} to {relativeMaxY:F2}");
 
-        // Add padding
+        // Add padding and store the RELATIVE offsets
         relativeMinY -= 0.2f;
         relativeMaxY += 0.2f;
-
-        // Assign the RELATIVE bounds to minY and maxY
+    
+        // Store as RELATIVE OFFSETS
         minY = relativeMinY;
         maxY = relativeMaxY;
-
+    
         Debug.Log($"Final RELATIVE bounds: {minY:F2} to {maxY:F2}");
     }
     
-    void Update()
+   void Update()
+{
+    if (isWiping)
     {
-        if (isWiping)
-        {
-            // Update wipe progress
-            wipeProgress += Time.deltaTime / wipeDuration;
+        // Update wipe progress
+        wipeProgress += Time.deltaTime / wipeDuration;
         
-            // actualThreshold is the calculated RELATIVE Y offset
-            float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
-    
-            Debug.Log($"[{gameObject.name}] Wipe Progress: {wipeProgress:F2}, Relative Threshold: {actualThreshold:F2}");
-    
-            // Apply to material instances
-            foreach (Renderer rend in renderers)
+        // 1. Calculate the RELATIVE Y threshold for the SHADER
+        // This is a RELATIVE offset (e.g., -1.7 to 1.7)
+        float relativeThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
+        
+        // 2. Calculate the WORLD Y position for the DRIP CONTROLLER
+        // World Y = Character World Y + Relative Threshold
+        float worldThresholdY = transform.position.y + relativeThreshold;
+        
+        Debug.Log($"[{gameObject.name}] Wipe Progress: {wipeProgress:F2}, Relative Threshold: {relativeThreshold:F2}, World Y: {worldThresholdY:F2}");
+        
+        // Apply dynamic values to material instances
+        foreach (Renderer rend in renderers)
+        {
+            // Pass the RELATIVE Y threshold to preserve the smooth wipe
+            if (rend.material.HasProperty("_WipeTheshold"))
             {
-                if (rend.material.HasProperty("_WipeTheshold"))
-                {
-                    // Pass the RELATIVE Y threshold
-                    rend.material.SetFloat("_WipeTheshold", actualThreshold);
-                }
-                // *** NOTE: The code to set _WipeOffset has been removed ***
-                // *** because the shader should now use Object Space.    ***
+                rend.material.SetFloat("_WipeTheshold", relativeThreshold);
             }
-    
-            // Trigger splash and puddle at specified time
-            if (!splashTriggered && wipeProgress >= splashTriggerTime)
+            
+            // Pass the character's full World Position to normalize the coordinates in the shader
+            if (rend.material.HasProperty("_WipeOffset"))
             {
-                TriggerSplashAndPuddle();
-                splashTriggered = true;
+                rend.material.SetVector("_WipeOffset", transform.position);
             }
+        }
+
+        // 3. Update the drip controller with the World Y position
+        if (dripController != null)
+        {
+            dripController.UpdateDripPosition(worldThresholdY);
+        }
     
-            // Finish wipe
-            if (wipeProgress >= 1f)
+        // Trigger splash and puddle at specified time
+        if (!splashTriggered && wipeProgress >= splashTriggerTime)
+        {
+            TriggerSplashAndPuddle();
+            splashTriggered = true;
+        }
+    
+        // Finish wipe
+        if (wipeProgress >= 1f)
+        {
+            isWiping = false;
+            // Stop drips when the wipe finishes
+            if (dripController != null)
             {
-                isWiping = false;
+                dripController.StopEmission();
             }
         }
     }
+}
     
     /// <summary>
     /// Triggers both the splash particle effect and queues the puddle spawn
