@@ -67,6 +67,8 @@ GameObject:
   - component: {fileID: 6506263302392460564}
   - component: {fileID: 1379033389560604084}
   - component: {fileID: 1664556486918992679}
+  - component: {fileID: 8209796826648373697}
+  - component: {fileID: 5042248301934423370}
   m_Layer: 0
   m_Name: Enemy_Shooter
   m_TagString: Untagged
@@ -566,6 +568,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c09477b0442810499575e6cac1c8047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &8209796826648373697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48aab27b714d3794f8e3651d467f0969, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wipeDuration: 2
+  autoPlay: 1
+  useManualRange: 1
+  manualMinY: -1
+  manualMaxY: 2
+  inkBandWidth: 0.39
+  splashEffectPrefab: {fileID: 0}
+  splashTriggerTime: 0.35
+  splashPositionOffset: {x: 0, y: 0.64, z: -0.2}
+  splashRotation: {x: 0, y: 0, z: 0}
+  splashScale: 0.17
+  puddlePrefab: {fileID: 0}
+  puddleDelay: 0.3
+  puddleDuration: 6
+  puddlePositionOffset: {x: 0, y: 0, z: 0}
+  puddleRotation: {x: 90, y: 0.94, z: 0}
+  puddleScale: 0.44
+--- !u!114 &5042248301934423370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec648ccd1c0f2944ba76dab37d2749c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dripParticles: {fileID: 0}
+  characterRoot: {fileID: 0}
+  dripRadius: 0.3
+  dripsPerSecond: 100
+  dripSpeed: 2
+  dripSizeRange: {x: 0.0003, y: 0.004}
+  inkColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &944862254045562238
 GameObject:
   m_ObjectHideFlags: 0

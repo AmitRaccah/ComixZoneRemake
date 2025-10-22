@@ -112,34 +112,42 @@ public class InkWipeTest : MonoBehaviour
     {
         if (useManualRange)
         {
-            // Make manual values relative to character position
             minY = transform.position.y + manualMinY;
             maxY = transform.position.y + manualMaxY;
-            Debug.Log($"Using MANUAL bounds (relative to character at Y={transform.position.y:F2}): {minY:F2} to {maxY:F2}");
+            Debug.Log($"Using MANUAL bounds: {minY:F2} to {maxY:F2}");
             return;
         }
-        
-        // Auto-calculate from renderers
-        minY = float.MaxValue;
-        maxY = float.MinValue;
-        
+    
+        // Auto-calculate RELATIVE to character
+        float relativeMinY = float.MaxValue;
+        float relativeMaxY = float.MinValue;
+    
         Debug.Log("=== FINDING BOUNDS ===");
         foreach (Renderer rend in renderers)
         {
             Bounds bounds = rend.bounds;
-            Debug.Log($"Renderer: {rend.name}, Y range: {bounds.min.y:F2} to {bounds.max.y:F2}");
-            
-            if (bounds.min.y < minY) minY = bounds.min.y;
-            if (bounds.max.y > maxY) maxY = bounds.max.y;
+        
+            // Calculate RELATIVE to character position
+            float rendererMinY = bounds.min.y - transform.position.y;
+            float rendererMaxY = bounds.max.y - transform.position.y;
+        
+            Debug.Log($"Renderer: {rend.name}, Relative Y: {rendererMinY:F2} to {rendererMaxY:F2}");
+        
+            if (rendererMinY < relativeMinY) relativeMinY = rendererMinY;
+            if (rendererMaxY > relativeMaxY) relativeMaxY = rendererMaxY;
         }
-        
-        Debug.Log($"Auto-calculated bounds BEFORE padding: {minY:F2} to {maxY:F2}");
-        
+    
+        Debug.Log($"Relative bounds: {relativeMinY:F2} to {relativeMaxY:F2}");
+    
         // Add padding
-        minY -= 0.2f;
-        maxY += 0.2f;
-        
-        Debug.Log($"Auto-calculated bounds AFTER padding: {minY:F2} to {maxY:F2}");
+        relativeMinY -= 0.2f;
+        relativeMaxY += 0.2f;
+    
+        // Convert back to world space based on character position
+        minY = transform.position.y + relativeMinY;
+        maxY = transform.position.y + relativeMaxY;
+    
+        Debug.Log($"World bounds for character at Y={transform.position.y:F2}: {minY:F2} to {maxY:F2}");
     }
     
     void Update()
