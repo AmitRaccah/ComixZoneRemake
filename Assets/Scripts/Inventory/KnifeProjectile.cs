@@ -61,6 +61,9 @@ public class KnifeProjectile : MonoBehaviour
         if (!active) return;
         if (other.transform.root.gameObject.GetInstanceID() == attackerId) return;
 
+        var blocker = other.GetComponentInParent<SpawnDamageBlocker>();
+        if (blocker != null && blocker.Active) return;
+
         var health = other.GetComponentInParent<Health>();
         if (health)
         {

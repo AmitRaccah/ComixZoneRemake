@@ -3,7 +3,7 @@ using Unity.Behavior;
 using System.Collections;
 
 [RequireComponent(typeof(BehaviorGraphAgent))]
-[DefaultExecutionOrder(-100)] // שירוץ לפני שאר ה-AI בפריים הראשון
+[DefaultExecutionOrder(-100)]
 public class EnemyBlackboardResetOnSpawn : MonoBehaviour
 {
     BehaviorGraphAgent agent;
