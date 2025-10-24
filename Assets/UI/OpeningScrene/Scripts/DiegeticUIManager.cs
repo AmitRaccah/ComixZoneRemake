@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
@@ -44,10 +45,27 @@ public class DiegeticUIManager : MonoBehaviour
     [SerializeField] private AudioClip settingsCloseSound; // Sound when closing settings
     [SerializeField] private float soundVolume = 1f;
     
+    [Header("Fade Effect")]
+    [SerializeField] private bool enableFadeEffect = true;
+    [SerializeField] private float fadeDuration = 1f; // Duration of fade to black in seconds
+    [SerializeField] private Color fadeColor = Color.black; // Color to fade to
+    [SerializeField] private float fadeStartOffset = 0f; // Start fade this many seconds BEFORE animation ends (0 = wait for animation to finish)
+    
+    [Header("Transition Sounds")]
+    [SerializeField] private AudioClip transitionStartSound; // Sound at animation start
+    [SerializeField] private float transitionStartSoundDelay = 0f; // Delay after animation starts (in seconds)
+    [SerializeField] private AudioClip transitionEndSound; // Sound before scene loads
+    [SerializeField] private float transitionEndSoundOffset = 0f; // Play this many seconds BEFORE delay ends (0 = at the very end)
+    [SerializeField] private float transitionSoundVolume = 1f;
+    
     private bool actionInProgress = false;
     private GameObject currentlyHovered = null;
     private Material[] originalMaterials;
     private Renderer[] buttonRenderers;
+    
+    // Fade UI elements
+    private Canvas fadeCanvas;
+    private Image fadeImage;
 
     void Start()
     {
@@ -99,6 +117,46 @@ public class DiegeticUIManager : MonoBehaviour
         {
             StoreOriginalMaterials();
         }
+        
+        // Setup fade canvas and image
+        if (enableFadeEffect)
+        {
+            CreateFadeCanvas();
+        }
+    }
+    
+    void CreateFadeCanvas()
+    {
+        // Create canvas
+        GameObject canvasObject = new GameObject("FadeCanvas");
+        fadeCanvas = canvasObject.AddComponent<Canvas>();
+        fadeCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        fadeCanvas.sortingOrder = 9999; // Make sure it's on top of everything
+        
+        // Add Canvas Scaler
+        CanvasScaler scaler = canvasObject.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
+        
+        // Add Graphic Raycaster
+        canvasObject.AddComponent<GraphicRaycaster>();
+        
+        // Create image
+        GameObject imageObject = new GameObject("FadeImage");
+        imageObject.transform.SetParent(canvasObject.transform);
+        
+        fadeImage = imageObject.AddComponent<Image>();
+        fadeImage.color = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 0f); // Start transparent
+        
+        // Stretch to fill entire screen
+        RectTransform rectTransform = imageObject.GetComponent<RectTransform>();
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.sizeDelta = Vector2.zero;
+        rectTransform.anchoredPosition = Vector2.zero;
+        
+        // Don't destroy on load to persist during scene transition
+        DontDestroyOnLoad(canvasObject);
     }
     
     void StoreOriginalMaterials()
@@ -308,9 +366,25 @@ public class DiegeticUIManager : MonoBehaviour
         }
         else
         {
-            // If no animation, just load scene directly
-            LoadScene(sceneToLoad);
+            // If no animation, play start sound and go straight to fade
+            StartCoroutine(NoAnimationTransition());
         }
+    }
+    
+    IEnumerator NoAnimationTransition()
+    {
+        // Play transition start sound
+        if (transitionStartSound != null)
+        {
+            if (transitionStartSoundDelay > 0)
+            {
+                yield return new WaitForSeconds(transitionStartSoundDelay);
+            }
+            PlaySound(transitionStartSound, transitionSoundVolume);
+        }
+        
+        // Fade and load scene
+        yield return StartCoroutine(FadeAndLoadScene(sceneToLoad));
     }
     
     void OnDestroy()
@@ -406,9 +480,14 @@ public class DiegeticUIManager : MonoBehaviour
     
     void PlaySound(AudioClip clip)
     {
+        PlaySound(clip, soundVolume);
+    }
+    
+    void PlaySound(AudioClip clip, float volume)
+    {
         if (audioSource != null && clip != null)
         {
-            audioSource.PlayOneShot(clip, soundVolume);
+            audioSource.PlayOneShot(clip, volume);
         }
     }
 
@@ -424,17 +503,128 @@ public class DiegeticUIManager : MonoBehaviour
             yield return null;
         }
         
-        // Wait until animation finishes
-        while (newGameAnimation.IsPlaying(clipName))
+        // Play transition start sound after delay
+        if (transitionStartSound != null)
         {
-            yield return null;
+            if (transitionStartSoundDelay > 0)
+            {
+                yield return new WaitForSeconds(transitionStartSoundDelay);
+            }
+            PlaySound(transitionStartSound, transitionSoundVolume);
         }
         
-        // Wait for delay
-        yield return new WaitForSeconds(delayBeforeLoad);
+        // Get animation length
+        AnimationState animState = newGameAnimation[clipName];
+        float animLength = animState.length / animState.speed;
         
-        // Load scene
-        LoadScene(sceneToLoad);
+        // If we want to start fade before animation ends
+        if (fadeStartOffset > 0 && enableFadeEffect)
+        {
+            // Calculate when to start fade
+            float fadeStartTime = animLength - fadeStartOffset;
+            if (fadeStartTime < 0) fadeStartTime = 0;
+            
+            // Wait until it's time to start the fade
+            float elapsed = transitionStartSoundDelay; // We already waited this amount
+            while (elapsed < fadeStartTime && newGameAnimation.IsPlaying(clipName))
+            {
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            
+            // Start fade while animation is still playing
+            StartCoroutine(FadeToBlack());
+            
+            // Wait for animation to finish
+            while (newGameAnimation.IsPlaying(clipName))
+            {
+                yield return null;
+            }
+        }
+        else
+        {
+            // Wait until animation finishes normally
+            while (newGameAnimation.IsPlaying(clipName))
+            {
+                yield return null;
+            }
+            
+            // Then start fade
+            if (enableFadeEffect)
+            {
+                yield return StartCoroutine(FadeToBlack());
+            }
+        }
+        
+        // Now do the delay while screen is black and load scene
+        yield return StartCoroutine(DelayAndLoadScene(sceneToLoad));
+    }
+    
+    IEnumerator FadeToBlack()
+    {
+        if (fadeImage != null)
+        {
+            // Fade to black
+            float elapsed = 0f;
+            Color startColor = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 0f);
+            Color endColor = new Color(fadeColor.r, fadeColor.g, fadeColor.b, 1f);
+            
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / fadeDuration;
+                fadeImage.color = Color.Lerp(startColor, endColor, t);
+                yield return null;
+            }
+            
+            // Ensure fully faded
+            fadeImage.color = endColor;
+        }
+    }
+    
+    IEnumerator DelayAndLoadScene(string sceneName)
+    {
+        // Play end sound before delay finishes
+        if (transitionEndSound != null && delayBeforeLoad > transitionEndSoundOffset)
+        {
+            float soundTiming = delayBeforeLoad - transitionEndSoundOffset;
+            
+            if (soundTiming > 0)
+            {
+                yield return new WaitForSeconds(soundTiming);
+                PlaySound(transitionEndSound, transitionSoundVolume);
+                
+                // Wait for the remaining time
+                if (transitionEndSoundOffset > 0)
+                {
+                    yield return new WaitForSeconds(transitionEndSoundOffset);
+                }
+            }
+            else
+            {
+                // Sound offset is larger than delay, play immediately
+                PlaySound(transitionEndSound, transitionSoundVolume);
+                yield return new WaitForSeconds(delayBeforeLoad);
+            }
+        }
+        else
+        {
+            // No end sound or offset too large, just wait
+            yield return new WaitForSeconds(delayBeforeLoad);
+        }
+        
+        // Load the scene (black screen will persist through transition)
+        LoadScene(sceneName);
+    }
+    
+    IEnumerator FadeAndLoadScene(string sceneName)
+    {
+        if (enableFadeEffect && fadeImage != null)
+        {
+            yield return StartCoroutine(FadeToBlack());
+        }
+        
+        yield return StartCoroutine(DelayAndLoadScene(sceneName));
     }
 
     void LoadScene(string sceneName)

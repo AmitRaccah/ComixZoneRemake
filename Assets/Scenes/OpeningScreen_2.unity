@@ -292,7 +292,7 @@ Transform:
   m_GameObject: {fileID: 118665083}
   serializedVersion: 2
   m_LocalRotation: {x: 0.59739107, y: -0.7468781, z: 0.14551373, w: 0.25322485}
-  m_LocalPosition: {x: -970.92, y: -1834.31, z: 473.5}
+  m_LocalPosition: {x: -970.92, y: -1837.1, z: 468.68}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -332,7 +332,7 @@ Light:
   serializedVersion: 11
   m_Type: 0
   m_Color: {r: 0.9528302, g: 0.9528302, b: 0.9528302, a: 1}
-  m_Intensity: 207.2
+  m_Intensity: 212.1
   m_Range: 18.140291
   m_SpotAngle: 38.22792
   m_InnerSpotAngle: 27.484613
@@ -515,7 +515,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0ec127d1fa6f7944bfe02b5124037b5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 3.59
+      value: 3.671
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0ec127d1fa6f7944bfe02b5124037b5, type: 3}
       propertyPath: m_LocalPosition.y
@@ -523,7 +523,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0ec127d1fa6f7944bfe02b5124037b5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.1510768
+      value: -0.177
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: f0ec127d1fa6f7944bfe02b5124037b5, type: 3}
       propertyPath: m_LocalRotation.w
@@ -852,7 +852,7 @@ MonoBehaviour:
   newGameAnimation: {fileID: 878710409}
   animationName: 
   sceneToLoad: Level_01_Short(new!)
-  delayBeforeLoad: 1
+  delayBeforeLoad: 6
   playerCamera: {fileID: 1730055747}
   manageCursor: 1
   customCursorTexture: {fileID: 0}
@@ -865,6 +865,15 @@ MonoBehaviour:
   settingsOpenSound: {fileID: 8300000, guid: 239f2ed0f833127429c829e28d42915b, type: 3}
   settingsCloseSound: {fileID: 8300000, guid: 239f2ed0f833127429c829e28d42915b, type: 3}
   soundVolume: 1
+  enableFadeEffect: 1
+  fadeDuration: 0.0001
+  fadeColor: {r: 0, g: 0, b: 0, a: 1}
+  fadeStartOffset: 0.1
+  transitionStartSound: {fileID: 8300000, guid: 2d68d4c97f6ab3d47bd5f0455f976681, type: 3}
+  transitionStartSoundDelay: 3
+  transitionEndSound: {fileID: 0}
+  transitionEndSoundOffset: 0
+  transitionSoundVolume: 2
 --- !u!1 &293281617
 GameObject:
   m_ObjectHideFlags: 0
@@ -3000,15 +3009,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c8fdfb069b8d40e41bfcc939756cb4ca, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -20.62
+      value: -20.529
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c8fdfb069b8d40e41bfcc939756cb4ca, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.856
+      value: 1.819
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c8fdfb069b8d40e41bfcc939756cb4ca, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -3.03
+      value: -3.169
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c8fdfb069b8d40e41bfcc939756cb4ca, type: 3}
       propertyPath: m_LocalRotation.w
@@ -9643,7 +9652,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2989192351485262277, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: d44e2910fd2f2004299e6df6db56f3d3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -11971,7 +11980,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5266720241970688102, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: 14162bc44feca06439d716e7dea2ef72, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -12387,7 +12396,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -2135062039414380988, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: c781d5a88e82c444685a315b3746084a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -12837,7 +12846,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5266720241970688102, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: da87c6f013d566746a7e7f1c0706f7cc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13300,7 +13309,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2989192351485262277, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: 4ff9757e504309348a83d25ef6668450, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13865,7 +13874,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 5989045980514972618, guid: 0d573488442087441b65e3b001e7919f, type: 3}
+  - {fileID: 2100000, guid: a2b2128075af68940924f31e5840bed1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -14398,3 +14407,4 @@ SceneRoots:
   - {fileID: 427697690}
   - {fileID: 805299403}
   - {fileID: 878710408}
+  - {fileID: 1970917629}
