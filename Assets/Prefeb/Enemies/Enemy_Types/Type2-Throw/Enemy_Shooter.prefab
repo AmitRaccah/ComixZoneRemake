@@ -67,8 +67,11 @@ GameObject:
   - component: {fileID: 6506263302392460564}
   - component: {fileID: 1379033389560604084}
   - component: {fileID: 1664556486918992679}
+  - component: {fileID: 4422308124340976491}
   - component: {fileID: 8209796826648373697}
   - component: {fileID: 5042248301934423370}
+  - component: {fileID: 2995592579695786798}
+  - component: {fileID: 3496391154128480738}
   m_Layer: 0
   m_Name: Enemy_Shooter
   m_TagString: Untagged
@@ -87,7 +90,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0.7047644, z: -0, w: -0.7094415}
   m_LocalPosition: {x: 4.93, y: 0, z: -0.009}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4337679547678619507}
   - {fileID: 4881476460229693896}
@@ -239,7 +242,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewDistance: 19.96
-  eyeHeight: 1
+  eyeHeight: 1.3
   attackDistance: 2
   targetLayers:
     serializedVersion: 2
@@ -548,13 +551,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stages:
-  - assignmentId: 1
-    encounterId: 
-    spawnCount: 3
+  - assignmentId: 11
+    encounterId: 5
+    spawnCount: 0
     respawnDelay: 2
-  - assignmentId: 2
-    encounterId: 
-    spawnCount: 3
+  - assignmentId: 4
+    encounterId: 2
+    spawnCount: 0
+    respawnDelay: 2
+  - assignmentId: 3
+    encounterId: 1
+    spawnCount: 0
     respawnDelay: 2
 --- !u!114 &1664556486918992679
 MonoBehaviour:
@@ -568,6 +575,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c09477b0442810499575e6cac1c8047, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &4422308124340976491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58fa7f9cb62b15a4c8f12fdfb03c398f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deadZone: 0.02
+  turnSpeed: 720
 --- !u!114 &8209796826648373697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -582,18 +603,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wipeDuration: 2
   autoPlay: 1
-  useManualRange: 1
+  useManualRange: 0
   manualMinY: -1
   manualMaxY: 2
   inkBandWidth: 0.39
-  splashEffectPrefab: {fileID: 0}
+  splashEffectPrefab: {fileID: 581758339970238076, guid: 744469f4c50d569468bf4fda283d54e5, type: 3}
   splashTriggerTime: 0.35
   splashPositionOffset: {x: 0, y: 0.64, z: -0.2}
   splashRotation: {x: 0, y: 0, z: 0}
   splashScale: 0.17
-  puddlePrefab: {fileID: 0}
+  puddleVfxId: ink
   puddleDelay: 0.3
-  puddleDuration: 6
   puddlePositionOffset: {x: 0, y: 0, z: 0}
   puddleRotation: {x: 90, y: 0.94, z: 0}
   puddleScale: 0.44
@@ -609,13 +629,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec648ccd1c0f2944ba76dab37d2749c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dripParticles: {fileID: 0}
-  characterRoot: {fileID: 0}
+  dripParticles: {fileID: 4202114564709507082}
+  characterRoot: {fileID: 8655562853323519446}
   dripRadius: 0.3
   dripsPerSecond: 100
   dripSpeed: 2
   dripSizeRange: {x: 0.0003, y: 0.004}
   inkColor: {r: 0, g: 0, b: 0, a: 1}
+--- !u!114 &2995592579695786798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cf9d1c2ad4f2b64e90be342f466bd47, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3496391154128480738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 550769658104927547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25b5fe2844f212f4aa2596175e5a35cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &944862254045562238
 GameObject:
   m_ObjectHideFlags: 0
@@ -1047,6 +1091,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8039017682478004694}
     m_Modifications:
+    - target: {fileID: 3593287649504368224, guid: c45f9ae18ae5cd5448d66a6cb52f8261, type: 3}
+      propertyPath: ShapeModule.m_Scale.x
+      value: 0.85
+      objectReference: {fileID: 0}
     - target: {fileID: 8328202947933160380, guid: c45f9ae18ae5cd5448d66a6cb52f8261, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.3
@@ -1115,6 +1163,11 @@ PrefabInstance:
 --- !u!4 &985705461159859087 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 441609080454800869, guid: c45f9ae18ae5cd5448d66a6cb52f8261, type: 3}
+  m_PrefabInstance: {fileID: 832326980262229610}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &4202114564709507082 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 3593287649504368224, guid: c45f9ae18ae5cd5448d66a6cb52f8261, type: 3}
   m_PrefabInstance: {fileID: 832326980262229610}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &7024819965257334507 stripped
