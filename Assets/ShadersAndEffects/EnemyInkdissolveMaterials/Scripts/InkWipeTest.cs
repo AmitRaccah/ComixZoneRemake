@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class InkWipeTest : MonoBehaviour
 {
@@ -27,34 +28,75 @@ public class InkWipeTest : MonoBehaviour
     [SerializeField] private Vector3 puddleRotation = new Vector3(90f, 0.94f, 0f);
     [SerializeField] private float puddleScale = 0.44f;
 
+    [Header("Debug")]
+    [SerializeField] private bool debugLogs = true;
+    [SerializeField] private bool verbosePerFrame = false;
+
+    static readonly int PID_InkBandWidth = Shader.PropertyToID("_InkBandWidth");
+    static readonly int PID_WipeOffset = Shader.PropertyToID("_WipeOffset");
+    static readonly int PID_WipeMinY = Shader.PropertyToID("_WipeMinY");
+    static readonly int PID_WipeMaxY = Shader.PropertyToID("_WipeMaxY");
+    static readonly int PID_WipeTheshold = Shader.PropertyToID("_WipeTheshold");
+    static readonly int PID_WipeThreshold = Shader.PropertyToID("_WipeThreshold");
+
     private Renderer[] renderers;
     private MaterialPropertyBlock propertyBlock;
     private float wipeProgress = 0f;
     private bool isWiping = false;
     private bool splashTriggered = false;
+    private bool firstUpdateLogged = false;
     private ParticleSystem spawnedSplash;
     private float minY;
     private float maxY;
 
     public float Duration => wipeDuration;
 
+    void Awake()
+    {
+        if (propertyBlock == null) propertyBlock = new MaterialPropertyBlock();
+    }
+
     void Start()
     {
-        renderers = GetComponentsInChildren<Renderer>();
-        propertyBlock = new MaterialPropertyBlock();
-        FindCharacterBounds();
+        RefreshRenderers(true);
+        Log("Start", $"renderers={renderers.Length} autoPlay={autoPlay} useManualRange={useManualRange} posY={transform.position.y:0.###}");
 
-        foreach (Renderer rend in renderers)
-        {
-            rend.GetPropertyBlock(propertyBlock);
-            if (rend.material.HasProperty("_InkBandWidth"))
-                propertyBlock.SetFloat("_InkBandWidth", inkBandWidth);
-            if (rend.material.HasProperty("_WipeTheshold"))
-                propertyBlock.SetFloat("_WipeTheshold", minY);
-            rend.SetPropertyBlock(propertyBlock);
-        }
+        FindCharacterBounds();
+        Log("Bounds", $"minY={minY:0.###} maxY={maxY:0.###} height={(maxY - minY):0.###}");
+
+        ApplyStaticPropsToAll(inkBandWidth, minY);
 
         if (autoPlay) StartWipe();
+    }
+
+    void RefreshRenderers(bool includeInactive)
+    {
+        renderers = GetComponentsInChildren<Renderer>(includeInactive);
+        List<Renderer> valid = new List<Renderer>(renderers.Length);
+        for (int i = 0; i < renderers.Length; i++)
+            if (renderers[i] != null) valid.Add(renderers[i]);
+        renderers = valid.ToArray();
+    }
+
+    void ApplyStaticPropsToAll(float bandWidth, float initialThresholdWorld)
+    {
+        float offset = transform.position.y;
+        float thrRel = initialThresholdWorld - offset;
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            var r = renderers[i];
+            if (!r) continue;
+
+            propertyBlock.Clear();
+            propertyBlock.SetFloat(PID_InkBandWidth, bandWidth);
+            propertyBlock.SetFloat(PID_WipeOffset, offset);
+            propertyBlock.SetFloat(PID_WipeMinY, minY - offset);
+            propertyBlock.SetFloat(PID_WipeMaxY, maxY - offset);
+            propertyBlock.SetFloat(PID_WipeTheshold, thrRel);
+            propertyBlock.SetFloat(PID_WipeThreshold, thrRel);
+            r.SetPropertyBlock(propertyBlock);
+        }
     }
 
     void FindCharacterBounds()
@@ -66,44 +108,85 @@ public class InkWipeTest : MonoBehaviour
             return;
         }
 
-        minY = float.MaxValue;
-        maxY = float.MinValue;
+        if (renderers == null || renderers.Length == 0)
+            RefreshRenderers(true);
 
-        foreach (Renderer rend in renderers)
+        float min = float.PositiveInfinity;
+        float max = float.NegativeInfinity;
+        int counted = 0;
+
+        for (int i = 0; i < renderers.Length; i++)
         {
-            Bounds bounds = rend.bounds;
-            if (bounds.min.y < minY) minY = bounds.min.y;
-            if (bounds.max.y > maxY) maxY = bounds.max.y;
+            var r = renderers[i];
+            if (!r) continue;
+
+            var b = r.bounds;
+            if (float.IsNaN(b.min.y) || float.IsNaN(b.max.y)) continue;
+            if (b.size.sqrMagnitude < 1e-8f) continue;
+
+            if (b.min.y < min) min = b.min.y;
+            if (b.max.y > max) max = b.max.y;
+            counted++;
         }
 
-        minY -= 0.2f;
-        maxY += 0.2f;
+        if (counted == 0)
+        {
+            float y = transform.position.y;
+            minY = y - 1f;
+            maxY = y + 2f;
+            Log("Bounds", "NO VALID RENDERERS — using fallback range around transform.y");
+        }
+        else
+        {
+            minY = min - 0.2f;
+            maxY = max + 0.2f;
+        }
     }
 
     void Update()
     {
         if (!isWiping) return;
 
-        wipeProgress += Time.deltaTime / wipeDuration;
+        wipeProgress += Time.deltaTime / Mathf.Max(0.0001f, wipeDuration);
         float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
 
-        foreach (Renderer rend in renderers)
+        float offset = transform.position.y;
+        float minRel = minY - offset;
+        float maxRel = maxY - offset;
+        float thrRel = actualThreshold - offset;
+
+        if (!firstUpdateLogged || verbosePerFrame)
         {
-            rend.GetPropertyBlock(propertyBlock);
-            propertyBlock.SetFloat("_WipeOffset", transform.position.y);
-            propertyBlock.SetFloat("_WipeMinY", minY - transform.position.y);
-            propertyBlock.SetFloat("_WipeMaxY", maxY - transform.position.y);
-            propertyBlock.SetFloat("_WipeTheshold", actualThreshold - transform.position.y);
-            rend.SetPropertyBlock(propertyBlock);
+            Log("Update", $"progress={wipeProgress:0.###} offsetY={offset:0.###} minRel={minRel:0.###} maxRel={maxRel:0.###} thrRel={thrRel:0.###}");
+            firstUpdateLogged = true;
+        }
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            var r = renderers[i];
+            if (!r) continue;
+
+            propertyBlock.Clear();
+            propertyBlock.SetFloat(PID_WipeOffset, offset);
+            propertyBlock.SetFloat(PID_WipeMinY, minRel);
+            propertyBlock.SetFloat(PID_WipeMaxY, maxRel);
+            propertyBlock.SetFloat(PID_WipeTheshold, thrRel);
+            propertyBlock.SetFloat(PID_WipeThreshold, thrRel);
+            r.SetPropertyBlock(propertyBlock);
         }
 
         if (!splashTriggered && wipeProgress >= splashTriggerTime)
         {
+            Log("Splash", $"trigger at progress={wipeProgress:0.###}");
             TriggerSplashAndPuddle();
             splashTriggered = true;
         }
 
-        if (wipeProgress >= 1f) isWiping = false;
+        if (wipeProgress >= 1f)
+        {
+            isWiping = false;
+            Log("Done", $"final thrRel={(maxY - offset):0.###}");
+        }
     }
 
     void TriggerSplashAndPuddle()
@@ -115,6 +198,7 @@ public class InkWipeTest : MonoBehaviour
             spawnedSplash = Instantiate(splashEffectPrefab, spawnPosition, spawnRotation);
             spawnedSplash.transform.localScale = Vector3.one * splashScale;
             spawnedSplash.Play();
+            Log("Splash", $"spawned at {spawnPosition} scale={splashScale:0.###}");
         }
 
         if (!string.IsNullOrEmpty(puddleVfxId))
@@ -131,13 +215,42 @@ public class InkWipeTest : MonoBehaviour
             Quaternion puddleRot = Quaternion.Euler(puddleRotation);
             var go = VfxPoolManager.Instance.Spawn(puddleVfxId, puddlePosition, puddleRot);
             if (go) go.transform.localScale = Vector3.one * puddleScale;
+            Log("Puddle", $"id={puddleVfxId} at {puddlePosition} scale={puddleScale:0.###} ok={(go != null)}");
+        }
+        else
+        {
+            Log("Puddle", "VfxPoolManager.Instance is null");
         }
     }
 
     public void StartWipe()
     {
+        RefreshRenderers(true);
+
         wipeProgress = 0f;
         isWiping = true;
         splashTriggered = false;
+        firstUpdateLogged = false;
+
+        FindCharacterBounds();
+        ApplyStaticPropsToAll(inkBandWidth, minY);
+
+        Log("StartWipe", $"reset; bounds minY={minY:0.###} maxY={maxY:0.###} renderers={renderers.Length}");
+    }
+
+    void OnDisable()
+    {
+        if (spawnedSplash != null)
+        {
+            Destroy(spawnedSplash.gameObject);
+            spawnedSplash = null;
+        }
+        Log("Disable", "cleanup");
+    }
+
+    void Log(string tag, string msg)
+    {
+        if (!debugLogs) return;
+        Debug.Log($"[INK][{Time.frameCount}][{tag}] {name}: {msg}", this);
     }
 }
