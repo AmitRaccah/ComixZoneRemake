@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class EnemySpawnSequence : MonoBehaviour
 {
@@ -14,16 +16,19 @@ public class EnemySpawnSequence : MonoBehaviour
     [SerializeField] private Stage[] stages;
 
     private EnemyPoolMember poolMember;
+    private EnemyPool poolRef;
     private int currentStageIndex = -1;
     private int livesRemainingInStage;
 
-    private void Awake()
+    void Awake()
     {
-        poolMember = GetComponent<EnemyPoolMember>();
+        poolRef = EnemyPool.Instance != null ? EnemyPool.Instance : FindFirstObjectByType<EnemyPool>(FindObjectsInactive.Include);
     }
 
     public void BeginSequence(string initialAssignmentId, float initialDelay)
     {
+        if (poolMember == null) poolMember = GetComponent<EnemyPoolMember>();
+
         int initialStageIndex = -1;
         for (int i = 0; i < stages.Length; i++)
         {
@@ -34,11 +39,7 @@ public class EnemySpawnSequence : MonoBehaviour
             }
         }
 
-        if (initialStageIndex == -1)
-        {
-            Debug.LogError($"Could not find an initial stage with ID '{initialAssignmentId}' for enemy {name}.", this);
-            return;
-        }
+        if (initialStageIndex == -1) return;
 
         currentStageIndex = initialStageIndex;
         livesRemainingInStage = stages[currentStageIndex].spawnCount;
@@ -73,6 +74,13 @@ public class EnemySpawnSequence : MonoBehaviour
     private void ScheduleSpawn(Stage stage, float delay, bool isFirstSpawn = false)
     {
         if (!isFirstSpawn) livesRemainingInStage--;
-        EnemyPool.Instance.ScheduleSpawn(poolMember, stage.assignmentId, stage.encounterId, delay);
+
+        var pool = poolRef != null ? poolRef : (EnemyPool.Instance != null ? EnemyPool.Instance : FindFirstObjectByType<EnemyPool>(FindObjectsInactive.Include));
+        if (pool == null) return;
+
+        if (poolMember == null) poolMember = GetComponent<EnemyPoolMember>();
+        if (poolMember == null) return;
+
+        pool.ScheduleSpawn(poolMember, stage.assignmentId, stage.encounterId, delay);
     }
 }
