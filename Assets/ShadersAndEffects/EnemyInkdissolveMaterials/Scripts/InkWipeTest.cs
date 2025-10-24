@@ -28,10 +28,6 @@ public class InkWipeTest : MonoBehaviour
     [SerializeField] private Vector3 puddleRotation = new Vector3(90f, 0.94f, 0f);
     [SerializeField] private float puddleScale = 0.44f;
 
-    [Header("Debug")]
-    [SerializeField] private bool debugLogs = true;
-    [SerializeField] private bool verbosePerFrame = false;
-
     static readonly int PID_InkBandWidth = Shader.PropertyToID("_InkBandWidth");
     static readonly int PID_WipeOffset = Shader.PropertyToID("_WipeOffset");
     static readonly int PID_WipeMinY = Shader.PropertyToID("_WipeMinY");
@@ -44,7 +40,6 @@ public class InkWipeTest : MonoBehaviour
     private float wipeProgress = 0f;
     private bool isWiping = false;
     private bool splashTriggered = false;
-    private bool firstUpdateLogged = false;
     private ParticleSystem spawnedSplash;
     private float minY;
     private float maxY;
@@ -59,13 +54,8 @@ public class InkWipeTest : MonoBehaviour
     void Start()
     {
         RefreshRenderers(true);
-        Log("Start", $"renderers={renderers.Length} autoPlay={autoPlay} useManualRange={useManualRange} posY={transform.position.y:0.###}");
-
         FindCharacterBounds();
-        Log("Bounds", $"minY={minY:0.###} maxY={maxY:0.###} height={(maxY - minY):0.###}");
-
         ApplyStaticPropsToAll(inkBandWidth, minY);
-
         if (autoPlay) StartWipe();
     }
 
@@ -134,7 +124,6 @@ public class InkWipeTest : MonoBehaviour
             float y = transform.position.y;
             minY = y - 1f;
             maxY = y + 2f;
-            Log("Bounds", "NO VALID RENDERERS — using fallback range around transform.y");
         }
         else
         {
@@ -155,12 +144,6 @@ public class InkWipeTest : MonoBehaviour
         float maxRel = maxY - offset;
         float thrRel = actualThreshold - offset;
 
-        if (!firstUpdateLogged || verbosePerFrame)
-        {
-            Log("Update", $"progress={wipeProgress:0.###} offsetY={offset:0.###} minRel={minRel:0.###} maxRel={maxRel:0.###} thrRel={thrRel:0.###}");
-            firstUpdateLogged = true;
-        }
-
         for (int i = 0; i < renderers.Length; i++)
         {
             var r = renderers[i];
@@ -177,16 +160,12 @@ public class InkWipeTest : MonoBehaviour
 
         if (!splashTriggered && wipeProgress >= splashTriggerTime)
         {
-            Log("Splash", $"trigger at progress={wipeProgress:0.###}");
             TriggerSplashAndPuddle();
             splashTriggered = true;
         }
 
         if (wipeProgress >= 1f)
-        {
             isWiping = false;
-            Log("Done", $"final thrRel={(maxY - offset):0.###}");
-        }
     }
 
     void TriggerSplashAndPuddle()
@@ -198,7 +177,6 @@ public class InkWipeTest : MonoBehaviour
             spawnedSplash = Instantiate(splashEffectPrefab, spawnPosition, spawnRotation);
             spawnedSplash.transform.localScale = Vector3.one * splashScale;
             spawnedSplash.Play();
-            Log("Splash", $"spawned at {spawnPosition} scale={splashScale:0.###}");
         }
 
         if (!string.IsNullOrEmpty(puddleVfxId))
@@ -215,11 +193,6 @@ public class InkWipeTest : MonoBehaviour
             Quaternion puddleRot = Quaternion.Euler(puddleRotation);
             var go = VfxPoolManager.Instance.Spawn(puddleVfxId, puddlePosition, puddleRot);
             if (go) go.transform.localScale = Vector3.one * puddleScale;
-            Log("Puddle", $"id={puddleVfxId} at {puddlePosition} scale={puddleScale:0.###} ok={(go != null)}");
-        }
-        else
-        {
-            Log("Puddle", "VfxPoolManager.Instance is null");
         }
     }
 
@@ -230,12 +203,9 @@ public class InkWipeTest : MonoBehaviour
         wipeProgress = 0f;
         isWiping = true;
         splashTriggered = false;
-        firstUpdateLogged = false;
 
         FindCharacterBounds();
         ApplyStaticPropsToAll(inkBandWidth, minY);
-
-        Log("StartWipe", $"reset; bounds minY={minY:0.###} maxY={maxY:0.###} renderers={renderers.Length}");
     }
 
     void OnDisable()
@@ -245,12 +215,5 @@ public class InkWipeTest : MonoBehaviour
             Destroy(spawnedSplash.gameObject);
             spawnedSplash = null;
         }
-        Log("Disable", "cleanup");
-    }
-
-    void Log(string tag, string msg)
-    {
-        if (!debugLogs) return;
-        Debug.Log($"[INK][{Time.frameCount}][{tag}] {name}: {msg}", this);
     }
 }
