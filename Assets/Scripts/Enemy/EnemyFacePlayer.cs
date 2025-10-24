@@ -7,18 +7,47 @@ public class EnemyFacePlayer : MonoBehaviour
     [SerializeField] float turnSpeed = 720f;
 
     Transform player;
+    int myId;
+    bool isDead;
 
     void Awake()
     {
+        myId = gameObject.GetInstanceID();
         var p = GameObject.FindGameObjectWithTag("Player");
         if (p) player = p.transform;
     }
 
+    void OnEnable()
+    {
+        isDead = false;
+        CoreBus.Subscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Subscribe<HealthChangedEvent>(OnHealthChanged);
+    }
+
+    void OnDisable()
+    {
+        CoreBus.Unsubscribe<HealthDepletedEvent>(OnDead);
+        CoreBus.Unsubscribe<HealthChangedEvent>(OnHealthChanged);
+    }
+
+    void OnDead(HealthDepletedEvent e)
+    {
+        if (e.entityId == myId) isDead = true;
+    }
+
+    void OnHealthChanged(HealthChangedEvent e)
+    {
+        if (e.entityId != myId) return;
+        isDead = e.isDead || e.current <= 0;
+    }
+
     void LateUpdate()
     {
-        if (!player) return;
+        if (isDead || !player) return;
+
         float dx = player.position.x - transform.position.x;
         if (Mathf.Abs(dx) <= deadZone) return;
+
         float yaw = Axis2D.YawForDx(dx);
         Quaternion target = Quaternion.Euler(0f, yaw, 0f);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, target, turnSpeed * Time.deltaTime);
