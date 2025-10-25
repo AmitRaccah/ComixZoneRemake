@@ -2008,6 +2008,14 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 2100000, guid: 401f8a82295b6f44e92753df553d526e, type: 2}
+    - target: {fileID: 2710550410077181672, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
+      propertyPath: m_Value
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2710550410077181672, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
+      propertyPath: m_MaxValue
+      value: 100
+      objectReference: {fileID: 0}
     - target: {fileID: 2807156364890797723, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: iconImage
       value: 
@@ -2026,7 +2034,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3249622158795508618, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3949898836768037204, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -2298,11 +2306,11 @@ PrefabInstance:
       objectReference: {fileID: 1831145965}
     - target: {fileID: 7836675534436075497, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7836675534436075497, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7879733911081462993, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_SizeDelta.x
@@ -2350,7 +2358,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8211526757228824452, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8997714004430768765, guid: b92cddb15a2f0904d9ce706433ff452f, type: 3}
       propertyPath: m_Material
@@ -12432,7 +12440,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2653474030131112429, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       propertyPath: maxHp
-      value: 200
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2653474030131112429, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       propertyPath: deathDelay
@@ -13118,6 +13126,22 @@ PrefabInstance:
       propertyPath: rightFootSocket
       value: 
       objectReference: {fileID: 461581024}
+    - target: {fileID: 5475519076379174595, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: attacks.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5475519076379174595, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: 'attacks.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1454cd1e7ae1af94185c076b81f972e8, type: 2}
+    - target: {fileID: 5475519076379174595, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: 'attacks.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 38c347c428204a743a1fdbafd0392451, type: 2}
+    - target: {fileID: 5475519076379174595, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
+      propertyPath: 'attacks.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9b8f27e196e81134fb04d9ca3411618c, type: 2}
     - target: {fileID: 5596094541689090943, guid: 96da49e5f3436e046a7e4feb79b152ca, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.03021276
@@ -14702,7 +14726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b63ccbcb045de48a85f1a45cc775a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attack: {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
+  attack: {fileID: 11400000, guid: 4357bc09e8d5f074cbd2ad2ba0b5c70a, type: 2}
   targetLayers:
     serializedVersion: 2
     m_Bits: 64
@@ -92338,7 +92362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1b63ccbcb045de48a85f1a45cc775a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attack: {fileID: 11400000, guid: 5a3df0bfb2058724d8fcfe842da848c1, type: 2}
+  attack: {fileID: 11400000, guid: 4a3c4caf28f115e45beb3e503d3cf0d6, type: 2}
   targetLayers:
     serializedVersion: 2
     m_Bits: 64
