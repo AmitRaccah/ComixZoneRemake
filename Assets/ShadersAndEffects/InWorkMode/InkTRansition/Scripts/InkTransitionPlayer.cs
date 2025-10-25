@@ -61,6 +61,9 @@ public class InkIntroController : MonoBehaviour
         if (playerAnimator != null && !string.IsNullOrEmpty(idleStateName))
         {
             playerAnimator.CrossFadeInFixedTime(idleStateName, 0f, 0, 0f);
+            playerAnimator.SetFloat("Speed", 0f);
+            playerAnimator.SetFloat("MotionSpeed", 1f);
+            playerAnimator.SetBool("Grounded", true);
         }
 
         if (lockLayer != null) lockLayer.IdleLockAfterIntro();

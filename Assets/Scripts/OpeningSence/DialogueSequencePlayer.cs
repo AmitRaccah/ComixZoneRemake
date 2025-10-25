@@ -1,17 +1,12 @@
 using UnityEngine;
 using System.Collections;
-using TMPro;
-using UnityEngine.UI;
 
 [System.Serializable]
 public class DialogueStep
 {
     public GameObject bubble;
-    [TextArea] public string text;
+    public GameObject textObj;
     public float duration = 2f;
-
-    public TMP_Text tmpText;
-    public Text uiText;
 }
 
 public class DialogueSequencePlayer : MonoBehaviour
@@ -29,19 +24,8 @@ public class DialogueSequencePlayer : MonoBehaviour
 
             HideAll();
 
-            if (s.bubble != null)
-            {
-                if (s.tmpText != null)
-                {
-                    s.tmpText.text = s.text;
-                }
-                else if (s.uiText != null)
-                {
-                    s.uiText.text = s.text;
-                }
-
-                s.bubble.SetActive(true);
-            }
+            if (s.bubble != null) s.bubble.SetActive(true);
+            if (s.textObj != null) s.textObj.SetActive(true);
 
             float waitT = s.duration;
             if (waitT > 0f)
@@ -57,8 +41,11 @@ public class DialogueSequencePlayer : MonoBehaviour
     {
         for (int i = 0; i < steps.Length; i++)
         {
-            if (steps[i] != null && steps[i].bubble != null)
-                steps[i].bubble.SetActive(false);
+            DialogueStep s = steps[i];
+            if (s == null) continue;
+
+            if (s.bubble != null) s.bubble.SetActive(false);
+            if (s.textObj != null) s.textObj.SetActive(false);
         }
     }
 }
