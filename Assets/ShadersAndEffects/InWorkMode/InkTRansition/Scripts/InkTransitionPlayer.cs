@@ -1,70 +1,68 @@
 using UnityEngine;
 using System.Collections;
 
-public class InkTransitionPlayer : MonoBehaviour
+public class InkIntroController : MonoBehaviour
 {
-    public Animator anim;
-    public string clipName = "InkReveal";
+    public GameObject inkRoot;
+    public Animator inkAnimator;
+    public string inkClipName = "InkReveal";
 
-    public Animator playerAnim;
-    public string playerIntroClip = "Getting_up";
+    public Animator playerAnimator;
+    public string getUpStateName = "Getting_up";
+    public string idleStateName = "Idle Walk Run Blend";
 
-    public MonoBehaviour playerController;
-
-    public bool autoRunOnStart = true;
-
-    Coroutine routine;
-
-    void Awake()
+    public IEnumerator PlayIntro(PlayerCutsceneLock lockLayer)
     {
-        if (playerController != null) playerController.enabled = false;
+        if (lockLayer != null) lockLayer.FullLockBeforeIntro();
 
-        if (playerAnim != null && !string.IsNullOrEmpty(playerIntroClip))
+        if (playerAnimator != null && !string.IsNullOrEmpty(getUpStateName))
         {
-            playerAnim.Play(playerIntroClip, 0, 0f);
-            playerAnim.Update(0f);
-            playerAnim.speed = 0f;
+            playerAnimator.Play(getUpStateName, 0, 0f);
+            playerAnimator.Update(0f);
+            playerAnimator.speed = 0f;
         }
 
-        gameObject.SetActive(true);
-    }
+        if (inkRoot != null) inkRoot.SetActive(true);
 
-    void Start()
-    {
-        if (autoRunOnStart)
+        if (inkAnimator != null && !string.IsNullOrEmpty(inkClipName))
         {
-            if (routine != null) StopCoroutine(routine);
-            routine = StartCoroutine(RunSequence());
-        }
-    }
-
-    public void PlayReveal()
-    {
-        if (routine != null) StopCoroutine(routine);
-        routine = StartCoroutine(RunSequence());
-    }
-
-    IEnumerator RunSequence()
-    {
-        anim.Play(clipName, 0, 0f);
-        yield return null;
-        float inkLen = anim.GetCurrentAnimatorStateInfo(0).length;
-        yield return new WaitForSeconds(inkLen);
-
-        if (playerAnim != null)
-        {
-            playerAnim.speed = 1f;
-            playerAnim.CrossFadeInFixedTime(playerIntroClip, 0f, 0, 0f);
+            inkAnimator.Play(inkClipName, 0, 0f);
         }
 
         yield return null;
-        float introLen = playerAnim.GetCurrentAnimatorStateInfo(0).length;
-        yield return new WaitForSeconds(introLen);
 
-        if (playerController != null) playerController.enabled = true;
+        float inkLen = 0f;
+        if (inkAnimator != null)
+        {
+            inkLen = inkAnimator.GetCurrentAnimatorStateInfo(0).length;
+        }
 
-        gameObject.SetActive(false);
+        if (inkLen > 0f)
+            yield return new WaitForSeconds(inkLen);
 
-        routine = null;
+        if (playerAnimator != null)
+        {
+            playerAnimator.speed = 1f;
+        }
+
+        yield return null;
+
+        float getUpLen = 0f;
+        if (playerAnimator != null)
+        {
+            getUpLen = playerAnimator.GetCurrentAnimatorStateInfo(0).length;
+        }
+
+        if (getUpLen > 0f)
+            yield return new WaitForSeconds(getUpLen);
+
+        if (inkRoot != null) inkRoot.SetActive(false);
+
+        if (playerAnimator != null && !string.IsNullOrEmpty(idleStateName))
+        {
+            playerAnimator.CrossFadeInFixedTime(idleStateName, 0f, 0, 0f);
+        }
+
+        if (lockLayer != null) lockLayer.IdleLockAfterIntro();
     }
 }
