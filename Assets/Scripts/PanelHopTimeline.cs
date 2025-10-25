@@ -25,12 +25,14 @@ public class PanelHopTimeline : MonoBehaviour
     public string enterRoomId;
 
     [Header("Facing")]
+    public float entryYaw = 90f;
     public float finalYaw = -90f;
 
     private bool triggered = false;
     private bool playerInsideGate = false;
     private static PanelHopTimeline waitingCrouchGate = null;
     private bool waitingForGrounded = false;
+    private bool pendingFinalFacing = false;
 
     void Awake()
     {
@@ -90,6 +92,12 @@ public class PanelHopTimeline : MonoBehaviour
         {
             StartTimeline();
         }
+
+        if (pendingFinalFacing && controller != null && controller.Grounded)
+        {
+            pendingFinalFacing = false;
+            DoFinalFacingNow();
+        }
     }
 
     void StartTimeline()
@@ -111,6 +119,8 @@ public class PanelHopTimeline : MonoBehaviour
 
         ResetAllInputs();
         ClearCombatBuffer();
+
+        ApplyEntryFacing();
 
         if (playerAnimator != null) playerAnimator.applyRootMotion = true;
 
@@ -212,7 +222,28 @@ public class PanelHopTimeline : MonoBehaviour
         if (InputBuffer.Instance != null) InputBuffer.Instance.Clear();
     }
 
+    void ApplyEntryFacing()
+    {
+        if (player != null) player.rotation = Quaternion.Euler(0f, entryYaw, 0f);
+        if (playerAnimator != null)
+        {
+            bool faceRight = Mathf.Abs(Mathf.DeltaAngle(entryYaw, 90f)) < 1f;
+            playerAnimator.SetBool("Mirror", !faceRight);
+        }
+    }
+
     void ApplyFinalFacing()
+    {
+        if (controller != null && !controller.Grounded)
+        {
+            pendingFinalFacing = true;
+            return;
+        }
+
+        DoFinalFacingNow();
+    }
+
+    void DoFinalFacingNow()
     {
         if (player != null) player.rotation = Quaternion.Euler(0f, finalYaw, 0f);
         if (playerAnimator != null)
