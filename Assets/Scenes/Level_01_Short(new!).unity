@@ -14454,6 +14454,76 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!1 &254345094
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 254345095}
+  - component: {fileID: 254345097}
+  - component: {fileID: 254345096}
+  m_Layer: 0
+  m_Name: FireDMG
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &254345095
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254345094}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 714348756}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &254345096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254345094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1b63ccbcb045de48a85f1a45cc775a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attack: {fileID: 11400000, guid: b2d96912bcc40ee4db97cd46dc7c3d9a, type: 2}
+  targetLayers:
+    serializedVersion: 2
+    m_Bits: 64
+--- !u!65 &254345097
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 254345094}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.84033203, y: 0.666687, z: 0.8368087}
+  m_Center: {x: 0.055603027, y: 0.90843964, z: 0.015069902}
 --- !u!43 &256663164
 Mesh:
   m_ObjectHideFlags: 0
@@ -16301,6 +16371,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8974952067974198408, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 840191423}
+    - targetCorrespondingSourceObject: {fileID: 8974952067974198408, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 254345095}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c954e7750a3cbc49a1596400135c4b9, type: 3}
 --- !u!1 &299929615
