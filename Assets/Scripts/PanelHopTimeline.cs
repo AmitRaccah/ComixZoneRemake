@@ -32,7 +32,10 @@ public class PanelHopTimeline : MonoBehaviour
     private bool playerInsideGate = false;
     private static PanelHopTimeline waitingCrouchGate = null;
     private bool waitingForGrounded = false;
+
     private bool pendingFinalFacing = false;
+    private bool waitLandingEdge = false;
+    private bool wasGroundedAtStop = false;
 
     void Awake()
     {
@@ -93,10 +96,24 @@ public class PanelHopTimeline : MonoBehaviour
             StartTimeline();
         }
 
-        if (pendingFinalFacing && controller != null && controller.Grounded)
+        if (pendingFinalFacing && controller != null)
         {
-            pendingFinalFacing = false;
-            DoFinalFacingNow();
+            if (waitLandingEdge)
+            {
+                if (wasGroundedAtStop)
+                {
+                    if (!controller.Grounded) wasGroundedAtStop = false;
+                }
+                else
+                {
+                    if (controller.Grounded)
+                    {
+                        pendingFinalFacing = false;
+                        waitLandingEdge = false;
+                        DoFinalFacingNow();
+                    }
+                }
+            }
         }
     }
 
@@ -136,7 +153,7 @@ public class PanelHopTimeline : MonoBehaviour
         waitingForGrounded = false;
 
         DisableRootMotion();
-        ApplyFinalFacing();
+        QueueFinalFacingAfterLanding();
         SafeReleaseControl();
         ResetAllInputs();
         ClearCombatBuffer();
@@ -179,7 +196,7 @@ public class PanelHopTimeline : MonoBehaviour
 
         if (cc != null) cc.enabled = true;
 
-        ApplyFinalFacing();
+        QueueFinalFacingAfterLanding();
 
         if (trackerFollow != null) trackerFollow.ResetSync();
     }
@@ -232,15 +249,11 @@ public class PanelHopTimeline : MonoBehaviour
         }
     }
 
-    void ApplyFinalFacing()
+    void QueueFinalFacingAfterLanding()
     {
-        if (controller != null && !controller.Grounded)
-        {
-            pendingFinalFacing = true;
-            return;
-        }
-
-        DoFinalFacingNow();
+        pendingFinalFacing = true;
+        waitLandingEdge = true;
+        wasGroundedAtStop = controller != null && controller.Grounded;
     }
 
     void DoFinalFacingNow()
