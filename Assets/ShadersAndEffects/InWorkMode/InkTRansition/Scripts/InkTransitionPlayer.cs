@@ -18,6 +18,14 @@ public class InkTransitionPlayer : MonoBehaviour
     void Awake()
     {
         if (playerController != null) playerController.enabled = false;
+
+        if (playerAnim != null && !string.IsNullOrEmpty(playerIntroClip))
+        {
+            playerAnim.Play(playerIntroClip, 0, 0f);
+            playerAnim.Update(0f);
+            playerAnim.speed = 0f;
+        }
+
         gameObject.SetActive(true);
     }
 
@@ -43,7 +51,12 @@ public class InkTransitionPlayer : MonoBehaviour
         float inkLen = anim.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(inkLen);
 
-        playerAnim.CrossFadeInFixedTime(playerIntroClip, 0f, 0, 0f);
+        if (playerAnim != null)
+        {
+            playerAnim.speed = 1f;
+            playerAnim.CrossFadeInFixedTime(playerIntroClip, 0f, 0, 0f);
+        }
+
         yield return null;
         float introLen = playerAnim.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(introLen);
