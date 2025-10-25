@@ -6,6 +6,7 @@ public class OpeningCutsceneDirector : MonoBehaviour
     public InkIntroController intro;
     public DialogueSequencePlayer dialogue;
     public PlayerCutsceneLock lockLayer;
+    public WizzardExitSequence npcExit;
 
     public bool autoRunOnStart = true;
 
@@ -33,6 +34,16 @@ public class OpeningCutsceneDirector : MonoBehaviour
 
         if (dialogue != null)
             yield return StartCoroutine(dialogue.PlaySequence());
+
+        if (npcExit != null)
+        {
+            npcExit.Begin();
+
+            while (npcExit.gameObject.activeSelf)
+            {
+                yield return null;
+            }
+        }
 
         if (lockLayer != null)
             lockLayer.FinalUnlock();
