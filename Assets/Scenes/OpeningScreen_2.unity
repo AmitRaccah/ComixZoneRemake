@@ -9968,7 +9968,7 @@ Animator:
   m_GameObject: {fileID: 8816409571580677273}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 0d573488442087441b65e3b001e7919f, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9b47bc0fb813c4240a4c70b752b27eb7, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -14211,6 +14211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8147571823452345891}
   - component: {fileID: 2878312205133417561}
+  - component: {fileID: 8816409571580677274}
   m_Layer: 0
   m_Name: Sketch
   m_TagString: Untagged
@@ -14218,6 +14219,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!111 &8816409571580677274
+Animation:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8816409571580677273}
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Animation: {fileID: 7400000, guid: 4049b7b93bd011245982488a1781a55a, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 4049b7b93bd011245982488a1781a55a, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 1
+  m_AnimatePhysics: 0
+  m_UpdateMode: 0
+  m_CullingType: 0
 --- !u!33 &8915597079674140013
 MeshFilter:
   m_ObjectHideFlags: 0
