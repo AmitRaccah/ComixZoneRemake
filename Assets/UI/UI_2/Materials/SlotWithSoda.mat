@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: _InkToonBaseWizard 1
-  m_Shader: {fileID: -6465566751694194690, guid: 77321f2a462f7864a933a78a90a1d066, type: 3}
+  m_Name: SlotWithSoda
+  m_Shader: {fileID: -6465566751694194690, guid: 7389d891373d8fa43b7d08e98e0afbee, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -25,11 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _NoiseTex:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 76a848499f6f4a041ba21195b6f05186, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
@@ -46,40 +42,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AmbientStrength: 0.077
-    - _Diffuse_softness: 0.932
-    - _Diffuse_threshold: 1.2
-    - _DripDensity: 3.43
-    - _DripSpeed: 0.33
-    - _DropSize: 0.08
-    - _FalloffAmount: 14.08
-    - _FresnelSize: 4.97
-    - _LightingCutoff: 5.65
-    - _NoiseScale: 1.82
+    - _AmbientStrength: 0.02
+    - _Diffuse_softness: 0.1
+    - _Diffuse_threshold: 0.9
+    - _FalloffAmount: 13
+    - _FresnelSize: 3
+    - _LightingCutoff: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Saturation: 1
+    - _Saturation: 0.5
     - _Smoothness: 1000
-    - _SpecIntensity: 0.85
-    - _SpecPower: 96
-    - _SpecWidth: 0.0751
     - _Step: 3
-    - _TrailWidth: 0.36
-    - _WetBoost: 9.08
-    - _WetSmoothness: 0.169
-    - _WettDark: 0.206
-    - _YBase: 0
-    - _YHeight: 2
     m_Colors:
-    - _DiffuseColor: {r: 0, g: 0, b: 0, a: 1}
-    - _EmissionColor: {r: 1024, g: 1024, b: 1024, a: 0}
+    - _DiffuseColor: {r: 1, g: 1, b: 1, a: 1}
     - _FresnelColor: {r: 1, g: 1, b: 1, a: 1}
-    - _HighlightColor: {r: 0.8490566, g: 0.8490566, b: 0.8490566, a: 0}
-    - _InkColor: {r: 0, g: 0, b: 0, a: 0}
     - _SpecularColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &861109724733220656
+--- !u!114 &2355583709291650920
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
