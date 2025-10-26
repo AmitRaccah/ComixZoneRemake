@@ -1795,7 +1795,7 @@ PrefabInstance:
     - target: {fileID: 3085336156958782557, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: ShapeModule.m_SkinnedMeshRenderer
       value: 
-      objectReference: {fileID: 4790654146703885454}
+      objectReference: {fileID: 0}
     - target: {fileID: 6412891523081259212, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: m_Name
       value: InkDripsAndPuddle (2)
@@ -1869,7 +1869,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d17296afc948f541a4fbd96a8bf7cd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxId: WizInk
+  vfxId: WizInk2
 --- !u!1001 &51177858
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -83536,7 +83536,7 @@ PrefabInstance:
     - target: {fileID: 3085336156958782557, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: ShapeModule.m_SkinnedMeshRenderer
       value: 
-      objectReference: {fileID: 8409145272994567846}
+      objectReference: {fileID: 0}
     - target: {fileID: 6412891523081259212, guid: 31db5072c12a25444a8a72ac01fd3d52, type: 3}
       propertyPath: m_Name
       value: InkDripsAndPuddle (1)
@@ -83610,7 +83610,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d17296afc948f541a4fbd96a8bf7cd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  vfxId: WizInk
+  vfxId: WizInk1
 --- !u!43 &1295399084
 Mesh:
   m_ObjectHideFlags: 0
@@ -91067,37 +91067,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!1 &1473843337
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1473843338}
-  m_Layer: 0
-  m_Name: InkDropsWizard
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1473843338
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1473843337}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -456.70944, y: 0.7329999, z: 0.16516101}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1476027054
 GameObject:
   m_ObjectHideFlags: 0
@@ -190327,6 +190296,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8743952206423183978}
   - component: {fileID: 8409145272994567846}
+  - component: {fileID: 8743952206423183979}
   m_Layer: 0
   m_Name: Scene_002
   m_TagString: Untagged
@@ -190722,6 +190692,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1345968677346440224}
   - component: {fileID: 4790654146703885454}
+  - component: {fileID: 5499003257563981826}
   m_Layer: 0
   m_Name: Scene_004
   m_TagString: Untagged
@@ -190729,6 +190700,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &5499003257563981826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5499003257563981825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd7dae1407f6f3a4fa0fc7be6f3c5871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxId: WizInk2
+  offset: {x: 0, y: 0, z: 0}
+  faceSameRotation: 0
 --- !u!4 &5516149205592534325
 Transform:
   m_ObjectHideFlags: 0
@@ -205562,6 +205548,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8660790809110418155}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8743952206423183979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5387069492703495574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd7dae1407f6f3a4fa0fc7be6f3c5871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  vfxId: WizInk1
+  offset: {x: 0, y: 0, z: 0}
+  faceSameRotation: 0
 --- !u!33 &8754141181489024467
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -206284,7 +206285,6 @@ SceneRoots:
   - {fileID: 1850938355}
   - {fileID: 2228337011415842721}
   - {fileID: 247684661}
-  - {fileID: 1473843338}
   - {fileID: 8660790809110418155}
   - {fileID: 1603164202}
   - {fileID: 447991809}
