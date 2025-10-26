@@ -36,6 +36,8 @@ public class PanelHopTimeline : MonoBehaviour
     private bool pendingFinalFacing = false;
     private bool waitLandingEdge = false;
     private bool wasGroundedAtStop = false;
+    private float facingQueueTime = 0f;
+    private const float finalFacingFallbackDelay = 0.1f;
 
     void Awake()
     {
@@ -102,7 +104,19 @@ public class PanelHopTimeline : MonoBehaviour
             {
                 if (wasGroundedAtStop)
                 {
-                    if (!controller.Grounded) wasGroundedAtStop = false;
+                    if (!controller.Grounded)
+                    {
+                        wasGroundedAtStop = false;
+                    }
+                    else
+                    {
+                        if (Time.time - facingQueueTime > finalFacingFallbackDelay)
+                        {
+                            pendingFinalFacing = false;
+                            waitLandingEdge = false;
+                            DoFinalFacingNow();
+                        }
+                    }
                 }
                 else
                 {
@@ -254,6 +268,7 @@ public class PanelHopTimeline : MonoBehaviour
         pendingFinalFacing = true;
         waitLandingEdge = true;
         wasGroundedAtStop = controller != null && controller.Grounded;
+        facingQueueTime = Time.time;
     }
 
     void DoFinalFacingNow()
