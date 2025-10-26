@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7100534885337236150}
   - component: {fileID: 6221103969884081734}
   - component: {fileID: 4060471261182577302}
-  - component: {fileID: 7251271440483613394}
+  - component: {fileID: 5205992752919484018}
   m_Layer: 0
   m_Name: Paper_PlanePickUp
   m_TagString: Untagged
@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7106329063091921944}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.013492258, y: -0.9140324, z: 0.37889296, w: 0.14423184}
+  m_LocalRotation: {x: -0.013493021, y: -0.91403306, z: 0.3788917, w: 0.14423093}
   m_LocalPosition: {x: -460.31, y: 0.53, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -66,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 803446601a3f3e442ae18fed6f2827a9, type: 2}
+  - {fileID: 2100000, guid: f6fc780fedfcbe54dbc3a826307a7ee8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupType: 2
   pickupRange: 0.46
---- !u!114 &7251271440483613394
+--- !u!114 &5205992752919484018
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,12 +111,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7106329063091921944}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c42e83528aed2254f8b146a6dd575a03, type: 3}
+  m_Script: {fileID: 11500000, guid: 6975c81b5d5411d4a939b2ad639d23c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationAxis: 2
-  rotationSpeed: 30
-  hoverHeight: 0.1
-  hoverSpeed: 1
-  rotationSpeedOffset: 10
-  hoverHeightOffset: 0.05
+  glowColor: {r: 0.25943398, g: 0.6678193, b: 1, a: 1}
+  size: 1.14
+  brightness: 7.55
+  groundHeight: 0.42
+  rotation: {x: 214.3, y: 8.2, z: -69.1}
+  rimIntensity: 1.48
+  rimPower: 3.28

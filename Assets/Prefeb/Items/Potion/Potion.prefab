@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 5613254213960143775}
   - component: {fileID: 3842622721766455953}
   - component: {fileID: 6910139766301248521}
-  - component: {fileID: 5686314709734863078}
+  - component: {fileID: 8342937227883110303}
   m_Layer: 0
   m_Name: Potion
   m_TagString: Untagged
@@ -205,7 +205,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8378486299137949896}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.6948799, y: -0.5923917, z: -0.095617905, w: -0.3963222}
+  m_LocalRotation: {x: 0.69488037, y: -0.5923892, z: -0.09561777, w: -0.39632505}
   m_LocalPosition: {x: -461.55725, y: 0.476, z: -0.436}
   m_LocalScale: {x: 0.8474874, y: 0.8474874, z: 0.8474874}
   m_ConstrainProportionsScale: 0
@@ -246,7 +246,7 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: bb3c578d6f3fd8243a7f2076b307e608, type: 2}
   - {fileID: 2100000, guid: bb3c578d6f3fd8243a7f2076b307e608, type: 2}
-  - {fileID: 2100000, guid: 0dd7cb65da86f1f4b862e53029075f1f, type: 2}
+  - {fileID: 2100000, guid: a66749d4a4d24f846881b3de75274dc3, type: 2}
   - {fileID: 2100000, guid: 733209b2addf5f449a6ef01d94639994, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -304,7 +304,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pickupType: 1
   pickupRange: 0.38
---- !u!114 &5686314709734863078
+--- !u!114 &8342937227883110303
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -313,12 +313,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8378486299137949896}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c42e83528aed2254f8b146a6dd575a03, type: 3}
+  m_Script: {fileID: 11500000, guid: 6975c81b5d5411d4a939b2ad639d23c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationAxis: 1
-  rotationSpeed: 30
-  hoverHeight: 0.05
-  hoverSpeed: 1
-  rotationSpeedOffset: 10
-  hoverHeightOffset: 0.05
+  glowColor: {r: 1, g: 0.015686274, b: 0.07977796, a: 1}
+  size: 0.74
+  brightness: 2.11
+  groundHeight: 0.548
+  rotation: {x: 180, y: 2.71, z: -1.86}
+  rimIntensity: 1.15
+  rimPower: 0.13

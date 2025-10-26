@@ -11,8 +11,10 @@ public class PickupGlowEffect : MonoBehaviour
     public Color glowColor = Color.yellow;
     [Range(0.5f, 5f)] public float size = 2.5f;
     [Range(0f, 10f)] public float brightness = 3f;
-    [Range(0f, 1f)] public float groundHeight = 0.1f;
-    [Range(0f, 360f)] public float rotation = 0f;
+    [Range(0f, 5f)] 
+    [Tooltip("Distance below the item to place the ground glow")]
+    public float groundHeight = 0.5f;
+    public Vector3 rotation = new Vector3(90, 0, 0); // X, Y, Z rotation
     
     [Header("Object Rim Glow")]
     [Range(0f, 3f)] public float rimIntensity = 0.5f;
@@ -27,7 +29,7 @@ public class PickupGlowEffect : MonoBehaviour
     private Color lastColor;
     private float lastBrightness;
     private float lastGroundHeight;
-    private float lastRotation;
+    private Vector3 lastRotation;
     private Vector3 lastPosition;
     
     void Start()
@@ -146,8 +148,9 @@ public class PickupGlowEffect : MonoBehaviour
     {
         if (glowQuad != null)
         {
+            // Use the item's position but offset the ground plane down by groundHeight
             Vector3 pos = transform.position;
-            pos.y = groundHeight;
+            pos.y = transform.position.y - groundHeight; // Offset DOWN from item, not absolute world Y
             glowQuad.transform.position = pos;
         }
     }
@@ -156,8 +159,8 @@ public class PickupGlowEffect : MonoBehaviour
     {
         if (glowQuad != null)
         {
-            // Face up (90 degrees on X) + custom rotation on Y axis
-            glowQuad.transform.rotation = Quaternion.Euler(90, rotation, 0);
+            // Apply full 3D rotation (X, Y, Z)
+            glowQuad.transform.rotation = Quaternion.Euler(rotation);
         }
     }
     

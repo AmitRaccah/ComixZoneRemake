@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8570278349728903584}
   - component: {fileID: 3874029988372392578}
   - component: {fileID: 3546332612299571151}
+  - component: {fileID: 310099062201547229}
   m_Layer: 0
   m_Name: Knife
   m_TagString: Untagged
@@ -42,7 +43,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4751174165125525104}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  m_Mesh: {fileID: 9042771077998628582, guid: 17923fa935cdcef4790b9b0144c3bab4, type: 3}
 --- !u!23 &8570278349728903584
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -66,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 1d14da6924eefc14395ff8d079ab3d5c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -122,4 +123,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupType: 0
-  pickupRange: 0.23
+  pickupRange: 0.46
+--- !u!114 &310099062201547229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4751174165125525104}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6975c81b5d5411d4a939b2ad639d23c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  glowColor: {r: 0, g: 0.5551176, b: 1, a: 1}
+  size: 3.41
+  brightness: 1.07
+  groundHeight: 0.632
+  rotation: {x: 172.4, y: 3, z: 0}
+  rimIntensity: 2.18
+  rimPower: 1.28
