@@ -61758,7 +61758,7 @@ VideoPlayer:
   m_TargetTexture: {fileID: 0}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
-  m_TargetMaterialProperty: <noninit>
+  m_TargetMaterialProperty: 
   m_RenderMode: 3
   m_AspectRatio: 2
   m_DataSource: 0
@@ -61784,15 +61784,15 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 896578648}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69352b6d868acbf4081286e2237f0e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brightness: 0.24
-  emissionIntensity: 0.66
+  brightness: 0
+  emissionIntensity: 0
   screenTint: {r: 0.4481132, g: 1, b: 0.4515277, a: 1}
-  useHDREmission: 1
+  useHDREmission: 0
   emissionColor: {r: 1, g: 1, b: 1, a: 1}
   liveUpdate: 1
 --- !u!1001 &905227673
@@ -120630,6 +120630,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0.382
       objectReference: {fileID: 0}
+    - target: {fileID: 673024747140805166, guid: 3c768f8eabdd702429234b46287c85a2, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 923828627578087648, guid: 1af3a24492f40c946afb390357e1353e, type: 3}
     - target: {fileID: 4222334724612617714, guid: 3c768f8eabdd702429234b46287c85a2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -457.85
@@ -163920,6 +163924,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 9.022
       objectReference: {fileID: 0}
+    - target: {fileID: 673024747140805166, guid: d4139ae60394de745b2a141f089ba241, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 923828627578087648, guid: 1af3a24492f40c946afb390357e1353e, type: 3}
     - target: {fileID: 4222334724612617714, guid: d4139ae60394de745b2a141f089ba241, type: 3}
       propertyPath: m_LocalPosition.x
       value: -458.42
