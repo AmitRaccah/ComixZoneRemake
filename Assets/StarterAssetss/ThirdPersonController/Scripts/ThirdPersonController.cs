@@ -131,7 +131,6 @@ namespace StarterAssets
 
         private void Update()
         {
-
             BlockController bc = GetComponent<BlockController>();
             if (bc != null)
                 bc.SetBlockInput(_input.block);
@@ -141,27 +140,18 @@ namespace StarterAssets
             var locker = GetComponent<MovementLock>();
             bool locked = locker != null && locker.IsLocked;
 
-            if (locked && !prevLocked)         
+            if (locked)
             {
-                _input.jump = false;           
+                _input.jump = false;
             }
+
             prevLocked = locked;
 
             JumpAndGravity();
             GroundedCheck();
-            Move();            
-
-            //if (_input.punch)
-            //{
-            //    InputBuffer.Instance.Add(InputType.Punch);
-            //    _input.punch = false;
-            //}
-            //if (_input.heavyPunch)
-            //{
-            //    InputBuffer.Instance.Add(InputType.HeavyPunch);
-            //    _input.heavyPunch = false;
-            //}
+            Move();
         }
+
 
 
 
