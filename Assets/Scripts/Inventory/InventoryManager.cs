@@ -36,7 +36,6 @@ public class InventoryManager : MonoBehaviour
         {
             return true;
         }
-        Debug.Log("Inventory Full!");
         return false;
     }
 
@@ -71,10 +70,10 @@ public class InventoryManager : MonoBehaviour
                 return false;
 
         ItemSlot slot = itemSlots.Find(s => s != null && s.m_item == null);
-        if (slot == null) { Debug.Log("Inventory Full!"); return false; }
+        if (slot == null) { return false; }
 
         Item newItem = GetItemDefinition(type);
-        if (newItem == null) { Debug.LogWarning($"AddItem: Item not found for {type}"); return false; }
+        if (newItem == null) { return false; }
 
         inventory.Add(newItem);
         slot.Initialize(newItem);

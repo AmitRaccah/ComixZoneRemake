@@ -42,13 +42,11 @@ public class EnemyPool : MonoBehaviour
     {
         if (enemy == null || !enemiesInScene.Contains(enemy))
         {
-            Debug.LogError($"Attempted to start a sequence for an enemy '{enemy?.name}' that is not registered in the EnemyPool.", this);
             return;
         }
         var sequence = enemy.GetComponent<EnemySpawnSequence>();
         if (sequence == null)
         {
-            Debug.LogError($"The enemy '{enemy.name}' is missing the EnemySpawnSequence component.", enemy);
             return;
         }
         sequence.BeginSequence(initialAssignmentId, initialDelay);
@@ -58,7 +56,6 @@ public class EnemyPool : MonoBehaviour
     {
         if (!assignmentLookup.TryGetValue(assignmentId, out Transform spawnPoint))
         {
-            Debug.LogError($"Spawn Assignment with ID '{assignmentId}' was not found.", this);
             return;
         }
         member.PrepareForSpawn(spawnPoint, assignmentId, encounterId);
