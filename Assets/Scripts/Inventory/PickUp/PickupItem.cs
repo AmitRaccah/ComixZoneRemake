@@ -1,20 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class PickupItem : MonoBehaviour
 {
     [SerializeField] private PickupType pickupType;
     [SerializeField] private float pickupRange = 2f;
-
-
-    //   [SerializeField] private LayerMask playerLayerMask;
-
-
-    private Transform player;
-
-    private void Awake()
-    {
-    }
 
     private void OnEnable() =>
         CoreBus.Subscribe<PlayerPickUpEvent>(TryPickup);
@@ -26,15 +15,25 @@ public class PickupItem : MonoBehaviour
     {
         if (!IsPlayerInRange()) return;
 
+        Item def = InventoryManager.Instance.GetItemDefinition(pickupType);
+
         bool accepted = InventoryManager.Instance.TryAddItem(pickupType);
+
+        var sfx = FindObjectOfType<SfxPlayer>();
 
         if (accepted)
         {
+            if (sfx && def && def.pickupSuccessCue != null)
+                sfx.Play(def.pickupSuccessCue, transform.position, null);
+
             AnimationHelper.Instance?.Trigger("Pickup");
-            Debug.Log("Picked up! " + pickupType);
             Destroy(gameObject);
         }
-
+        else
+        {
+            if (sfx && def && def.pickupFailCue != null)
+                sfx.Play(def.pickupFailCue, transform.position, null);
+        }
     }
 
     bool IsPlayerInRange()
@@ -46,18 +45,6 @@ public class PickupItem : MonoBehaviour
         return false;
     }
 
-
-
-    //private bool PlayerInRange()
-    //{
-    //    if (player == null)
-    //        player = GameObject.FindGameObjectWithTag("Player")?.transform;
-
-    //    if (player == null) return false;
-
-    //    return Vector3.Distance(transform.position, player.position) <= pickupRange;
-    //}
-
 #if UNITY_EDITOR
     private void OnDrawGizmosSelected()
     {
@@ -66,4 +53,3 @@ public class PickupItem : MonoBehaviour
     }
 #endif
 }
-

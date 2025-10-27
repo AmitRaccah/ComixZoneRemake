@@ -7,7 +7,6 @@ public class KnifePoolManager : MonoBehaviour
 
     [SerializeField] private List<KnifePoolMember> knivesInScene;
 
-    // Round-robin pointer per knifeId so multiple instances של אותו סוג יחולקו בצורה מאוזנת
     private readonly Dictionary<string, int> nextIndexPerId = new Dictionary<string, int>();
 
     private void Awake()
@@ -16,9 +15,6 @@ public class KnifePoolManager : MonoBehaviour
         Instance = this;
     }
 
-    /// <summary>
-    /// Spawns a pooled knife with full spin control (X/Y/Z in degrees per second).
-    /// </summary>
     public KnifePoolMember Spawn(
         string knifeId,
         Vector3 position,

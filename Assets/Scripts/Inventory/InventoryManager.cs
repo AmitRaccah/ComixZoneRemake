@@ -73,11 +73,7 @@ public class InventoryManager : MonoBehaviour
         ItemSlot slot = itemSlots.Find(s => s != null && s.m_item == null);
         if (slot == null) { Debug.Log("Inventory Full!"); return false; }
 
-        Item newItem = null;
-        for (int i = 0; i < allItems.Count; i++)
-            if (allItems[i] != null && allItems[i].pickupType == type)
-            { newItem = allItems[i]; break; }
-
+        Item newItem = GetItemDefinition(type);
         if (newItem == null) { Debug.LogWarning($"AddItem: Item not found for {type}"); return false; }
 
         inventory.Add(newItem);
@@ -87,5 +83,11 @@ public class InventoryManager : MonoBehaviour
         return true;
     }
 
-
+    public Item GetItemDefinition(PickupType type)
+    {
+        for (int i = 0; i < allItems.Count; i++)
+            if (allItems[i] != null && allItems[i].pickupType == type)
+                return allItems[i];
+        return null;
+    }
 }
