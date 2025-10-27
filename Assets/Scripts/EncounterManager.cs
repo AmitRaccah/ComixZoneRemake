@@ -13,6 +13,10 @@ public class EncounterManager : MonoBehaviour
         public float delay;
         public HazardSide side;
         public float warningLeadTime = 0.5f;
+         public int warningFlashes = 3;
+         public float warningDuration = 0.8f;
+        public AudioClip warningSfxOverride;
+
     }
 
     [System.Serializable]
@@ -104,7 +108,7 @@ public class EncounterManager : MonoBehaviour
     {
         float wait = Mathf.Max(0f, t.delay - Mathf.Max(0f, t.warningLeadTime));
         if (wait > 0f) yield return new WaitForSeconds(wait);
-        HazardWarningUI.Instance.Ping(t.side);
+        HazardWarningUI.Instance.Ping(t.side, t.warningFlashes, t.warningDuration, t.warningSfxOverride);
     }
 
     void SetObjectsActive(Encounter enc, bool isActive)

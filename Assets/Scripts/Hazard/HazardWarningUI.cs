@@ -19,9 +19,9 @@ public class HazardWarningUI : MonoBehaviour
         if (right?.image) right.image.enabled = false;
     }
 
-    public void Ping(HazardSide side)
+    public void Ping(HazardSide side, int flashesOverride = -1, float durationOverride = -1f, AudioClip sfxOverride = null)
     {
-        if (side == HazardSide.Left) left?.Ping(this, audioSrc);
-        else right?.Ping(this, audioSrc);
+        if (side == HazardSide.Left) left?.Ping(this, audioSrc, flashesOverride, durationOverride, sfxOverride);
+        else right?.Ping(this, audioSrc, flashesOverride, durationOverride, sfxOverride);
     }
 }
