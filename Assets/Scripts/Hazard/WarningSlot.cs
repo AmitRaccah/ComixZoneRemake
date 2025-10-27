@@ -6,23 +6,14 @@ using System.Collections;
 public class WarningSlot
 {
     public Image image;
-    public AudioClip sfx;
-    [Min(1)] public int flashes = 3;
-    [Min(0f)] public float duration = 0.8f;
 
     Coroutine _co;
 
-    public void Ping(MonoBehaviour host, AudioSource audio, int flashesOverride = -1, float durationOverride = -1f, AudioClip sfxOverride = null)
+    public void Ping(MonoBehaviour host, int flashes, float duration)
     {
         if (!image) return;
         if (_co != null) host.StopCoroutine(_co);
-        var clip = sfxOverride ? sfxOverride : sfx;
-        if (clip && audio) audio.PlayOneShot(clip);
-
-        int flashesToUse = flashesOverride > 0 ? flashesOverride : Mathf.Max(1, flashes);
-        float durationToUse = durationOverride >= 0f ? Mathf.Max(0f, durationOverride) : Mathf.Max(0f, duration);
-
-        _co = host.StartCoroutine(Blink(flashesToUse, durationToUse));
+        _co = host.StartCoroutine(Blink(flashes, duration));
     }
 
     IEnumerator Blink(int flashesCount, float totalDuration)

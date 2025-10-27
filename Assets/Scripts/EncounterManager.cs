@@ -5,6 +5,15 @@ using System.Collections.Generic;
 public class EncounterManager : MonoBehaviour
 {
     [System.Serializable]
+    public class WarningConfig
+    {
+        [Min(0f)] public float leadTime = 0.5f;
+        [Min(1)] public int flashes = 3;
+        [Min(0f)] public float duration = 0.8f;
+        public AudioClip sfx;
+    }
+
+    [System.Serializable]
     public class HazardTrigger
     {
         public int onKills;
@@ -12,11 +21,7 @@ public class EncounterManager : MonoBehaviour
         public string assignmentId;
         public float delay;
         public HazardSide side;
-        public float warningLeadTime = 0.5f;
-         public int warningFlashes = 3;
-         public float warningDuration = 0.8f;
-        public AudioClip warningSfxOverride;
-
+        public WarningConfig warning;
     }
 
     [System.Serializable]
@@ -83,7 +88,7 @@ public class EncounterManager : MonoBehaviour
 
             EnemyPool.Instance.ScheduleSpawn(t.hazard, t.assignmentId, encounterId, t.delay);
 
-            if (HazardWarningUI.Instance)
+            if (HazardWarningUI.Instance && t.warning != null)
                 StartCoroutine(WarningRoutine(t));
         }
     }
@@ -106,14 +111,21 @@ public class EncounterManager : MonoBehaviour
 
     IEnumerator WarningRoutine(HazardTrigger t)
     {
-        float wait = Mathf.Max(0f, t.delay - Mathf.Max(0f, t.warningLeadTime));
+        float leadTime = Mathf.Max(0f, t.warning.leadTime);
+        float wait = Mathf.Max(0f, t.delay - leadTime);
         if (wait > 0f) yield return new WaitForSeconds(wait);
-        HazardWarningUI.Instance.Ping(t.side, t.warningFlashes, t.warningDuration, t.warningSfxOverride);
+
+        int flashes = Mathf.Max(1, t.warning.flashes);
+        float dur = Mathf.Max(0f, t.warning.duration);
+        AudioClip clip = t.warning.sfx;
+
+        HazardWarningUI.Instance.Ping(t.side, flashes, dur, clip);
     }
 
     void SetObjectsActive(Encounter enc, bool isActive)
     {
         if (enc.objectsToEnable == null) return;
-        foreach (var go in enc.objectsToEnable) if (go) go.SetActive(isActive);
+        foreach (var go in enc.objectsToEnable)
+            if (go) go.SetActive(isActive);
     }
 }

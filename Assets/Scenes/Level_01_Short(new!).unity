@@ -4985,7 +4985,11 @@ MonoBehaviour:
       assignmentId: 13
       delay: 2
       side: 1
-      warningLeadTime: 4
+      warning:
+        leadTime: 0
+        flashes: 5
+        duration: 10
+        sfx: {fileID: 8300000, guid: 754d375366979bb45873dd03a4fefdfc, type: 3}
     enemyTriggers:
     - onKills: 1
       enemy: {fileID: 980265605}
@@ -5008,7 +5012,11 @@ MonoBehaviour:
       assignmentId: 18
       delay: 2
       side: 0
-      warningLeadTime: 1
+      warning:
+        leadTime: 0
+        flashes: 3
+        duration: 0.8
+        sfx: {fileID: 0}
     enemyTriggers: []
     currentKills: 0
     isCompleted: 0
@@ -5045,19 +5053,31 @@ MonoBehaviour:
       assignmentId: 16
       delay: 2
       side: 0
-      warningLeadTime: 1
+      warning:
+        leadTime: 0
+        flashes: 3
+        duration: 0.8
+        sfx: {fileID: 0}
     - onKills: 2
       hazard: {fileID: 1481970033}
       assignmentId: 15
       delay: 2
       side: 1
-      warningLeadTime: 0.5
+      warning:
+        leadTime: 0
+        flashes: 3
+        duration: 0.8
+        sfx: {fileID: 0}
     - onKills: 6
       hazard: {fileID: 1481970033}
       assignmentId: 17
       delay: 2
       side: 0
-      warningLeadTime: 0.5
+      warning:
+        leadTime: 0
+        flashes: 3
+        duration: 0.8
+        sfx: {fileID: 0}
     enemyTriggers:
     - onKills: 1
       enemy: {fileID: 413739089}
@@ -71895,14 +71915,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   left:
     image: {fileID: 1738531475}
-    sfx: {fileID: 8300000, guid: 754d375366979bb45873dd03a4fefdfc, type: 3}
-    flashes: 3
-    duration: 0.8
   right:
     image: {fileID: 1567114966}
-    sfx: {fileID: 8300000, guid: 754d375366979bb45873dd03a4fefdfc, type: 3}
-    flashes: 3
-    duration: 0.8
 --- !u!82 &1042337569
 AudioSource:
   m_ObjectHideFlags: 0
@@ -102723,7 +102737,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 19a25bc9f4c92aa4cbea9887aa2c79d4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 22675551cd72df744a382a9bd93c41a3, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -109915,7 +109929,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 19a25bc9f4c92aa4cbea9887aa2c79d4, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4746d70dcb018e64c823b38b52091a34, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -177578,14 +177592,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   left:
     image: {fileID: 0}
-    sfx: {fileID: 8300000, guid: 754d375366979bb45873dd03a4fefdfc, type: 3}
-    flashes: 3
-    duration: 0.8
   right:
     image: {fileID: 0}
-    sfx: {fileID: 8300000, guid: 754d375366979bb45873dd03a4fefdfc, type: 3}
-    flashes: 3
-    duration: 0.8
 --- !u!82 &8067808121113660116
 AudioSource:
   m_ObjectHideFlags: 0
@@ -188247,6 +188255,7 @@ SceneRoots:
   - {fileID: 3436447117489928808}
   - {fileID: 1458774180}
   - {fileID: 868991817521987135}
+  - {fileID: 1268907087}
   - {fileID: 1097498377}
   - {fileID: 1044197103}
   - {fileID: 1878413142}
@@ -188263,7 +188272,6 @@ SceneRoots:
   - {fileID: 1073614905}
   - {fileID: 463285961}
   - {fileID: 4335666709427305677}
-  - {fileID: 1268907087}
   - {fileID: 1250603451}
   - {fileID: 802047414}
   - {fileID: 871340802}
