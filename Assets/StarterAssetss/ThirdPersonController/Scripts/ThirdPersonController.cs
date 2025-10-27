@@ -254,8 +254,10 @@ namespace StarterAssets
             }
             else
             {
-                _shouldRotate = false;
-                IsTurning = false;
+                if (!allowZMovementTemporarily && Mathf.Abs(delta) > TurnCompleteTolerance)
+                {
+                    transform.rotation = Quaternion.Euler(0, _desiredRotationY, 0);
+                }
             }
 
             Vector3 targetDirection = inputDirection;
