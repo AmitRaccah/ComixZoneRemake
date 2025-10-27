@@ -18,7 +18,6 @@ public class VfxPoolMember : MonoBehaviour
 
         if (mainParticleSystem == null)
         {
-            Debug.LogError("VfxPoolMember requires a ParticleSystem on the root object to function.", this);
             enabled = false;
             return;
         }

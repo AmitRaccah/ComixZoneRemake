@@ -10,7 +10,8 @@ Shader "Custom/BrightGroundGlow"
     
     SubShader
     {
-        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" "IgnoreProjector"="True" }
+        LOD 200
         
         Blend One One
         ZWrite Off
@@ -21,6 +22,8 @@ Shader "Custom/BrightGroundGlow"
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 3.0
+            #pragma multi_compile_fog
             #include "UnityCG.cginc"
             
             struct appdata
@@ -33,6 +36,7 @@ Shader "Custom/BrightGroundGlow"
             {
                 float4 pos : SV_POSITION;
                 float2 uv : TEXCOORD0;
+                UNITY_FOG_COORDS(1)
             };
             
             float4 _Color;
@@ -45,6 +49,7 @@ Shader "Custom/BrightGroundGlow"
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = v.uv;
+                UNITY_TRANSFER_FOG(o, o.pos);
                 return o;
             }
             
@@ -64,7 +69,7 @@ Shader "Custom/BrightGroundGlow"
                 
                 // Fade at edges
                 float edgeFade = 1.0 - smoothstep(0.35, 0.5, dist / pulse);
-                if (edgeFade <= 0.0) return float4(0, 0, 0, 0);
+                if (edgeFade <= 0.0) return fixed4(0, 0, 0, 0);
                 
                 // Grid
                 float2 grid = uv * _Scale * 2.0;
@@ -93,9 +98,13 @@ Shader "Custom/BrightGroundGlow"
                 // Bright color
                 float3 col = _Color.rgb * dot * _Intensity;
                 
-                return float4(col, 1);
+                fixed4 finalColor = fixed4(col, 1);
+                UNITY_APPLY_FOG(i.fogCoord, finalColor);
+                return finalColor;
             }
             ENDCG
         }
     }
+    
+    FallBack "Particles/Additive"
 }

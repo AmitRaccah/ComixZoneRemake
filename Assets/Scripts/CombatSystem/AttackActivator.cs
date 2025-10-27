@@ -46,9 +46,6 @@ public class AttackActivator : MonoBehaviour
     public void SetCurrentAttack(AttackData data)
     {
         _currentAttack = data;
-#if UNITY_EDITOR
-        if (data) Debug.Log($"[Activator] CurrentAttack ← {data.attackName}", this);
-#endif
     }
 
     public void BeginHitbox(string attackKey = "")

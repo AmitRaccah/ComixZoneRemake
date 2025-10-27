@@ -15,7 +15,6 @@ public class InputBuffer : MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
-            Debug.LogWarning("[InputBuffer] Duplicate found, destroying this one.", this);
             Destroy(gameObject);
             return;
         }
@@ -76,9 +75,6 @@ public class InputBuffer : MonoBehaviour
             }
         }
 
-        if (log && (now % 30 == 0))
-        {
-            Debug.Log("[InputBuffer] count=" + buffer.Count);
-        }
+
     }
 }

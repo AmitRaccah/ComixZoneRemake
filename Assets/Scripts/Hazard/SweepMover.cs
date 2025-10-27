@@ -3,7 +3,6 @@ using System.Collections;
 
 [DisallowMultipleComponent]
 [RequireComponent(typeof(EnemyPoolMember))]
-[RequireComponent(typeof(Collider))]
 public class SweepMover : MonoBehaviour
 {
     [SerializeField] private float speed = 8f;

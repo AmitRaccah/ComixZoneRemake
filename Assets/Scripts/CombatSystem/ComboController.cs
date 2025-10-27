@@ -186,7 +186,6 @@ public class ComboController : MonoBehaviour
         resetT = 0.4f;
 
         var stepData = curSeq.steps[idx].attack;
-        Debug.Log($"[Combo] Step {idx}: attack = {stepData.attackName}");
         activator.SetCurrentAttack(stepData);
 
 
@@ -195,7 +194,6 @@ public class ComboController : MonoBehaviour
 
     public void EnableChain()
     {
-        Debug.Log("EnableChain()");
         windowStep = step;
     }
 
