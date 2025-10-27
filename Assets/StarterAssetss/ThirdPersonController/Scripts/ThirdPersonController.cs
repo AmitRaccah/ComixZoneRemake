@@ -118,7 +118,7 @@ namespace StarterAssets
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM 
+#if ENABLE_INPUT_SYSTEM
             _playerInput = GetComponent<PlayerInput>();
 #else
             Debug.LogError("Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
@@ -127,6 +127,7 @@ namespace StarterAssets
             AssignAnimationIDs();
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+            SyncDesiredYawWithTransform();
         }
 
         private void Update()
@@ -254,8 +255,10 @@ namespace StarterAssets
             }
             else
             {
-                _shouldRotate = false;
-                IsTurning = false;
+                if (!allowZMovementTemporarily && Mathf.Abs(delta) > TurnCompleteTolerance)
+                {
+                    transform.rotation = Quaternion.Euler(0, _desiredRotationY, 0);
+                }
             }
 
             Vector3 targetDirection = inputDirection;
@@ -342,6 +345,21 @@ namespace StarterAssets
                 _animator.SetBool("Mirror", !faceRight);
             }
         }
+
+        private void SyncDesiredYawWithTransform()
+        {
+            float currentYaw = transform.eulerAngles.y;
+            float snapToRight = Mathf.Abs(Mathf.DeltaAngle(currentYaw, 90f));
+            float snapToLeft = Mathf.Abs(Mathf.DeltaAngle(currentYaw, -90f));
+            _desiredRotationY = snapToRight <= snapToLeft ? 90f : -90f;
+
+            if (_hasAnimator && _animator != null)
+            {
+                bool faceRight = Mathf.Abs(Mathf.DeltaAngle(_desiredRotationY, 90f)) < 1f;
+                _animator.SetBool("Mirror", !faceRight);
+            }
+        }
+
 
         private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
