@@ -42,7 +42,6 @@ public class VfxPoolManager : MonoBehaviour
             }
         }
 
-        Debug.LogWarning($"VfxPoolManager: No available effect with ID '{vfxId}' found. Consider adding more copies to the scene.", this);
         return null;
     }
 

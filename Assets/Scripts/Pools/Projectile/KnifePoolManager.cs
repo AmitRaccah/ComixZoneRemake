@@ -44,7 +44,6 @@ public class KnifePoolManager : MonoBehaviour
             }
         }
 
-        Debug.LogWarning($"KnifePoolManager: No available knife with ID '{knifeId}' found. Add more copies to the scene.", this);
         return null;
     }
 
