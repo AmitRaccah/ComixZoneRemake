@@ -1607,15 +1607,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e69a78dca7602949b0146ee62c16217, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  transitionText: Loading...
+  transitionText: "No, no, no\u2014what the hell?!"
   showTextOnTransition: 1
   textColor: {r: 1, g: 1, b: 1, a: 1}
   fontSize: 48
   customFont: {fileID: 12800000, guid: bb21a49c47b2ffc48bc18277c1f51db2, type: 3}
-  textDelayAfterBlackScreen: 0
-  textFadeInDuration: 1
-  textDisplayDuration: 2
-  textFadeOutDuration: 1
+  textDelayAfterBlackScreen: 1.3
+  textFadeInDuration: 2
+  textDisplayDuration: 3
+  textFadeOutDuration: 0
   textAlignment: 4
   textOffset: {x: 0, y: 0}
 --- !u!4 &472616703
@@ -3741,7 +3741,7 @@ MonoBehaviour:
     fadeOutDuration: 2
   gameMusic:
     clip: {fileID: 8300000, guid: 326169c90325f4b4f93498ed9826989c, type: 3}
-    startOffset: 30
+    startOffset: 0
     endOffset: 0
     volume: 0.253
     loop: 1
