@@ -58,6 +58,18 @@ public class DiegeticUIManager : MonoBehaviour
     [SerializeField] private float transitionEndSoundOffset = 0f; // Play this many seconds BEFORE delay ends (0 = at the very end)
     [SerializeField] private float transitionSoundVolume = 1f;
     
+    [Header("Music & Text Management")]
+    [SerializeField] private MusicManager musicManager;
+    [SerializeField] private BlackScreenTextManager textManager;
+    [SerializeField] private bool fadeOutMenuMusicOnTransition = true;
+    [SerializeField] private float menuMusicFadeOutDuration = 2f;
+    [SerializeField] private bool playTransitionMusicDuringBlackScreen = true;
+    [Tooltip("When should transition music START? (seconds after clicking New Game, 0 = immediately)")]
+    [SerializeField] private float transitionMusicStartDelay = 0f;
+    [SerializeField] private bool playGameMusicAfterTransition = true;
+    [SerializeField] private bool showTransitionText = true;
+    [SerializeField] [TextArea(2, 5)] private string customTransitionText = "";
+    
     private bool actionInProgress = false;
     private GameObject currentlyHovered = null;
     private Material[] originalMaterials;
@@ -122,6 +134,32 @@ public class DiegeticUIManager : MonoBehaviour
         if (enableFadeEffect)
         {
             CreateFadeCanvas();
+        }
+        
+        // Find or validate managers
+        FindManagers();
+    }
+    
+    void FindManagers()
+    {
+        // Find MusicManager if not assigned
+        if (musicManager == null)
+        {
+            musicManager = FindObjectOfType<MusicManager>();
+            if (musicManager == null)
+            {
+                Debug.LogWarning("DiegeticUIManager: No MusicManager found in scene. Music features will be disabled.");
+            }
+        }
+        
+        // Find BlackScreenTextManager if not assigned
+        if (textManager == null)
+        {
+            textManager = FindObjectOfType<BlackScreenTextManager>();
+            if (textManager == null && showTransitionText)
+            {
+                Debug.LogWarning("DiegeticUIManager: No BlackScreenTextManager found in scene. Text display will be disabled.");
+            }
         }
     }
     
@@ -219,69 +257,102 @@ public class DiegeticUIManager : MonoBehaviour
     {
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        GameObject hoveredObject = null;
         
         if (Physics.Raycast(ray, out hit))
         {
             GameObject hitObject = hit.collider.gameObject;
             
-            // Check if it's one of our buttons
-            if (hitObject == newGameButton || hitObject == resumeButton || 
-                hitObject == settingsButton || hitObject == exitButton)
+            // Check if we're hovering over a button
+            if (IsButton(hitObject))
             {
-                hoveredObject = hitObject;
+                if (currentlyHovered != hitObject)
+                {
+                    // Clear previous hover
+                    ClearHoverEffect();
+                    
+                    // Apply new hover
+                    currentlyHovered = hitObject;
+                    ApplyHoverEffect(hitObject);
+                    
+                    // Play hover sound
+                    PlaySound(hoverSound);
+                }
+            }
+            else
+            {
+                ClearHoverEffect();
             }
         }
-        
-        // If we're hovering over a different object than before
-        if (hoveredObject != currentlyHovered)
+        else
         {
-            // Reset the previously hovered object
-            if (currentlyHovered != null)
-            {
-                ResetMaterial(currentlyHovered);
-            }
-            
-            // Brighten the newly hovered object
-            if (hoveredObject != null)
-            {
-                BrightenMaterial(hoveredObject);
-                PlaySound(hoverSound); // Play hover sound
-            }
-            
-            currentlyHovered = hoveredObject;
+            ClearHoverEffect();
         }
     }
     
-    void BrightenMaterial(GameObject obj)
+    bool IsButton(GameObject obj)
     {
-        GameObject[] buttons = { newGameButton, resumeButton, settingsButton, exitButton };
-        
-        for (int i = 0; i < buttons.Length; i++)
+        return obj == newGameButton || obj == resumeButton || 
+               obj == settingsButton || obj == exitButton;
+    }
+    
+    void ApplyHoverEffect(GameObject button)
+    {
+        Renderer renderer = button.GetComponent<Renderer>();
+        if (renderer != null && renderer.material != null)
         {
-            if (buttons[i] == obj && buttonRenderers[i] != null)
+            // Get the emission color
+            if (renderer.material.HasProperty("_EmissionColor"))
             {
-                Color originalColor = originalMaterials[i].color;
-                Color brightColor = originalColor * brightnessMultiplier;
-                brightColor.a = originalColor.a; // Keep original alpha
-                buttonRenderers[i].material.color = brightColor;
-                break;
+                Color emissionColor = renderer.material.GetColor("_EmissionColor");
+                Color brighterColor = emissionColor * brightnessMultiplier;
+                renderer.material.SetColor("_EmissionColor", brighterColor);
+            }
+            else if (renderer.material.HasProperty("_Color"))
+            {
+                Color baseColor = renderer.material.GetColor("_Color");
+                Color brighterColor = baseColor * brightnessMultiplier;
+                renderer.material.SetColor("_Color", brighterColor);
             }
         }
     }
     
-    void ResetMaterial(GameObject obj)
+    void ClearHoverEffect()
     {
-        GameObject[] buttons = { newGameButton, resumeButton, settingsButton, exitButton };
-        
-        for (int i = 0; i < buttons.Length; i++)
+        if (currentlyHovered != null)
         {
-            if (buttons[i] == obj && buttonRenderers[i] != null)
+            Renderer renderer = currentlyHovered.GetComponent<Renderer>();
+            if (renderer != null)
             {
-                buttonRenderers[i].material.color = originalMaterials[i].color;
-                break;
+                // Find the original material for this button
+                int index = GetButtonIndex(currentlyHovered);
+                if (index >= 0 && index < originalMaterials.Length && originalMaterials[index] != null)
+                {
+                    // Restore emission color
+                    if (renderer.material.HasProperty("_EmissionColor") && 
+                        originalMaterials[index].HasProperty("_EmissionColor"))
+                    {
+                        renderer.material.SetColor("_EmissionColor", 
+                            originalMaterials[index].GetColor("_EmissionColor"));
+                    }
+                    else if (renderer.material.HasProperty("_Color") && 
+                             originalMaterials[index].HasProperty("_Color"))
+                    {
+                        renderer.material.SetColor("_Color", 
+                            originalMaterials[index].GetColor("_Color"));
+                    }
+                }
             }
+            currentlyHovered = null;
         }
+    }
+    
+    int GetButtonIndex(GameObject button)
+    {
+        if (button == newGameButton) return 0;
+        if (button == resumeButton) return 1;
+        if (button == settingsButton) return 2;
+        if (button == exitButton) return 3;
+        return -1;
     }
 
     void CheckForButtonClick()
@@ -291,139 +362,65 @@ public class DiegeticUIManager : MonoBehaviour
         
         if (Physics.Raycast(ray, out hit))
         {
-            GameObject clickedObject = hit.collider.gameObject;
+            GameObject hitObject = hit.collider.gameObject;
             
-            // Check which button was clicked
-            if (clickedObject == newGameButton)
+            // Check if settings is open and we should disable menu interaction
+            bool settingsIsOpen = settingsPanel != null && settingsPanel.activeSelf;
+            
+            if (hitObject == newGameButton && !(settingsIsOpen && disableMenuInteractionWhenSettingsOpen))
             {
                 OnNewGameClicked();
             }
-            else if (clickedObject == resumeButton)
+            else if (hitObject == resumeButton && !(settingsIsOpen && disableMenuInteractionWhenSettingsOpen))
             {
                 OnResumeClicked();
             }
-            else if (clickedObject == settingsButton)
+            else if (hitObject == settingsButton)
             {
                 OnSettingsClicked();
             }
-            else if (clickedObject == exitButton)
+            else if (hitObject == exitButton && !(settingsIsOpen && disableMenuInteractionWhenSettingsOpen))
             {
                 OnExitClicked();
             }
-            // If settings panel is open and we clicked something that's not part of it, close it
-            else if (settingsPanel != null && settingsPanel.activeSelf && !IsPartOfSettingsPanel(clickedObject))
-            {
-                CloseSettings();
-            }
         }
-        // Clicked on nothing and settings is open - close it
-        else if (settingsPanel != null && settingsPanel.activeSelf)
-        {
-            CloseSettings();
-        }
-    }
-    
-    bool IsPartOfSettingsPanel(GameObject obj)
-    {
-        // Check if the clicked object is the settings panel or a child of it
-        Transform current = obj.transform;
-        while (current != null)
-        {
-            if (current.gameObject == settingsPanel)
-                return true;
-            current = current.parent;
-        }
-        return false;
     }
 
     void OnNewGameClicked()
     {
+        if (actionInProgress)
+            return;
+        
         actionInProgress = true;
-        
-        // Reset hover effect
-        if (currentlyHovered != null)
-        {
-            ResetMaterial(currentlyHovered);
-            currentlyHovered = null;
-        }
-        
         PlaySound(clickSound); // Play click sound
-        
         Debug.Log("New Game clicked!");
         
         if (newGameAnimation != null)
         {
-            if (!string.IsNullOrEmpty(animationName))
-            {
-                newGameAnimation.Play(animationName);
-            }
-            else
-            {
-                newGameAnimation.Play();
-            }
+            // Play the animation
+            string clipName = string.IsNullOrEmpty(animationName) 
+                ? newGameAnimation.clip.name 
+                : animationName;
             
+            newGameAnimation.Play(clipName);
             StartCoroutine(WaitForAnimationAndLoadScene());
         }
         else
         {
-            // If no animation, play start sound and go straight to fade
-            StartCoroutine(NoAnimationTransition());
+            // No animation, just fade and load
+            StartCoroutine(FadeAndLoadScene(sceneToLoad));
         }
     }
     
-    IEnumerator NoAnimationTransition()
-    {
-        // Play transition start sound
-        if (transitionStartSound != null)
-        {
-            if (transitionStartSoundDelay > 0)
-            {
-                yield return new WaitForSeconds(transitionStartSoundDelay);
-            }
-            PlaySound(transitionStartSound, transitionSoundVolume);
-        }
-        
-        // Fade and load scene
-        yield return StartCoroutine(FadeAndLoadScene(sceneToLoad));
-    }
-    
-    void OnDestroy()
-    {
-        // Clean up material copies to avoid memory leaks
-        if (originalMaterials != null)
-        {
-            foreach (Material mat in originalMaterials)
-            {
-                if (mat != null)
-                {
-                    Destroy(mat);
-                }
-            }
-        }
-    }
-
     void OnResumeClicked()
     {
         PlaySound(clickSound); // Play click sound
         Debug.Log("Resume clicked!");
-        
-        // Add your resume logic here
-        // For example: Time.timeScale = 1; or load saved game state
-        
-        // Example: Hide cursor and unpause
-        if (manageCursor)
-        {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-        
-        // You might want to disable the menu UI here
-        gameObject.SetActive(false);
+        // Add your resume game logic here
     }
-
+    
     void OnSettingsClicked()
     {
-        PlaySound(clickSound); // Play click sound
         Debug.Log("Settings clicked!");
         ToggleSettings();
     }
@@ -503,6 +500,12 @@ public class DiegeticUIManager : MonoBehaviour
             yield return null;
         }
         
+        // Start transition music with delay (MusicManager handles the timing)
+        if (playTransitionMusicDuringBlackScreen && musicManager != null)
+        {
+            musicManager.PlayTransitionMusic(transitionMusicStartDelay);
+        }
+        
         // Play transition start sound after delay
         if (transitionStartSound != null)
         {
@@ -535,6 +538,12 @@ public class DiegeticUIManager : MonoBehaviour
             // Start fade while animation is still playing
             StartCoroutine(FadeToBlack());
             
+            // Fade out menu music if enabled
+            if (fadeOutMenuMusicOnTransition && musicManager != null)
+            {
+                musicManager.StopMusic(true, menuMusicFadeOutDuration);
+            }
+            
             // Wait for animation to finish
             while (newGameAnimation.IsPlaying(clipName))
             {
@@ -553,6 +562,25 @@ public class DiegeticUIManager : MonoBehaviour
             if (enableFadeEffect)
             {
                 yield return StartCoroutine(FadeToBlack());
+            }
+            
+            // Fade out menu music if enabled
+            if (fadeOutMenuMusicOnTransition && musicManager != null)
+            {
+                musicManager.StopMusic(true, menuMusicFadeOutDuration);
+            }
+        }
+        
+        // NOW show text on black screen (like original!)
+        if (showTransitionText && textManager != null)
+        {
+            if (!string.IsNullOrEmpty(customTransitionText))
+            {
+                textManager.ShowTransitionText(customTransitionText);
+            }
+            else
+            {
+                textManager.ShowTransitionText();
             }
         }
         
@@ -613,15 +641,46 @@ public class DiegeticUIManager : MonoBehaviour
             yield return new WaitForSeconds(delayBeforeLoad);
         }
         
+        // Play game music if enabled (will continue into the next scene)
+        if (playGameMusicAfterTransition && musicManager != null)
+        {
+            musicManager.PlayGameMusic();
+        }
+        
         // Load the scene (black screen will persist through transition)
         LoadScene(sceneName);
     }
     
     IEnumerator FadeAndLoadScene(string sceneName)
     {
+        // Start transition music immediately
+        if (playTransitionMusicDuringBlackScreen && musicManager != null)
+        {
+            musicManager.PlayTransitionMusic(transitionMusicStartDelay);
+        }
+        
         if (enableFadeEffect && fadeImage != null)
         {
             yield return StartCoroutine(FadeToBlack());
+        }
+        
+        // Fade out menu music if enabled
+        if (fadeOutMenuMusicOnTransition && musicManager != null)
+        {
+            musicManager.StopMusic(true, menuMusicFadeOutDuration);
+        }
+        
+        // Show transition text on black screen (like original!)
+        if (showTransitionText && textManager != null)
+        {
+            if (!string.IsNullOrEmpty(customTransitionText))
+            {
+                textManager.ShowTransitionText(customTransitionText);
+            }
+            else
+            {
+                textManager.ShowTransitionText();
+            }
         }
         
         yield return StartCoroutine(DelayAndLoadScene(sceneName));
