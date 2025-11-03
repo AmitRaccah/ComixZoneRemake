@@ -25,6 +25,8 @@ Material:
   m_Parent: {fileID: 2100000, guid: 92c147aa19e14564684eeb6fa90e0b2d, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
+  - _DETAIL_SCALED
+  - _NORMALMAP
   - _OCCLUSIONMAP
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -44,7 +46,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 13bb77ec512f0ca43a40cbcb1e64a585, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 2800000, guid: 7e7ddfbcd0bb45442b3c8876d20a43c0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 2800000, guid: f9b4e28bf2c8b3f4ab94105b319ae0f9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -58,6 +68,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _BumpScale: 1
+    - _DetailAlbedoMapScale: 0.3
+    - _DetailNormalMapScale: 2
     - _Glossiness: 0
     - _OcclusionStrength: 0.777
     m_Colors:
