@@ -51,7 +51,7 @@ public class DeathHandler : MonoBehaviour
         if (isDying) return;
         isDying = true;
 
-        SetCollisionEnabled(false);
+       // SetCollisionEnabled(false);
 
         if (anim != null)
             anim.SetTrigger(deathTriggerName);
