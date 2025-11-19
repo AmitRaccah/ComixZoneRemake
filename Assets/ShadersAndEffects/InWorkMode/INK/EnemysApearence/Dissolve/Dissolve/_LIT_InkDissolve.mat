@@ -33,7 +33,7 @@ Material:
   stringTagMap: {}
   disabledShaderPasses:
   - MOTIONVECTORS
-  m_LockedProperties: 
+  m_LockedProperties: _QueueControl
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -55,16 +55,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Ambient_Strength: 0.2
-    - _Diffuse_softness: 0.54
-    - _Diffuse_threshold: 1.2
+    - _Ambient_Strength: 0.105
+    - _Diffuse_softness: 0.554
+    - _Diffuse_threshold: 1.119
     - _Falloff_Amount: 9.38
-    - _Fresnel_Sharpness: 3
+    - _Fresnel_Sharpness: 3.14
     - _InkBandWidth: 0.312
-    - _Lighting_Cutoff: 7.55
+    - _Lighting_Cutoff: 3.75
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Saturation: 0.622
+    - _Saturation: 0.91
     - _Smoothness: 1000
     - _Step: 3
     - _WipeMaxY: 3
@@ -73,9 +73,9 @@ Material:
     - _WipeTheshold: 0.784
     m_Colors:
     - _Diffuse_Color: {r: 1, g: 1, b: 1, a: 0}
-    - _Fresnel_Color: {r: 1, g: 0.8367378, b: 0.031372547, a: 0}
+    - _Fresnel_Color: {r: 1, g: 1, b: 1, a: 0}
     - _Inkcolor: {r: 0, g: 0, b: 0, a: 0}
-    - _Specular_Color: {r: 1, g: 0.6018832, b: 0, a: 0}
+    - _Specular_Color: {r: 0.6961997, g: 0.990566, b: 0.9836397, a: 0}
     - _specColor: {r: 2, g: 2, b: 2, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

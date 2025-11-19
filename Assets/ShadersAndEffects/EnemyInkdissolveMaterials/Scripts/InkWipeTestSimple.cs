@@ -7,6 +7,11 @@ public class InkWipeTestSimple : MonoBehaviour
     [SerializeField] private float wipeDuration = 2f;
     [SerializeField] private bool autoPlay = true;
     
+    [Header("Y Range Settings")]
+    [SerializeField] private bool useManualRange = false;
+    [SerializeField] private float manualMinY = -1f;
+    [SerializeField] private float manualMaxY = 2f;
+    
     [Header("Drip Effect")]
     [SerializeField] private InkDripController dripController;
     
@@ -18,7 +23,7 @@ public class InkWipeTestSimple : MonoBehaviour
     [SerializeField] private float splashScale = 0.17f;
     
     [Header("Puddle Effect")]
-    [SerializeField] private ParticleSystem puddleEffectPrefab;  // Changed from string ID to prefab!
+    [SerializeField] private ParticleSystem puddleEffectPrefab;
     [SerializeField] private float puddleDelay = 0.3f;
     [SerializeField] private Vector3 puddlePositionOffset = Vector3.zero;
     [SerializeField] private Vector3 puddleRotation = new Vector3(90f, 0.94f, 0f);
@@ -39,14 +44,37 @@ public class InkWipeTestSimple : MonoBehaviour
         renderers = GetComponentsInChildren<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
         
-        FindCharacterBounds();
+        if (useManualRange)
+        {
+            minY = manualMinY;
+            maxY = manualMaxY;
+            Debug.Log($"Using MANUAL range: {minY:F2} to {maxY:F2}");
+        }
+        else
+        {
+            FindCharacterBounds();
+            Debug.Log($"Using AUTO bounds: {minY:F2} to {maxY:F2}");
+        }
         
-        Debug.Log($"Character height: {minY:F2} to {maxY:F2}");
+        // Set the shader's Y range to match this object!
+        SetShaderYRange();
         
         if (autoPlay)
         {
             StartWipe();
         }
+    }
+    
+    void SetShaderYRange()
+    {
+        foreach (Renderer rend in renderers)
+        {
+            rend.GetPropertyBlock(propertyBlock);
+            propertyBlock.SetFloat("_WipeMinY", minY);
+            propertyBlock.SetFloat("_WipeMaxY", maxY);
+            rend.SetPropertyBlock(propertyBlock);
+        }
+        Debug.Log($"Set shader _WipeMinY={minY:F2}, _WipeMaxY={maxY:F2}");
     }
     
     void FindCharacterBounds()
@@ -72,13 +100,13 @@ public class InkWipeTestSimple : MonoBehaviour
         
         wipeProgress += Time.deltaTime / wipeDuration;
         
-        // Remap 0-1 to actual character height
+        // Remap 0-1 to actual Y range
         float actualThreshold = Mathf.Lerp(minY, maxY, wipeProgress);
         
         foreach (Renderer rend in renderers)
         {
             rend.GetPropertyBlock(propertyBlock);
-            propertyBlock.SetFloat("_WipeTheshold", actualThreshold);
+            propertyBlock.SetFloat("_WipeTheshold", actualThreshold);  // Note: matches your shader's spelling
             rend.SetPropertyBlock(propertyBlock);
         }
         
@@ -146,6 +174,9 @@ public class InkWipeTestSimple : MonoBehaviour
         wipeProgress = 0f;
         isWiping = true;
         splashTriggered = false;
+        
+        // Make sure shader knows the Y range
+        SetShaderYRange();
         
         if (dripController != null)
         {
